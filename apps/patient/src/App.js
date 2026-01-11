@@ -47,22 +47,40 @@ function App() {
   };
 
   // Simple QR code visualization (in production, use a library like qrcode.react)
-  const QRCodeDisplay = ({ data }) => (
-    <div className="qr-display">
-      <div className="qr-grid">
-        {Array.from({ length: 256 }).map((_, i) => (
-          <div 
-            key={i} 
-            className="qr-pixel"
-            style={{
-              background: Math.random() > 0.5 ? '#000' : '#fff'
-            }}
-          />
-        ))}
+  const QRCodeDisplay = ({ data }) => {
+    // Generate deterministic pattern based on data hash
+    const generatePattern = (str) => {
+      let hash = 0;
+      for (let i = 0; i < str.length; i++) {
+        hash = ((hash << 5) - hash) + str.charCodeAt(i);
+        hash = hash & hash;
+      }
+      return hash;
+    };
+    
+    const seed = generatePattern(data);
+    
+    return (
+      <div className="qr-display">
+        <div className="qr-grid">
+          {Array.from({ length: 256 }).map((_, i) => {
+            // Use seed to generate deterministic pattern
+            const value = (seed + i * 7919) % 2; // 7919 is a prime number for better distribution
+            return (
+              <div 
+                key={i} 
+                className="qr-pixel"
+                style={{
+                  background: value === 0 ? '#000' : '#fff'
+                }}
+              />
+            );
+          })}
+        </div>
+        <p className="qr-info">Scan this code at reception</p>
       </div>
-      <p className="qr-info">Scan this code at reception</p>
-    </div>
-  );
+    );
+  };
 
   return (
     <div className="App">

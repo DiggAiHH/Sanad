@@ -1,0 +1,11 @@
+{
+  "name": "@sanad/shared",
+  "version": "1.0.0",
+  "description": "Shared utilities and components",
+  "main": "src/index.js",
+  "private": true,
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  }
+}

@@ -1,0 +1,162 @@
+# ==============================================================================
+# SANAD - GitHub Actions: Build & Deploy Flutter Web Apps
+# ==============================================================================
+
+name: Deploy Web Apps
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'apps/**'
+      - 'packages/**'
+  workflow_dispatch:
+
+env:
+  API_BASE_URL: ${{ secrets.API_BASE_URL }}
+
+jobs:
+  build:
+    name: Build Flutter Web Apps
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.16.0'
+          channel: 'stable'
+          cache: true
+
+      - name: Install Melos
+        run: dart pub global activate melos
+
+      - name: Bootstrap
+        run: melos bootstrap
+
+      - name: Build Admin App
+        run: |
+          cd apps/admin_app
+          flutter build web --release --dart-define=API_BASE_URL=$API_BASE_URL
+
+      - name: Build MFA App
+        run: |
+          cd apps/mfa_app
+          flutter build web --release --dart-define=API_BASE_URL=$API_BASE_URL
+
+      - name: Build Staff App
+        run: |
+          cd apps/staff_app
+          flutter build web --release --dart-define=API_BASE_URL=$API_BASE_URL
+
+      - name: Build Patient App
+        run: |
+          cd apps/patient_app
+          flutter build web --release --dart-define=API_BASE_URL=$API_BASE_URL
+
+      - name: Upload Admin Build
+        uses: actions/upload-artifact@v4
+        with:
+          name: admin-web
+          path: apps/admin_app/build/web
+
+      - name: Upload MFA Build
+        uses: actions/upload-artifact@v4
+        with:
+          name: mfa-web
+          path: apps/mfa_app/build/web
+
+      - name: Upload Staff Build
+        uses: actions/upload-artifact@v4
+        with:
+          name: staff-web
+          path: apps/staff_app/build/web
+
+      - name: Upload Patient Build
+        uses: actions/upload-artifact@v4
+        with:
+          name: patient-web
+          path: apps/patient_app/build/web
+
+  deploy-admin:
+    name: Deploy Admin to Cloudflare
+    needs: build
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Download Build
+        uses: actions/download-artifact@v4
+        with:
+          name: admin-web
+          path: dist
+
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          projectName: sanad-admin
+          directory: dist
+
+  deploy-mfa:
+    name: Deploy MFA to Cloudflare
+    needs: build
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Download Build
+        uses: actions/download-artifact@v4
+        with:
+          name: mfa-web
+          path: dist
+
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          projectName: sanad-mfa
+          directory: dist
+
+  deploy-staff:
+    name: Deploy Staff to Cloudflare
+    needs: build
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Download Build
+        uses: actions/download-artifact@v4
+        with:
+          name: staff-web
+          path: dist
+
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          projectName: sanad-staff
+          directory: dist
+
+  deploy-patient:
+    name: Deploy Patient to Cloudflare
+    needs: build
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Download Build
+        uses: actions/download-artifact@v4
+        with:
+          name: patient-web
+          path: dist
+
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          projectName: sanad-patient
+          directory: dist

@@ -1,0 +1,88 @@
+# ============================================================================
+# SANAD - Docker Compose Konfiguration
+# ============================================================================
+# Startet Backend + PostgreSQL für lokale Entwicklung
+# Usage: docker-compose up -d
+# ============================================================================
+
+version: '3.9'
+
+services:
+  # ==========================================================================
+  # PostgreSQL Datenbank
+  # ==========================================================================
+  db:
+    image: postgres:16-alpine
+    container_name: sanad-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: sanad
+      POSTGRES_PASSWORD: sanad_dev_password_2025
+      POSTGRES_DB: sanad_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sanad -d sanad_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ==========================================================================
+  # FastAPI Backend
+  # ==========================================================================
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: sanad-backend
+    restart: unless-stopped
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://sanad:sanad_dev_password_2025@db:5432/sanad_db
+      - SECRET_KEY=dev-secret-key-change-in-production-minimum-32-chars
+      - ACCESS_TOKEN_EXPIRE_MINUTES=30
+      - REFRESH_TOKEN_EXPIRE_DAYS=7
+      - CORS_ORIGINS=http://localhost:3000,http://localhost:8080,http://localhost:5000
+      - DEBUG=true
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app:ro
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+  # ==========================================================================
+  # Redis (für Caching & WebSocket Sessions)
+  # ==========================================================================
+  redis:
+    image: redis:7-alpine
+    container_name: sanad-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+# ============================================================================
+# Volumes
+# ============================================================================
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+
+# ============================================================================
+# Networks (Optional, Docker Compose erstellt automatisch ein Netzwerk)
+# ============================================================================
+networks:
+  default:
+    name: sanad-network

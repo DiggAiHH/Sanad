@@ -24,3 +24,15 @@ export {
   shouldDeleteData,
   GDPRRights
 } from './privacy-utils';
+
+// Enhanced Features
+export {
+  translations,
+  calculateWaitingTime,
+  NotificationManager,
+  AppointmentScheduler,
+  FeedbackSystem,
+  DocumentManager,
+  EmergencyContactManager,
+  HealthTipsProvider
+} from './enhanced-features';

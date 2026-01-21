@@ -36,3 +36,20 @@ export {
   EmergencyContactManager,
   HealthTipsProvider
 } from './enhanced-features';
+
+// Advanced NFC Features
+export {
+  NFC_FEATURES,
+  TapToCheckIn,
+  MedicalAlertTag,
+  PrescriptionPickup,
+  RoomNavigation,
+  StaffNFCLogin,
+  LabSampleTracking,
+  VisitorAccess,
+  EquipmentTracking,
+  TapToPay,
+  MedicationVerification,
+  LoyaltyProgram,
+  NFCFeatureManager
+} from './nfc-features';

@@ -65,7 +65,7 @@ sanad/
 - Node.js 20.x or higher
 - npm 10.x or higher
 
-### Installation
+### Quick Start
 
 1. Clone the repository:
 ```bash
@@ -73,11 +73,18 @@ git clone https://github.com/DiggAiHH/Sanad.git
 cd Sanad
 ```
 
-2. Install dependencies for all apps:
+2. Build all applications:
 ```bash
-npm install
-cd apps/reception && npm install
-cd ../doctor && npm install
+./build-all.sh
+```
+
+Or install dependencies manually for each app:
+```bash
+cd apps/reception && npm install && npm run build
+cd ../doctor && npm install && npm run build
+cd ../patient && npm install && npm run build
+cd ../dashboard && npm install && npm run build
+```
 cd ../patient && npm install
 cd ../dashboard && npm install
 cd ../..
@@ -116,37 +123,69 @@ npm run build:patient
 npm run build:dashboard
 ```
 
-## 🌐 Deployment to Netlify
+## 🌐 Production Deployment to Netlify
 
-Each application can be deployed separately to Netlify:
+**Ready to deploy!** All applications are production-ready with:
+- ✅ Error boundaries for graceful error handling
+- ✅ SPA routing configured
+- ✅ Environment variable support
+- ✅ Optimized production builds
 
-### Method 1: Netlify CLI
+### Quick Deploy (Recommended)
+
+See **[DEPLOYMENT_CHECKLIST.md](DEPLOYMENT_CHECKLIST.md)** for complete step-by-step instructions.
+
+#### Method 1: Netlify Dashboard
+
+1. Create 4 new sites on Netlify
+2. For each site, configure:
+
+**Reception App**
+   - Base directory: `apps/reception`
+   - Build command: `npm install && npm run build`
+   - Publish directory: `apps/reception/build`
+
+**Doctor Portal**
+   - Base directory: `apps/doctor`
+   - Build command: `npm install && npm run build`
+   - Publish directory: `apps/doctor/build`
+
+**Patient Portal**
+   - Base directory: `apps/patient`
+   - Build command: `npm install && npm run build`
+   - Publish directory: `apps/patient/build`
+
+**Master Dashboard**
+   - Base directory: `apps/dashboard`
+   - Build command: `npm install && npm run build`
+   - Publish directory: `apps/dashboard/build`
+
+#### Method 2: Netlify CLI
 
 ```bash
 # Install Netlify CLI
 npm install -g netlify-cli
 
-# Deploy Reception App
-netlify deploy --config=netlify-reception.toml --prod
+# Login
+netlify login
 
-# Deploy Doctor Portal
-netlify deploy --config=netlify-doctor.toml --prod
-
-# Deploy Patient Portal
-netlify deploy --config=netlify-patient.toml --prod
-
-# Deploy Master Dashboard
-netlify deploy --config=netlify-dashboard.toml --prod
+# Deploy each app
+cd apps/reception && npm install && npm run build && netlify deploy --prod
+cd ../doctor && npm install && npm run build && netlify deploy --prod
+cd ../patient && npm install && npm run build && netlify deploy --prod
+cd ../dashboard && npm install && npm run build && netlify deploy --prod
 ```
 
-### Method 2: Netlify Dashboard
+### Environment Variables
 
-1. Create 4 new sites on Netlify
-2. For each site:
-   - Connect your GitHub repository
-   - Set build command: `npm run build`
-   - Set publish directory: `apps/[app-name]/build`
-   - Deploy!
+Each app includes an `.env.example` template. Copy to `.env.local` and configure:
+
+```bash
+# Example for all apps
+REACT_APP_API_URL=https://your-api-url.com
+```
+
+In Netlify Dashboard, add these under Site Settings → Environment variables.
 
 ### Recommended Site Names:
 - `sanad-reception` - Reception kiosk
@@ -155,6 +194,14 @@ netlify deploy --config=netlify-dashboard.toml --prod
 - `sanad-dashboard` - Master dashboard
 
 ## ✨ Features
+
+### 🔒 Production Ready
+- ✅ **Error Boundaries** - Graceful error handling in all apps
+- ✅ **SPA Routing** - Proper _redirects configuration for Netlify
+- ✅ **Environment Variables** - Template files for easy configuration
+- ✅ **Optimized Builds** - Production-ready, minified bundles
+- ✅ **Clean Code** - No unused dependencies, ESLint compliant
+- ✅ **Build Script** - Automated `build-all.sh` for all apps
 
 ### Reception App Features
 - ✅ QR code scanning for instant check-in

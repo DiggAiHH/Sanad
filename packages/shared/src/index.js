@@ -6,3 +6,4 @@ export {
   generateQRCodeData, 
   parseQRCodeData 
 } from './utils';
+export { default as ErrorBoundary } from './ErrorBoundary';

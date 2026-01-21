@@ -425,3 +425,394 @@ class ErrorResponse(BaseModel):
     """Error response schema."""
     detail: str
     code: Optional[str] = None
+
+
+# ============================================================================
+# IoT / Zero-Touch Reception Schemas
+# ============================================================================
+
+class DeviceType(str, Enum):
+    """IoT device type enumeration."""
+    NFC_READER = "nfc_reader"
+    LED_CONTROLLER = "led_controller"
+    DISPLAY = "display"
+    KIOSK = "kiosk"
+
+
+class DeviceStatus(str, Enum):
+    """IoT device online status."""
+    ONLINE = "online"
+    OFFLINE = "offline"
+    ERROR = "error"
+    MAINTENANCE = "maintenance"
+
+
+class LEDPattern(str, Enum):
+    """LED animation patterns for wayfinding."""
+    SOLID = "solid"
+    PULSE = "pulse"
+    CHASE = "chase"
+    RAINBOW = "rainbow"
+    BREATHE = "breathe"
+    WIPE = "wipe"
+
+
+class NFCCardType(str, Enum):
+    """Type of NFC card/token."""
+    EGK = "egk"
+    CUSTOM = "custom"
+    TEMPORARY = "temporary"
+    MOBILE = "mobile"
+
+
+class CheckInMethod(str, Enum):
+    """Method used for patient check-in."""
+    NFC = "nfc"
+    QR = "qr"
+    MANUAL = "manual"
+    KIOSK = "kiosk"
+    ONLINE = "online"
+
+
+# --- NFC Schemas ---
+
+class NFCCheckInRequest(BaseModel):
+    """Request for NFC-based check-in."""
+    nfc_uid: str = Field(..., description="Raw NFC UID from reader (e.g., '04:A3:5B:1A:7C:8D:90')")
+    device_id: UUID = Field(..., description="ID of the NFC reader device")
+    device_secret: str = Field(..., description="Device authentication secret")
+
+
+class NFCCheckInResponse(BaseModel):
+    """Response after successful NFC check-in."""
+    success: bool
+    ticket_number: Optional[str] = None
+    queue_name: Optional[str] = None
+    estimated_wait_minutes: Optional[int] = None
+    assigned_room: Optional[str] = None
+    wayfinding_route_id: Optional[UUID] = None
+    patient_name: Optional[str] = Field(None, description="First name only for privacy")
+    message: str
+
+
+class NFCCardRegisterRequest(BaseModel):
+    """Request to register a new NFC card for a patient."""
+    patient_id: UUID
+    nfc_uid: str = Field(..., description="Raw NFC UID from reader")
+    card_type: NFCCardType = NFCCardType.CUSTOM
+    card_label: Optional[str] = Field(None, description="Label like 'Hauptkarte'")
+    expires_at: Optional[datetime] = None
+
+
+class NFCCardResponse(BaseModel):
+    """Response for NFC card information."""
+    id: UUID
+    patient_id: UUID
+    card_type: NFCCardType
+    card_label: Optional[str]
+    is_active: bool
+    created_at: datetime
+    expires_at: Optional[datetime]
+    last_used_at: Optional[datetime]
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class NFCCardListResponse(BaseModel):
+    """List of NFC cards."""
+    items: list[NFCCardResponse]
+    total: int
+
+
+# --- IoT Device Schemas ---
+
+class IoTDeviceBase(BaseModel):
+    """Base IoT device schema."""
+    device_name: str = Field(..., min_length=1, max_length=100)
+    device_type: DeviceType
+    location: Optional[str] = Field(None, description="Physical location (e.g., 'Empfang')")
+    ip_address: Optional[str] = None
+    firmware_version: Optional[str] = None
+
+
+class IoTDeviceCreate(IoTDeviceBase):
+    """Create IoT device request."""
+    device_serial: str = Field(..., description="Unique hardware serial number")
+
+
+class IoTDeviceUpdate(BaseModel):
+    """Update IoT device request."""
+    device_name: Optional[str] = None
+    location: Optional[str] = None
+    ip_address: Optional[str] = None
+    firmware_version: Optional[str] = None
+    is_active: Optional[bool] = None
+
+
+class IoTDeviceResponse(IoTDeviceBase):
+    """IoT device response."""
+    id: UUID
+    practice_id: UUID
+    device_serial: str
+    status: DeviceStatus
+    is_active: bool
+    last_heartbeat: Optional[datetime]
+    created_at: datetime
+    device_secret: Optional[str] = Field(
+        None, 
+        description="Plain device secret (only returned on creation)"
+    )
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class IoTDeviceListResponse(BaseModel):
+    """List of IoT devices."""
+    items: list[IoTDeviceResponse]
+    total: int
+
+
+class DeviceHeartbeatRequest(BaseModel):
+    """Heartbeat from IoT device."""
+    device_serial: str
+    device_secret: str
+    firmware_version: Optional[str] = None
+    uptime_seconds: Optional[int] = None
+    free_memory: Optional[int] = None
+
+
+class DeviceHeartbeatResponse(BaseModel):
+    """Response to device heartbeat."""
+    success: bool
+    server_time: datetime
+    commands: list[dict] = Field(default_factory=list, description="Pending commands for device")
+
+
+# --- LED / Wayfinding Schemas ---
+
+class ZoneBase(BaseModel):
+    """Base zone schema."""
+    zone_name: str = Field(..., min_length=1, max_length=100)
+    zone_code: str = Field(..., description="Short code like 'WARTE' or 'RAUM3'")
+    zone_type: str = Field(..., description="Type: entrance, corridor, waiting, room")
+    default_color: str = Field("#0066CC", description="Default hex color")
+
+
+class ZoneCreate(ZoneBase):
+    """Create zone request."""
+    pass
+
+
+class ZoneResponse(ZoneBase):
+    """Zone response."""
+    id: UUID
+    practice_id: UUID
+    is_active: bool
+    created_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class ZoneListResponse(BaseModel):
+    """List of zones."""
+    items: list[ZoneResponse]
+    total: int
+
+
+class LEDSegmentBase(BaseModel):
+    """Base LED segment schema."""
+    segment_id: int = Field(..., ge=0, le=15, description="WLED segment ID (0-15)")
+    start_led: int = Field(..., ge=0, description="Start LED index")
+    end_led: int = Field(..., ge=0, description="End LED index")
+    default_color: str = Field("#FFFFFF", description="Default hex color")
+    default_brightness: int = Field(128, ge=0, le=255)
+
+
+class LEDSegmentCreate(LEDSegmentBase):
+    """Create LED segment request."""
+    zone_id: UUID
+    controller_id: UUID
+
+
+class LEDSegmentResponse(LEDSegmentBase):
+    """LED segment response."""
+    id: UUID
+    zone_id: UUID
+    controller_id: UUID
+    is_active: bool
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class WayfindingRouteBase(BaseModel):
+    """Base wayfinding route schema."""
+    route_name: str = Field(..., description="Human-readable name")
+    from_zone_id: UUID
+    to_zone_id: UUID
+    led_pattern: LEDPattern = LEDPattern.CHASE
+    route_color: str = Field("#00FF00", description="Hex color for route")
+    animation_speed: int = Field(50, ge=1, le=255, description="WLED animation speed")
+
+
+class WayfindingRouteCreate(WayfindingRouteBase):
+    """Create wayfinding route request."""
+    segment_ids: list[UUID] = Field(..., description="Ordered list of LED segments")
+
+
+class WayfindingRouteResponse(WayfindingRouteBase):
+    """Wayfinding route response."""
+    id: UUID
+    practice_id: UUID
+    is_active: bool
+    created_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class WayfindingRouteListResponse(BaseModel):
+    """List of wayfinding routes."""
+    items: list[WayfindingRouteResponse]
+    total: int
+
+
+class TriggerRouteRequest(BaseModel):
+    """Request to trigger a wayfinding route."""
+    route_id: UUID
+    duration_seconds: int = Field(30, ge=5, le=300, description="How long to show the route")
+    patient_ticket_id: Optional[UUID] = None
+
+
+class TriggerRouteResponse(BaseModel):
+    """Response after triggering a route."""
+    success: bool
+    message: str
+    route_id: UUID
+    expires_at: datetime
+
+
+class LEDCommandRequest(BaseModel):
+    """Direct LED command to a controller."""
+    controller_id: UUID
+    segment_id: int = Field(..., ge=0, le=15)
+    color: str = Field(..., description="Hex color")
+    brightness: int = Field(255, ge=0, le=255)
+    pattern: LEDPattern = LEDPattern.SOLID
+    duration_seconds: Optional[int] = Field(None, description="Auto-off after N seconds")
+
+
+class LEDCommandResponse(BaseModel):
+    """Response to LED command."""
+    success: bool
+    controller_id: UUID
+    segment_id: int
+
+
+# --- Check-In Event Schemas ---
+
+class CheckInEventResponse(BaseModel):
+    """Check-in event log entry."""
+    id: UUID
+    ticket_id: UUID
+    ticket_number: str
+    check_in_method: CheckInMethod
+    device_id: Optional[UUID]
+    patient_name: Optional[str]
+    checked_in_at: datetime
+    assigned_room: Optional[str]
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class CheckInEventListResponse(BaseModel):
+    """List of check-in events."""
+    items: list[CheckInEventResponse]
+    total: int
+
+
+# --- Wait Time Visualization Schemas ---
+
+class WaitTimeStatus(str, Enum):
+    """Visual wait time status."""
+    OK = "ok"           # Green: < 10 min
+    WARNING = "warning" # Yellow: 10-20 min
+    CRITICAL = "critical"  # Red: > 20 min
+
+
+class WaitTimeVisualization(BaseModel):
+    """Wait time visualization data for LED zones."""
+    zone_id: UUID
+    zone_name: str
+    current_wait_minutes: int
+    status: WaitTimeStatus
+    color: str  # Calculated hex color
+    patient_count: int
+
+
+class WaitTimeOverviewResponse(BaseModel):
+    """Overview of all waiting areas."""
+    zones: list[WaitTimeVisualization]
+    total_waiting: int
+    average_wait_minutes: float
+    updated_at: datetime
+
+# ============================================================================
+# Push Notification Schemas
+# ============================================================================
+
+class DevicePlatform(str, Enum):
+    """Mobile device platform."""
+    IOS = "ios"
+    ANDROID = "android"
+    WEB = "web"
+
+
+class PushNotificationType(str, Enum):
+    """Type of push notification event."""
+    TICKET_CALLED = "ticket_called"       # Patient: Your number is called
+    TICKET_CREATED = "ticket_created"     # MFA: New ticket in queue
+    QUEUE_UPDATE = "queue_update"         # Patient: Wait time changed
+    CHECK_IN_SUCCESS = "check_in_success" # Patient: Check-in confirmed
+    APPOINTMENT_REMINDER = "appointment_reminder"
+    SYSTEM_ALERT = "system_alert"
+
+
+class RegisterDeviceTokenRequest(BaseModel):
+    """Request to register FCM device token."""
+    fcm_token: str = Field(..., min_length=50, max_length=500)
+    platform: DevicePlatform
+    device_name: Optional[str] = Field(None, max_length=100)
+    app_version: Optional[str] = Field(None, max_length=20)
+
+
+class RegisterDeviceTokenResponse(BaseModel):
+    """Response after token registration."""
+    success: bool
+    device_id: UUID
+    message: str
+
+
+class UnregisterDeviceTokenRequest(BaseModel):
+    """Request to unregister FCM device token."""
+    fcm_token: str
+
+
+class PushNotificationPayload(BaseModel):
+    """Push notification payload structure."""
+    notification_type: PushNotificationType
+    title: str
+    body: str
+    data: Optional[dict] = None  # Custom data (ticket_number, queue_id, etc.)
+    
+
+class SendPushRequest(BaseModel):
+    """Internal request to send push notification."""
+    user_ids: list[UUID]
+    payload: PushNotificationPayload
+    
+    
+class PushNotificationStats(BaseModel):
+    """Push notification delivery stats."""
+    total_tokens: int
+    successful: int
+    failed: int
+    invalid_tokens: list[str] = []

@@ -62,6 +62,15 @@ class _CheckInScreenState extends State<CheckInScreen> {
                           icon: const Icon(Icons.qr_code_scanner),
                           label: const Text('QR Scan'),
                         ),
+                        const SizedBox(width: 8),
+                        ElevatedButton.icon(
+                          onPressed: () => context.push('/check-in/nfc'),
+                          icon: const Icon(Icons.nfc),
+                          label: const Text('NFC'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.success,
+                          ),
+                        ),
                       ],
                     ),
                     const SizedBox(height: 16),

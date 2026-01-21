@@ -1,18 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:sanad_core/sanad_core.dart';
 import 'package:sanad_ui/sanad_ui.dart';
 
 /// Login screen for admin app
-class LoginScreen extends StatefulWidget {
+class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  ConsumerState<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  bool _isLoading = false;
   bool _obscurePassword = true;
 
   @override
@@ -24,6 +26,30 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final authState = ref.watch(authProvider);
+    final isLoading = authState.maybeWhen(
+      loading: () => true,
+      orElse: () => false,
+    );
+
+    // Listen for auth state changes
+    ref.listen<AuthState>(authProvider, (previous, next) {
+      next.maybeWhen(
+        authenticated: (user, _, __) {
+          context.go('/dashboard');
+        },
+        error: (message) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(message),
+              backgroundColor: Colors.red,
+            ),
+          );
+        },
+        orElse: () {},
+      );
+    });
+
     return Scaffold(
       body: Center(
         child: SingleChildScrollView(
@@ -92,9 +118,9 @@ class _LoginScreenState extends State<LoginScreen> {
                 // Login button
                 PrimaryButton(
                   label: 'Anmelden',
-                  isLoading: _isLoading,
+                  isLoading: isLoading,
                   isFullWidth: true,
-                  onPressed: _handleLogin,
+                  onPressed: isLoading ? null : _handleLogin,
                 ),
               ],
             ),
@@ -105,12 +131,22 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void _handleLogin() {
-    setState(() => _isLoading = true);
-    // TODO: Implement actual login
-    Future.delayed(const Duration(seconds: 2), () {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
-    });
+    final email = _emailController.text.trim();
+    final password = _passwordController.text;
+
+    if (email.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Bitte E-Mail und Passwort eingeben'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
+
+    ref.read(authProvider.notifier).login(
+      email: email,
+      password: password,
+    );
   }
 }

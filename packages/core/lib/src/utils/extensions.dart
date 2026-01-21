@@ -8,16 +8,22 @@ extension StringExtension on String {
   String get titleCase =>
       split(' ').map((word) => word.capitalized).join(' ');
 
-  /// Truncate with ellipsis
+  /// Truncate string to [maxLength] characters with ellipsis.
+  ///
+  /// Returns original string if length <= [maxLength].
+  /// Params:
+  ///   - maxLength: Maximum string length including ellipsis
   String truncate(int maxLength) {
     if (length <= maxLength) return this;
     return '${substring(0, maxLength - 3)}...';
   }
 
-  /// Check if string is numeric
+  /// Check if string contains only numeric characters.
+  ///
+  /// Returns true if parseable as double, false otherwise.
   bool get isNumeric => double.tryParse(this) != null;
 
-  /// Remove all whitespace
+  /// Remove all whitespace characters from string.
   String get removeWhitespace => replaceAll(RegExp(r'\s+'), '');
 }
 

@@ -3,9 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'features/home/home_screen.dart';
 import 'features/check_in/check_in_screen.dart';
+import 'features/check_in/nfc_check_in_screen.dart';
 import 'features/check_in/qr_scanner_screen.dart';
 import 'features/queue/queue_screen.dart';
 import 'features/ticket/ticket_issued_screen.dart';
+import 'features/settings/iot_device_credentials_screen.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
@@ -20,6 +22,10 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const CheckInScreen(),
       ),
       GoRoute(
+        path: '/check-in/nfc',
+        builder: (context, state) => const NfcCheckInScreen(),
+      ),
+      GoRoute(
         path: '/check-in/qr',
         builder: (context, state) => const QrScannerScreen(),
       ),
@@ -31,8 +37,16 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/ticket/:ticketNumber',
         builder: (context, state) {
           final ticketNumber = state.pathParameters['ticketNumber']!;
-          return TicketIssuedScreen(ticketNumber: ticketNumber);
+          final extraMap = state.extra as Map<String, dynamic>?;
+          return TicketIssuedScreen(
+            ticketNumber: ticketNumber,
+            extra: TicketExtra.fromMap(extraMap),
+          );
         },
+      ),
+      GoRoute(
+        path: '/settings/iot-device',
+        builder: (context, state) => const IotDeviceCredentialsScreen(),
       ),
     ],
   );

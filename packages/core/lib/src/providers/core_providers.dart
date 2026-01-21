@@ -5,6 +5,7 @@ import '../services/auth_service.dart';
 import '../services/storage_service.dart';
 import '../services/queue_service.dart';
 import '../services/chat_service.dart';
+import '../services/push_service.dart';
 import '../constants/app_constants.dart';
 
 /// Storage service provider - singleton
@@ -50,6 +51,12 @@ final queueServiceProvider = Provider<QueueService>((ref) {
 final chatServiceProvider = Provider<ChatService>((ref) {
   final apiService = ref.watch(apiServiceProvider);
   return ChatService(apiService: apiService);
+});
+
+/// Push notification service provider
+final pushServiceProvider = Provider<PushNotificationService>((ref) {
+  final dio = ref.watch(dioProvider);
+  return PushNotificationService(dio: dio);
 });
 
 /// Provider overrides for dependency injection

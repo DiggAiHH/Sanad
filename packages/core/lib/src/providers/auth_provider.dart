@@ -14,8 +14,17 @@ class AuthNotifier extends StateNotifier<AuthState> {
     state = const AuthState.loading();
     final isAuth = await _authService.isAuthenticated();
     if (isAuth) {
-      // TODO: Fetch user profile
-      state = const AuthState.unauthenticated();
+      final user = await _authService.getUserProfile();
+      if (user != null) {
+        final token = await _authService.getAccessToken();
+        state = AuthState.authenticated(
+          user: user,
+          accessToken: token ?? '',
+          refreshToken: '',
+        );
+      } else {
+        state = const AuthState.unauthenticated();
+      }
     } else {
       state = const AuthState.unauthenticated();
     }

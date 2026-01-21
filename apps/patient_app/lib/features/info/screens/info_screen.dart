@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sanad_ui/sanad_ui.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 /// Practice information screen.
 class InfoScreen extends StatelessWidget {
@@ -117,8 +118,11 @@ class InfoScreen extends StatelessWidget {
                 icon: Icons.phone,
                 title: 'Telefon',
                 value: '+49 123 456789',
-                onTap: () {
-                  // TODO: Implement phone call
+                onTap: () async {
+                  final uri = Uri(scheme: 'tel', path: '+49123456789');
+                  if (await canLaunchUrl(uri)) {
+                    await launchUrl(uri);
+                  }
                 },
               ),
               const SizedBox(height: 12),
@@ -126,8 +130,15 @@ class InfoScreen extends StatelessWidget {
                 icon: Icons.email,
                 title: 'E-Mail',
                 value: 'praxis@musterstadt.de',
-                onTap: () {
-                  // TODO: Implement email
+                onTap: () async {
+                  final uri = Uri(
+                    scheme: 'mailto',
+                    path: 'praxis@musterstadt.de',
+                    query: 'subject=Anfrage%20Praxis',
+                  );
+                  if (await canLaunchUrl(uri)) {
+                    await launchUrl(uri);
+                  }
                 },
               ),
               const SizedBox(height: 12),
@@ -135,8 +146,11 @@ class InfoScreen extends StatelessWidget {
                 icon: Icons.language,
                 title: 'Website',
                 value: 'www.praxis-musterstadt.de',
-                onTap: () {
-                  // TODO: Implement web link
+                onTap: () async {
+                  final uri = Uri.parse('https://www.praxis-musterstadt.de');
+                  if (await canLaunchUrl(uri)) {
+                    await launchUrl(uri, mode: LaunchMode.externalApplication);
+                  }
                 },
               ),
               const SizedBox(height: 24),
@@ -181,8 +195,11 @@ class InfoScreen extends StatelessWidget {
                     ),
                     IconButton(
                       icon: const Icon(Icons.directions, color: AppColors.primary),
-                      onPressed: () {
-                        // TODO: Open maps
+                      onPressed: () async {
+                        final uri = Uri.parse('geo:0,0?q=Musterstraße+123,+12345+Musterstadt');
+                        if (await canLaunchUrl(uri)) {
+                          await launchUrl(uri);
+                        }
                       },
                     ),
                   ],

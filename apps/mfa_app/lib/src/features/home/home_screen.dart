@@ -1,17 +1,56 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:sanad_core/sanad_core.dart';
 import 'package:sanad_ui/sanad_ui.dart';
 
+/// Keys for IoT device credentials in secure storage.
+const _deviceIdKey = 'sanad_iot.device_id';
+const _deviceSecretKey = 'sanad_iot.device_secret';
+
+/// Provider that checks whether IoT device credentials are configured.
+final iotDeviceConfiguredProvider = FutureProvider<bool>((ref) async {
+  final storage = ref.watch(storageServiceProvider);
+  final deviceId = await storage.getSecure(_deviceIdKey);
+  final deviceSecret = await storage.getSecure(_deviceSecretKey);
+  return deviceId != null && deviceId.isNotEmpty && deviceSecret != null && deviceSecret.isNotEmpty;
+});
+
 /// MFA Home screen with quick actions
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final iotConfigAsync = ref.watch(iotDeviceConfiguredProvider);
+    
     return Scaffold(
       appBar: AppBar(
         title: const Text('Sanad Empfang'),
         actions: [
+          // IoT device status chip
+          iotConfigAsync.when(
+            data: (configured) => Padding(
+              padding: const EdgeInsets.symmetric(vertical: 10),
+              child: Chip(
+                avatar: Icon(
+                  configured ? Icons.check_circle : Icons.warning_amber_rounded,
+                  size: 18,
+                  color: configured ? AppColors.success : AppColors.warning,
+                ),
+                label: Text(
+                  configured ? 'NFC-Gerät OK' : 'NFC nicht konfiguriert',
+                  style: AppTextStyles.bodySmall,
+                ),
+                backgroundColor: configured
+                    ? AppColors.success.withOpacity(0.1)
+                    : AppColors.warning.withOpacity(0.15),
+              ),
+            ),
+            loading: () => const SizedBox.shrink(),
+            error: (_, __) => const SizedBox.shrink(),
+          ),
+          const SizedBox(width: 8),
           const QueueStatus(
             waitingCount: 8,
             inProgressCount: 2,
@@ -20,7 +59,7 @@ class HomeScreen extends StatelessWidget {
           const SizedBox(width: 16),
           IconButton(
             icon: const Icon(Icons.settings),
-            onPressed: () {},
+            onPressed: () => context.push('/settings/iot-device'),
           ),
         ],
       ),

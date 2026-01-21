@@ -38,7 +38,9 @@ services:
       - key: DEBUG
         value: "true"
       - key: CORS_ORIGINS
-        value: "https://sanad-admin.pages.dev,https://sanad-mfa.pages.dev,https://sanad-staff.pages.dev,https://sanad-patient.pages.dev,http://localhost:3000,http://localhost:8080"
+        value: "https://sanad-admin.netlify.app,https://sanad-mfa.netlify.app,https://sanad-staff.netlify.app,https://sanad-patient.netlify.app,http://localhost:3000,http://localhost:8080"
+      - key: SEED_ON_STARTUP
+        value: "true"
 
 databases:
   # ============================================================================

@@ -32,10 +32,10 @@ async def seed_database() -> None:
             select(User).where(User.email == "admin@sanad.de")
         )
         if existing_user.scalar_one_or_none():
-            print("✅ Seed-Daten existieren bereits, überspringe...")
+            logger.info("Seed-Daten existieren bereits, überspringe...")
             return
         
-        print("🌱 Seeding database...")
+        logger.info("Seeding database...")
         
         # Create Practice
         practice = Practice(
@@ -121,13 +121,14 @@ async def seed_database() -> None:
                 id=uuid.uuid4(),
                 queue_id=queue.id,
                 ticket_number="A001",
-                patient_name="Erika Muster",
+                patient_name="Erika Mustermann",
                 status=TicketStatus.IN_PROGRESS,
                 priority=TicketPriority.NORMAL,
                 created_by_id=mfa.id,
                 assigned_to_id=doctor.id,
                 created_at=now - timedelta(minutes=30),
                 called_at=now - timedelta(minutes=5),
+                notes="Routinekontrolle Blutdruck",
             ),
             Ticket(
                 id=uuid.uuid4(),
@@ -136,7 +137,7 @@ async def seed_database() -> None:
                 patient_name="Klaus Bauer",
                 status=TicketStatus.WAITING,
                 priority=TicketPriority.HIGH,
-                notes="Diabetes-Patient",
+                notes="Diabetes-Patient - Nüchternblutzucker prüfen",
                 created_by_id=mfa.id,
                 created_at=now - timedelta(minutes=20),
             ),
@@ -147,6 +148,7 @@ async def seed_database() -> None:
                 patient_name="Helga Fischer",
                 status=TicketStatus.WAITING,
                 priority=TicketPriority.NORMAL,
+                notes="Grippe-Impfung",
                 created_by_id=mfa.id,
                 created_at=now - timedelta(minutes=10),
             ),
@@ -154,10 +156,37 @@ async def seed_database() -> None:
                 id=uuid.uuid4(),
                 queue_id=queue.id,
                 ticket_number="A004",
+                patient_name="Thomas Schmidt",
                 status=TicketStatus.WAITING,
                 priority=TicketPriority.NORMAL,
+                notes="Rezept abholen",
                 created_by_id=mfa.id,
                 created_at=now - timedelta(minutes=5),
+            ),
+            Ticket(
+                id=uuid.uuid4(),
+                queue_id=queue.id,
+                ticket_number="A005",
+                patient_name="Anna Weber",
+                status=TicketStatus.COMPLETED,
+                priority=TicketPriority.NORMAL,
+                notes="Ultraschall abgeschlossen",
+                created_by_id=mfa.id,
+                assigned_to_id=doctor.id,
+                created_at=now - timedelta(hours=2),
+                called_at=now - timedelta(hours=1, minutes=50),
+                completed_at=now - timedelta(hours=1, minutes=30),
+            ),
+            Ticket(
+                id=uuid.uuid4(),
+                queue_id=queue.id,
+                ticket_number="B001",
+                patient_name="Fatima Al-Hassan",
+                status=TicketStatus.WAITING,
+                priority=TicketPriority.URGENT,
+                notes="Starke Kopfschmerzen seit 3 Tagen",
+                created_by_id=mfa.id,
+                created_at=now - timedelta(minutes=2),
             ),
         ]
         db.add_all(tickets)
@@ -168,7 +197,7 @@ async def seed_database() -> None:
                 id=uuid.uuid4(),
                 practice_id=practice.id,
                 title="Patientenakten digitalisieren",
-                description="Akten aus Ordner 2023-A scannen und ablegen",
+                description="Akten aus Ordner 2023-A scannen und ablegen (35 Akten, Priorität Patienten mit Terminen nächste Woche)",
                 status=TaskStatus.TODO,
                 priority=TaskPriority.MEDIUM,
                 assignee_id=staff.id,
@@ -178,7 +207,7 @@ async def seed_database() -> None:
                 id=uuid.uuid4(),
                 practice_id=practice.id,
                 title="Bestellung Praxisbedarf",
-                description="Handschuhe, Desinfektionsmittel, Verbandsmaterial",
+                description="Handschuhe (500 Stück), Desinfektionsmittel (5 Liter), Verbandsmaterial (Komplett-Set)",
                 status=TaskStatus.IN_PROGRESS,
                 priority=TaskPriority.HIGH,
                 assignee_id=mfa.id,
@@ -188,10 +217,41 @@ async def seed_database() -> None:
                 id=uuid.uuid4(),
                 practice_id=practice.id,
                 title="Wartezimmer aufräumen",
+                description="Zeitschriften sortieren, Spielecke desinfizieren, Pflanzen gießen",
                 status=TaskStatus.COMPLETED,
                 priority=TaskPriority.LOW,
                 assignee_id=staff.id,
                 completed_at=now - timedelta(hours=2),
+            ),
+            Task(
+                id=uuid.uuid4(),
+                practice_id=practice.id,
+                title="Labor-Ergebnisse nachverfolgen",
+                description="3 ausstehende Befunde anfordern: Klaus Bauer (HbA1c), Anna Weber (Schilddrüse), Thomas Schmidt (Urin)",
+                status=TaskStatus.TODO,
+                priority=TaskPriority.HIGH,
+                assignee_id=mfa.id,
+                due_date=now + timedelta(hours=4),
+            ),
+            Task(
+                id=uuid.uuid4(),
+                practice_id=practice.id,
+                title="Geräte-Wartung planen",
+                description="EKG-Gerät Kalibrierung überfällig - Techniker kontaktieren (Firma Medtec, Tel. 089-12345)",
+                status=TaskStatus.TODO,
+                priority=TaskPriority.URGENT,
+                assignee_id=doctor.id,
+                due_date=now + timedelta(hours=6),
+            ),
+            Task(
+                id=uuid.uuid4(),
+                practice_id=practice.id,
+                title="Impf-Kampagne koordinieren",
+                description="15 Patienten für Grippe-Impfung nächste Woche einbestellen, Impfstoff prüfen (12 Dosen vorrätig)",
+                status=TaskStatus.IN_PROGRESS,
+                priority=TaskPriority.MEDIUM,
+                assignee_id=mfa.id,
+                due_date=now + timedelta(days=5),
             ),
         ]
         db.add_all(tasks)
@@ -238,6 +298,70 @@ async def seed_database() -> None:
                 id=uuid.uuid4(),
                 room_id=team_chat.id,
                 sender_id=mfa.id,
+                content="Morgen! Wir haben 6 Tickets in der Warteschlange. Klaus Bauer (A002) ist Diabetes-Notfall, sollte prioritär behandelt werden.",
+                created_at=now - timedelta(hours=1, minutes=55),
+            ),
+            ChatMessage(
+                id=uuid.uuid4(),
+                room_id=team_chat.id,
+                sender_id=doctor.id,
+                content="Verstanden, rufe ihn gleich nach Erika auf. Sind die Labor-Ergebnisse schon da?",
+                created_at=now - timedelta(hours=1, minutes=50),
+            ),
+            ChatMessage(
+                id=uuid.uuid4(),
+                room_id=team_chat.id,
+                sender_id=mfa.id,
+                content="Noch nicht, habe gerade beim Labor angerufen - kommen bis 14 Uhr. Ich erstelle die Task.",
+                created_at=now - timedelta(hours=1, minutes=45),
+            ),
+            ChatMessage(
+                id=uuid.uuid4(),
+                room_id=team_chat.id,
+                sender_id=staff.id,
+                content="Übrigens: EKG-Gerät zeigt Kalibrierungsfehler. Techniker kontaktiert?",
+                created_at=now - timedelta(hours=1, minutes=30),
+            ),
+            ChatMessage(
+                id=uuid.uuid4(),
+                room_id=team_chat.id,
+                sender_id=doctor.id,
+                content="Danke für den Hinweis! @mfa kannst du Firma Medtec anrufen? Dringend!",
+                created_at=now - timedelta(hours=1, minutes=25),
+            ),
+            ChatMessage(
+                id=uuid.uuid4(),
+                room_id=team_chat.id,
+                sender_id=mfa.id,
+                content="✓ Mache ich sofort. Termin für morgen früh angefragt.",
+                created_at=now - timedelta(hours=1, minutes=20),
+            ),
+            ChatMessage(
+                id=uuid.uuid4(),
+                room_id=team_chat.id,
+                sender_id=staff.id,
+                content="Impfstoff-Inventur: 12 Grippe-Dosen vorrätig, Nachbestellung nötig für Kampagne nächste Woche.",
+                created_at=now - timedelta(minutes=45),
+            ),
+            ChatMessage(
+                id=uuid.uuid4(),
+                room_id=team_chat.id,
+                sender_id=mfa.id,
+                content="Gut, ich bestelle 30 Dosen nach. Liste für Impftermine ist fast voll (15/20 Plätze belegt).",
+                created_at=now - timedelta(minutes=40),
+            ),
+            ChatMessage(
+                id=uuid.uuid4(),
+                room_id=team_chat.id,
+                sender_id=doctor.id,
+                content="Perfekt! Bitte auch Fatima Al-Hassan (B001) im Auge behalten - starke Kopfschmerzen, evtl. Migräne. Rufe sie als nächstes.",
+                created_at=now - timedelta(minutes=5),
+            ),
+        ]
+            ChatMessage(
+                id=uuid.uuid4(),
+                room_id=team_chat.id,
+                sender_id=mfa.id,
                 content="Morgen! Wir haben 12 Termine heute.",
                 created_at=now - timedelta(hours=2, minutes=-5),
             ),
@@ -253,13 +377,13 @@ async def seed_database() -> None:
         
         await db.commit()
         
-        print("✅ Seed data created successfully!")
-        print("\n📋 Test Accounts:")
-        print("   Admin:      admin@sanad.de / Admin123!")
-        print("   Arzt:       arzt@sanad.de / Arzt123!")
-        print("   MFA:        mfa@sanad.de / Mfa123!")
-        print("   Mitarbeiter: mitarbeiter@sanad.de / Staff123!")
-        print("   Patient:    patient@example.de / Patient123!")
+        logger.info("Seed data created successfully!")
+        logger.info("Test Accounts:")
+        logger.info("   Admin:      admin@sanad.de / Admin123!")
+        logger.info("   Arzt:       arzt@sanad.de / Arzt123!")
+        logger.info("   MFA:        mfa@sanad.de / Mfa123!")
+        logger.info("   Mitarbeiter: mitarbeiter@sanad.de / Staff123!")
+        logger.info("   Patient:    patient@example.de / Patient123!")
 
 
 if __name__ == "__main__":

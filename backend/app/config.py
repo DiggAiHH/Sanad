@@ -47,6 +47,19 @@ class Settings(BaseSettings):
     # Rate Limiting
     RATE_LIMIT_PER_MINUTE: int = 60
     
+    # Netlify domains (auto-generated)
+    NETLIFY_DOMAINS: list[str] = [
+        "https://sanad-admin.netlify.app",
+        "https://sanad-mfa.netlify.app",
+        "https://sanad-staff.netlify.app",
+        "https://sanad-patient.netlify.app",
+    ]
+    
+    @property
+    def all_cors_origins(self) -> list[str]:
+        """Get all allowed CORS origins including Netlify domains."""
+        return list(set(self.CORS_ORIGINS + self.NETLIFY_DOMAINS))
+    
     @property
     def async_database_url(self) -> str:
         """Convert standard postgres:// URL to asyncpg format."""

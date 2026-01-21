@@ -71,6 +71,26 @@ services:
       timeout: 5s
       retries: 5
 
+  # ==========================================================================
+  # Mosquitto MQTT Broker (für IoT-Geräte: NFC-Reader, LED-Controller)
+  # ==========================================================================
+  mosquitto:
+    image: eclipse-mosquitto:2.0.18
+    container_name: sanad-mqtt
+    restart: unless-stopped
+    ports:
+      - "1883:1883"   # MQTT Standard
+      - "9001:9001"   # WebSocket für Browser-Clients
+    volumes:
+      - ./mosquitto/config:/mosquitto/config:ro
+      - mosquitto_data:/mosquitto/data
+      - mosquitto_log:/mosquitto/log
+    healthcheck:
+      test: ["CMD", "mosquitto_sub", "-t", "$$SYS/#", "-C", "1", "-i", "healthcheck", "-W", "3"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
 # ============================================================================
 # Volumes
 # ============================================================================
@@ -78,6 +98,10 @@ volumes:
   postgres_data:
     driver: local
   redis_data:
+    driver: local
+  mosquitto_data:
+    driver: local
+  mosquitto_log:
     driver: local
 
 # ============================================================================

@@ -161,6 +161,21 @@ class AuthService {
     return token != null;
   }
 
+  /// Get current user profile
+  /// 
+  /// Returns: User object if authenticated, null otherwise
+  /// 
+  /// Raises: DioException on network errors
+  Future<User?> getUserProfile() async {
+    try {
+      final response = await _dio.get('/auth/me');
+      final data = response.data as Map<String, dynamic>;
+      return User.fromJson(data);
+    } on DioException {
+      return null;
+    }
+  }
+
   Future<void> _saveTokens(String accessToken, String refreshToken) async {
     await _storage.write(key: _accessTokenKey, value: accessToken);
     await _storage.write(key: _refreshTokenKey, value: refreshToken);

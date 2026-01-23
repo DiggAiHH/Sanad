@@ -12,6 +12,7 @@ import '../services/public_queue_summary_service.dart';
 import '../services/consultation_service.dart';
 import '../services/document_request_service.dart';
 import '../services/encryption_service.dart';
+import '../services/medication_service.dart';
 import '../constants/app_constants.dart';
 
 /// Storage service provider - singleton
@@ -94,6 +95,12 @@ final consultationServiceProvider = Provider<ConsultationService>((ref) {
 final documentRequestServiceProvider = Provider<DocumentRequestService>((ref) {
   final dio = ref.watch(dioProvider);
   return DocumentRequestService(dio);
+});
+
+/// Medication service provider - uses shared Dio instance.
+final medicationServiceProvider = Provider<MedicationService>((ref) {
+  final dio = ref.watch(dioProvider);
+  return MedicationService(dio);
 });
 
 /// Encryption service provider - singleton for E2E encryption.

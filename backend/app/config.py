@@ -5,6 +5,9 @@ Security: All secrets loaded from environment variables (Fail Fast).
 """
 
 from functools import lru_cache
+from typing import Any
+
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -41,6 +44,14 @@ class Settings(BaseSettings):
     # CORS - Support comma-separated string from env
     CORS_ORIGINS: list[str] = ["http://localhost:3000", "http://localhost:8080"]
 
+    @field_validator("CORS_ORIGINS", mode="before")
+    @classmethod
+    def parse_cors_origins(cls, v: Any) -> list[str]:
+        """Parse CORS origins from comma-separated string or list."""
+        if isinstance(v, str):
+            return [origin.strip() for origin in v.split(",") if origin.strip()]
+        return v
+
     # Seed data on startup (for demo/testing)
     SEED_ON_STARTUP: bool = True
 
@@ -73,6 +84,11 @@ class Settings(BaseSettings):
         "https://sanad-mfa.netlify.app",
         "https://sanad-staff.netlify.app",
         "https://sanad-patient.netlify.app",
+        # With owner suffix
+        "https://sanad-admin-diggaihh.netlify.app",
+        "https://sanad-mfa-diggaihh.netlify.app",
+        "https://sanad-staff-diggaihh.netlify.app",
+        "https://sanad-patient-diggaihh.netlify.app",
     ]
 
     @property

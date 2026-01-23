@@ -1,12 +1,47 @@
 # ==============================================================================
-# 🚀 SANAD - Kostenlose Deployment-Anleitung
+# 🚀 SANAD - Deployment-Anleitung (Railway + Netlify)
 # ==============================================================================
-# 
+#
 # Diese Anleitung bringt alle 4 Apps + Backend öffentlich online:
-# - Backend: Render.com (kostenlos)
-# - Flutter Web Apps: Cloudflare Pages (kostenlos)
-# 
+# - Backend: Railway (kostenloses/kleines Hobby-Tier)
+# - Flutter Web Apps: Netlify (kostenlos)
+#
 # Geschätzte Zeit: ~30 Minuten
+# ==============================================================================
+
+## ✅ Bevorzugter Weg: Railway (Backend) + Netlify (Frontend)
+
+### 1) Backend auf Railway deployen
+1. https://railway.app öffnen und anmelden
+2. "New Project" → "Deploy from GitHub Repo"
+3. Repo `DiggAiHH/Sanad` auswählen
+4. Service Root auf `backend/` setzen (oder Dockerfile im Root angeben)
+5. Environment Variables setzen:
+   - `DATABASE_URL` (Railway Postgres Plugin liefert diese URL)
+   - `JWT_SECRET_KEY` (starkes Secret, keine Defaults)
+   - `CORS_ORIGINS` (kommasepariert, z.B. Netlify Domains)
+   - optional: `SEED_ON_STARTUP=true` für Demo-Daten
+6. Deploy starten → Domain notieren, z.B. `https://sanad-api-production.up.railway.app`
+
+### 2) Frontend auf Netlify deployen
+Pro App eine eigene Netlify Site erstellen (monorepo-ready).
+
+1. Netlify → "Add new site" → "Import from Git"
+2. Repo `DiggAiHH/Sanad` wählen
+3. Build Einstellungen (wie in `netlify.toml`):
+   - Build command: `bash scripts/netlify_build.sh`
+   - Publish directory: `build/web_deploy/admin` (wird pro App gesetzt)
+4. Environment Variables je Site setzen:
+   - `APP_NAME` = `admin` | `mfa` | `staff` | `patient`
+   - `API_BASE_URL` = `https://<railway-domain>/api/v1`
+
+### 3) CORS auf Backend prüfen
+Stelle sicher, dass deine Netlify URLs in `CORS_ORIGINS` oder `NETLIFY_DOMAINS` enthalten sind.
+
+---
+
+# ==============================================================================
+# Legacy: Render + Cloudflare Pages (Alternative)
 # ==============================================================================
 
 ## 📋 Voraussetzungen

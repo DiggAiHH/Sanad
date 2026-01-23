@@ -407,7 +407,7 @@ class _VideoCallScreenState extends ConsumerState<VideoCallScreen> {
               Container(
                 width: double.infinity,
                 height: double.infinity,
-                color: AppColors.primary.shade900,
+                color: AppColors.primaryDark,
                 child: Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -834,8 +834,14 @@ class _RequestVideoCallScreenState extends ConsumerState<RequestVideoCallScreen>
     setState(() => _isSubmitting = true);
 
     try {
-      // TODO: Call API to create consultation request
-      await Future.delayed(const Duration(seconds: 1));
+      final service = ref.read(consultationServiceProvider);
+      final preferredTime = _buildPreferredDateTime();
+
+      await service.requestVideoCall(
+        reason: _reasonController.text.trim(),
+        preferredTime: preferredTime,
+        priority: _mapPriority(_priority),
+      );
 
       if (mounted) {
         showDialog(
@@ -875,6 +881,30 @@ class _RequestVideoCallScreenState extends ConsumerState<RequestVideoCallScreen>
     }
   }
 
+  DateTime? _buildPreferredDateTime() {
+    if (_preferredDate == null) return null;
+    final time = _preferredTime ?? const TimeOfDay(hour: 9, minute: 0);
+    return DateTime(
+      _preferredDate!.year,
+      _preferredDate!.month,
+      _preferredDate!.day,
+      time.hour,
+      time.minute,
+    );
+  }
+
+  ConsultationPriority _mapPriority(String value) {
+    switch (value) {
+      case 'high':
+        return ConsultationPriority.urgent;
+      case 'normal':
+        return ConsultationPriority.sameDay;
+      case 'low':
+      default:
+        return ConsultationPriority.routine;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -908,7 +938,7 @@ class _RequestVideoCallScreenState extends ConsumerState<RequestVideoCallScreen>
                         'Vereinbaren Sie eine persönliche Video-Beratung '
                         'mit Ihrem Arzt von zu Hause aus.',
                         style: AppTextStyles.bodySmall.copyWith(
-                          color: AppColors.info.shade700,
+                          color: AppColors.info,
                         ),
                       ),
                     ),

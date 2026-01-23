@@ -16,6 +16,12 @@ void main() async {
     ProviderScope(
       overrides: [
         storageServiceProvider.overrideWithValue(storage),
+        themeModeProvider.overrideWith(
+          (ref) => ThemeModeController(
+            storage,
+            storageKey: AppConstants.keyThemeModePatient,
+          ),
+        ),
       ],
       child: const PatientApp(),
     ),

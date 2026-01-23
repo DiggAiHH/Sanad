@@ -31,13 +31,23 @@ class HomeScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: AppColors.background,
+      appBar: AppBar(
+        title: const Text('Sanad'),
+        actions: [
+          ThemeModeMenuButton(
+            mode: ref.watch(themeModeProvider),
+            onSelected: (next) =>
+                ref.read(themeModeProvider.notifier).setMode(next),
+          ),
+        ],
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const SizedBox(height: 40),
+              const SizedBox(height: 16),
               // Logo/Header
               Center(
                 child: Column(
@@ -176,6 +186,16 @@ class HomeScreen extends ConsumerWidget {
                 description: 'Rezepte, Überweisungen, AU-Bescheinigungen und andere Dokumente anfragen.',
                 buttonText: 'Dokument anfragen',
                 onPressed: () => context.push('/documents'),
+              ),
+              const SizedBox(height: 16),
+              
+              // NEW: Medication Plan Action
+              _ActionCard(
+                icon: Icons.medication,
+                title: 'Medikationsplan',
+                description: 'Ihre aktuellen Medikamente, Dosierungen und Hinweise.',
+                buttonText: 'Plan anzeigen',
+                onPressed: () => context.push('/medications'),
               ),
               const SizedBox(height: 16),
               

@@ -63,7 +63,7 @@ class _AURequestScreenState extends ConsumerState<AURequestScreen> {
                         'Eine AU-Bescheinigung kann nur nach vorheriger '
                         'Untersuchung oder Videosprechstunde ausgestellt werden.',
                         style: AppTextStyles.bodyMedium.copyWith(
-                          color: AppColors.warning.shade700,
+                          color: AppColors.warning,
                         ),
                       ),
                     ),

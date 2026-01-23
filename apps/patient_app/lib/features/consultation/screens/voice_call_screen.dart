@@ -259,7 +259,7 @@ class _VoiceCallScreenState extends ConsumerState<VoiceCallScreen> {
     final doctorName = _consultation?.doctorName ?? 'Dr. med. Schmidt';
     
     return Scaffold(
-      backgroundColor: AppColors.primary.shade900,
+      backgroundColor: AppColors.primaryDark,
       body: SafeArea(
         child: Column(
           children: [
@@ -601,9 +601,14 @@ class _SoundBarState extends State<_SoundBar>
 }
 
 
-/// Screen zum Anfragen eines Rückrufs.
+/// Screen zum Anfragen einer Telefonsprechstunde oder eines Rueckrufs.
 class RequestCallbackScreen extends ConsumerStatefulWidget {
-  const RequestCallbackScreen({super.key});
+  final ConsultationType requestType;
+
+  const RequestCallbackScreen({
+    super.key,
+    this.requestType = ConsultationType.callbackRequest,
+  });
 
   @override
   ConsumerState<RequestCallbackScreen> createState() => _RequestCallbackScreenState();
@@ -640,18 +645,32 @@ class _RequestCallbackScreenState extends ConsumerState<RequestCallbackScreen> {
     setState(() => _isSubmitting = true);
 
     try {
-      // TODO: Call API to create callback request
-      await Future.delayed(const Duration(seconds: 1));
+      final service = ref.read(consultationServiceProvider);
+      final details =
+          'Telefon: ${_phoneController.text.trim()} | Zeitfenster: ${_timeSlotLabel(_preferredTimeSlot)}';
+
+      if (widget.requestType == ConsultationType.voiceCall) {
+        await service.requestVoiceCall(
+          reason: _reasonController.text.trim(),
+          symptoms: details,
+          priority: _mapPriority(_priority),
+        );
+      } else {
+        await service.requestCallback(
+          reason: _reasonController.text.trim(),
+          symptoms: details,
+          priority: _mapPriority(_priority),
+        );
+      }
 
       if (mounted) {
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
             icon: Icon(Icons.check_circle, color: AppColors.success, size: 48),
-            title: const Text('Rückruf angefordert'),
-            content: const Text(
-              'Ihre Rückrufanfrage wurde erfolgreich übermittelt. '
-              'Wir werden Sie schnellstmöglich zurückrufen.',
+            title: Text(_successTitle()),
+            content: Text(
+              _successMessage(),
             ),
             actions: [
               ElevatedButton(
@@ -683,10 +702,11 @@ class _RequestCallbackScreenState extends ConsumerState<RequestCallbackScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isVoiceCall = widget.requestType == ConsultationType.voiceCall;
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text('Rückruf anfordern'),
+        title: Text(isVoiceCall ? 'Telefonsprechstunde anfragen' : 'Rückruf anfordern'),
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
       ),
@@ -707,14 +727,20 @@ class _RequestCallbackScreenState extends ConsumerState<RequestCallbackScreen> {
                 ),
                 child: Row(
                   children: [
-                    Icon(Icons.phone_callback, color: AppColors.secondary),
+                    Icon(
+                      isVoiceCall ? Icons.phone_in_talk : Icons.phone_callback,
+                      color: AppColors.secondary,
+                    ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
-                        'Fordern Sie einen Rückruf an und wir melden uns '
-                        'telefonisch bei Ihnen.',
+                        isVoiceCall
+                            ? 'Fordern Sie eine Telefonsprechstunde an '
+                                'und sprechen Sie direkt mit Ihrem Arzt.'
+                            : 'Fordern Sie einen Rückruf an und wir melden uns '
+                                'telefonisch bei Ihnen.',
                         style: AppTextStyles.bodySmall.copyWith(
-                          color: AppColors.secondary.shade700,
+                          color: AppColors.secondaryDark,
                         ),
                       ),
                     ),
@@ -752,7 +778,9 @@ class _RequestCallbackScreenState extends ConsumerState<RequestCallbackScreen> {
 
               // Reason
               Text(
-                'Grund für den Rückruf *',
+                isVoiceCall
+                    ? 'Grund für die Telefonsprechstunde *'
+                    : 'Grund für den Rückruf *',
                 style: AppTextStyles.labelLarge.copyWith(
                   fontWeight: FontWeight.w600,
                 ),
@@ -881,7 +909,9 @@ class _RequestCallbackScreenState extends ConsumerState<RequestCallbackScreen> {
                       )
                     : const Icon(Icons.send),
                 label: Text(
-                  _isSubmitting ? 'Wird gesendet...' : 'Rückruf anfordern',
+                  _isSubmitting
+                      ? 'Wird gesendet...'
+                      : (isVoiceCall ? 'Telefontermin anfragen' : 'Rückruf anfordern'),
                 ),
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.all(16),
@@ -894,6 +924,47 @@ class _RequestCallbackScreenState extends ConsumerState<RequestCallbackScreen> {
         ),
       ),
     );
+  }
+
+  String _timeSlotLabel(String slot) {
+    switch (slot) {
+      case 'morning':
+        return 'Morgens (08-12 Uhr)';
+      case 'noon':
+        return 'Mittags (12-14 Uhr)';
+      case 'afternoon':
+        return 'Nachmittags (14-18 Uhr)';
+      case 'evening':
+        return 'Abends (18-20 Uhr)';
+      default:
+        return 'Beliebig';
+    }
+  }
+
+  ConsultationPriority _mapPriority(String value) {
+    switch (value) {
+      case 'high':
+        return ConsultationPriority.urgent;
+      case 'normal':
+        return ConsultationPriority.sameDay;
+      case 'low':
+      default:
+        return ConsultationPriority.routine;
+    }
+  }
+
+  String _successTitle() {
+    return widget.requestType == ConsultationType.voiceCall
+        ? 'Telefonsprechstunde angefragt'
+        : 'Rückruf angefordert';
+  }
+
+  String _successMessage() {
+    return widget.requestType == ConsultationType.voiceCall
+        ? 'Ihre Anfrage wurde übermittelt. Sie erhalten eine Benachrichtigung, '
+            'sobald ein Termin bestätigt wurde.'
+        : 'Ihre Rückrufanfrage wurde erfolgreich übermittelt. '
+            'Wir werden Sie schnellstmöglich zurückrufen.';
   }
 }
 

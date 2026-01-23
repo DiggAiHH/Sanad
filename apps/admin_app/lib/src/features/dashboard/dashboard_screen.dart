@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:sanad_core/sanad_core.dart';
 import 'package:sanad_ui/sanad_ui.dart';
 
 /// Admin dashboard with overview statistics
@@ -28,6 +30,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
             icon: const Icon(Icons.notifications_outlined),
             onPressed: () {},
             tooltip: 'Benachrichtigungen',
+          ),
+          Consumer(
+            builder: (context, ref, _) {
+              final mode = ref.watch(themeModeProvider);
+              return ThemeModeMenuButton(
+                mode: mode,
+                onSelected: (next) =>
+                    ref.read(themeModeProvider.notifier).setMode(next),
+              );
+            },
           ),
         ],
       ),

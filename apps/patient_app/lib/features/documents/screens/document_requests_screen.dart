@@ -19,12 +19,20 @@ class _DocumentRequestsScreenState
     extends ConsumerState<DocumentRequestsScreen> {
   @override
   Widget build(BuildContext context) {
+    final requestsAsync = ref.watch(myDocumentRequestsProvider);
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
         title: const Text('Dokumente anfordern'),
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
+        actions: [
+          ThemeModeMenuButton(
+            mode: ref.watch(themeModeProvider),
+            onSelected: (next) =>
+                ref.read(themeModeProvider.notifier).setMode(next),
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -124,32 +132,20 @@ class _DocumentRequestsScreenState
             ),
             const SizedBox(height: 12),
 
-            // Recent requests (placeholder)
-            _buildRecentRequests(),
+            // Recent requests
+            requestsAsync.when(
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (error, _) => _buildErrorState(error),
+              data: (requests) => _buildRecentRequests(requests),
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildRecentRequests() {
-    // TODO: Replace with actual data from provider
-    final recentRequests = <_MockRequest>[
-      _MockRequest(
-        type: 'Rezept',
-        title: 'Ibuprofen 400mg',
-        status: DocumentRequestStatus.ready,
-        date: DateTime.now().subtract(const Duration(days: 1)),
-      ),
-      _MockRequest(
-        type: 'Überweisung',
-        title: 'Orthopädie',
-        status: DocumentRequestStatus.inReview,
-        date: DateTime.now().subtract(const Duration(days: 2)),
-      ),
-    ];
-
-    if (recentRequests.isEmpty) {
+  Widget _buildRecentRequests(List<DocumentRequest> requests) {
+    if (requests.isEmpty) {
       return Container(
         padding: const EdgeInsets.all(32),
         decoration: BoxDecoration(
@@ -175,10 +171,39 @@ class _DocumentRequestsScreenState
       );
     }
 
+    final recentRequests = requests.take(3).toList();
     return Column(
       children: recentRequests
           .map((req) => _RequestListItem(request: req))
           .toList(),
+    );
+  }
+
+  Widget _buildErrorState(Object error) {
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: AppColors.error.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        children: [
+          Icon(Icons.error_outline, size: 48, color: AppColors.error),
+          const SizedBox(height: 12),
+          Text(
+            'Fehler beim Laden',
+            style: AppTextStyles.bodyLarge.copyWith(color: AppColors.error),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            error.toString(),
+            style: AppTextStyles.bodySmall.copyWith(
+              color: AppColors.textSecondary,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
     );
   }
 }
@@ -254,22 +279,8 @@ class _DocumentTypeCard extends StatelessWidget {
   }
 }
 
-class _MockRequest {
-  final String type;
-  final String title;
-  final DocumentRequestStatus status;
-  final DateTime date;
-
-  _MockRequest({
-    required this.type,
-    required this.title,
-    required this.status,
-    required this.date,
-  });
-}
-
 class _RequestListItem extends StatelessWidget {
-  final _MockRequest request;
+  final DocumentRequest request;
 
   const _RequestListItem({required this.request});
 
@@ -299,7 +310,7 @@ class _RequestListItem extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  '${request.type} • ${_formatDate(request.date)}',
+                  '${_typeLabel(request.documentType)} • ${_formatDate(request.createdAt)}',
                   style: AppTextStyles.bodySmall.copyWith(
                     color: AppColors.textSecondary,
                   ),
@@ -319,6 +330,25 @@ class _RequestListItem extends StatelessWidget {
     if (diff.inDays == 0) return 'Heute';
     if (diff.inDays == 1) return 'Gestern';
     return '${date.day}.${date.month}.${date.year}';
+  }
+
+  String _typeLabel(DocumentType type) {
+    switch (type) {
+      case DocumentType.rezept:
+        return 'Rezept';
+      case DocumentType.ueberweisung:
+        return 'Überweisung';
+      case DocumentType.auBescheinigung:
+        return 'AU';
+      case DocumentType.bescheinigung:
+        return 'Bescheinigung';
+      case DocumentType.befund:
+        return 'Befund';
+      case DocumentType.attest:
+        return 'Attest';
+      case DocumentType.sonstige:
+        return 'Sonstige';
+    }
   }
 }
 

@@ -1,4 +1,5 @@
 import 'package:go_router/go_router.dart';
+import 'package:sanad_core/sanad_core.dart';
 
 import 'features/home/screens/home_screen.dart';
 import 'features/ticket/screens/ticket_entry_screen.dart';
@@ -6,6 +7,7 @@ import 'features/ticket/screens/ticket_status_screen.dart';
 import 'features/info/screens/info_screen.dart';
 import 'features/documents/documents.dart';
 import 'features/consultation/consultation.dart';
+import 'features/medications/medications.dart';
 
 /// Application router configuration.
 final router = GoRouter(
@@ -35,11 +37,19 @@ final router = GoRouter(
       path: '/info',
       builder: (context, state) => const InfoScreen(),
     ),
+    GoRoute(
+      path: '/medications',
+      builder: (context, state) => const MedicationPlanScreen(),
+    ),
     
     // Document Request Routes
     GoRoute(
       path: '/documents',
       builder: (context, state) => const DocumentRequestsScreen(),
+    ),
+    GoRoute(
+      path: '/documents/history',
+      builder: (context, state) => const DocumentHistoryScreen(),
     ),
     GoRoute(
       path: '/documents/rezept',
@@ -69,7 +79,8 @@ final router = GoRouter(
     ),
     GoRoute(
       path: '/consultation/voice',
-      builder: (context, state) => const RequestCallbackScreen(),
+      builder: (context, state) =>
+          const RequestCallbackScreen(requestType: ConsultationType.voiceCall),
     ),
     GoRoute(
       path: '/consultation/chat',

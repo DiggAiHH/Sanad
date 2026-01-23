@@ -42,6 +42,13 @@ class ConsultationsScreen extends ConsumerWidget {
         title: const Text('Arzt kontaktieren'),
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
+        actions: [
+          ThemeModeMenuButton(
+            mode: ref.watch(themeModeProvider),
+            onSelected: (next) =>
+                ref.read(themeModeProvider.notifier).setMode(next),
+          ),
+        ],
       ),
       // Schritt 8: Pull-to-Refresh
       body: RefreshIndicator(
@@ -149,7 +156,7 @@ class ConsultationsScreen extends ConsumerWidget {
                     'Bei akuten Notfällen rufen Sie bitte die 112 an '
                     'oder suchen Sie die nächste Notaufnahme auf.',
                     style: AppTextStyles.bodyMedium.copyWith(
-                      color: AppColors.error.shade700,
+                      color: AppColors.error,
                     ),
                   ),
                   const SizedBox(height: 12),

@@ -29,6 +29,7 @@ export 'feedback/screen_state.dart';
 
 // Navigation
 export 'navigation/modern_navigation.dart';
+export 'navigation/theme_mode_menu_button.dart';
 
 // Animations
 export 'animations/animation_widgets.dart';

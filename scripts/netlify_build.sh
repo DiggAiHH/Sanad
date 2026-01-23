@@ -43,7 +43,10 @@ echo "📦 Building: $APP_NAME"
 echo "📁 App directory: $APP_DIR"
 
 # API URL with fallback
-API_URL="${API_BASE_URL:-https://sanad-api.onrender.com/api/v1}"
+if [ -z "$API_BASE_URL" ]; then
+    echo "⚠️  API_BASE_URL not set, defaulting to localhost."
+fi
+API_URL="${API_BASE_URL:-http://localhost:8000/api/v1}"
 echo "📡 API URL: $API_URL"
 
 # Feature flags

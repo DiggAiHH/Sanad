@@ -184,7 +184,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       final messages = await service.getMessages(widget.consultationId!);
       
       // Decrypt messages and index for search
-      final decryptedMessages = messages.map((msg) {
+      final decryptedMessages = messages.map<ConsultationMessage>((msg) {
         final decryptedContent = _decryptContent(msg.content);
         // Index for client-side search (DSGVO-konform)
         _encryptionService.indexMessage(
@@ -200,10 +200,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
           senderRole: msg.senderRole,
           content: decryptedContent,
           isRead: msg.isRead,
-          attachmentUrl: msg.attachmentUrl,
-          attachmentType: msg.attachmentType,
           createdAt: msg.createdAt,
-          readAt: msg.readAt,
           senderName: msg.senderName,
         );
       }).toList();
@@ -255,10 +252,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         senderRole: message.senderRole,
         content: content, // Use original plaintext for display
         isRead: message.isRead,
-        attachmentUrl: message.attachmentUrl,
-        attachmentType: message.attachmentType,
         createdAt: message.createdAt,
-        readAt: message.readAt,
         senderName: message.senderName,
       );
 

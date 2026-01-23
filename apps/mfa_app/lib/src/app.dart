@@ -79,13 +79,14 @@ class _MfaAppState extends ConsumerState<MfaApp> {
   @override
   Widget build(BuildContext context) {
     final router = ref.watch(routerProvider);
+    final themeModePreference = ref.watch(themeModeProvider);
 
     return MaterialApp.router(
       title: 'Sanad Empfang',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
-      themeMode: ThemeMode.light,
+      themeMode: themeModePreference.themeMode,
       routerConfig: router,
     );
   }

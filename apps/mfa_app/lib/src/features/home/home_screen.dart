@@ -57,6 +57,11 @@ class HomeScreen extends ConsumerWidget {
             compact: true,
           ),
           const SizedBox(width: 16),
+          ThemeModeMenuButton(
+            mode: ref.watch(themeModeProvider),
+            onSelected: (next) =>
+                ref.read(themeModeProvider.notifier).setMode(next),
+          ),
           IconButton(
             icon: const Icon(Icons.settings),
             onPressed: () => context.push('/settings/iot-device'),

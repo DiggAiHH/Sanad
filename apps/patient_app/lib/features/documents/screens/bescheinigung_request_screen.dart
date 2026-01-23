@@ -141,7 +141,7 @@ class _BescheinigungRequestScreenState
                         'Ärztliche Bescheinigungen für verschiedene Zwecke. '
                         'Bitte beachten Sie, dass manche Bescheinigungen eine persönliche Untersuchung erfordern.',
                         style: AppTextStyles.bodySmall.copyWith(
-                          color: AppColors.info.shade700,
+                          color: AppColors.info,
                         ),
                       ),
                     ),
@@ -383,7 +383,7 @@ class _BescheinigungRequestScreenState
                         'Hinweis: Für einige Bescheinigungen (z.B. Sporttauglichkeit, Fahreignung) '
                         'ist möglicherweise eine persönliche Untersuchung erforderlich.',
                         style: AppTextStyles.labelSmall.copyWith(
-                          color: AppColors.warning.shade700,
+                          color: AppColors.warning,
                         ),
                       ),
                     ),

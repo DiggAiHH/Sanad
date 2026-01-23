@@ -67,6 +67,12 @@ class ApiEndpoints {
   static String documentRequest(String id) => '/document-requests/$id';
   static const String myDocumentRequests = '/document-requests/my';
 
+  // Medications
+  static const String medications = '/medications';
+  static const String myMedications = '/medications/my';
+  static const String myMedicationPlan = '/medications/my/plan';
+  static const String myMedicationScheduleToday = '/medications/my/schedule/today';
+
   // Consultations (Video, Voice, Chat mit Arzt)
   static const String consultations = '/consultations';
   static String consultation(String id) => '/consultations/$id';

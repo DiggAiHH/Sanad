@@ -29,5 +29,8 @@ export 'document_request.dart';
 // Consultation Models (Chat, Video, Voice)
 export 'consultation.dart';
 
+// Medication Models
+export 'medication.dart';
+
 // Encryption Models (E2E)
 export 'encryption.dart';

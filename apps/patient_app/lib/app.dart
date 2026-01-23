@@ -118,12 +118,13 @@ class _PatientAppState extends ConsumerState<PatientApp> {
 
   @override
   Widget build(BuildContext context) {
+    final themeModePreference = ref.watch(themeModeProvider);
     return MaterialApp.router(
       title: 'Sanad - Patienten-App',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
-      themeMode: ThemeMode.light,
+      themeMode: themeModePreference.themeMode,
       routerConfig: router,
     );
   }

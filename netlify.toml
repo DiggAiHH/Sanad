@@ -66,6 +66,6 @@
 # ==============================================================================
 # Each Netlify site should set:
 #   APP_NAME = "admin" | "mfa" | "staff" | "patient"
-#   API_BASE_URL = "https://sanad-api.onrender.com/api/v1"
+#   API_BASE_URL = "https://<your-railway-domain>/api/v1"
 #   ENABLE_DEMO_MODE = "true" (optional)
 # ==============================================================================

@@ -6,7 +6,8 @@ library sanad_core;
 export 'src/models/models.dart';
 
 // Services
-export 'src/services/services.dart';
+export 'src/services/services.dart'
+    hide documentRequestServiceProvider, encryptionServiceProvider;
 
 // Providers
 export 'src/providers/providers.dart';

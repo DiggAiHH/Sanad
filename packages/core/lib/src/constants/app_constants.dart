@@ -34,6 +34,7 @@ class AppConstants {
   static const String keyUserData = 'user_data';
   static const String keyPracticeId = 'practice_id';
   static const String keyThemeMode = 'theme_mode';
+  static const String keyThemeModePatient = 'theme_mode_patient';
   static const String keyLocale = 'locale';
   static const String keyLastTicketNumber = 'last_ticket_number';
 

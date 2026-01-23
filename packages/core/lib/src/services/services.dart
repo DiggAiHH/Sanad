@@ -8,6 +8,7 @@ export 'offline_service.dart';
 export 'public_ticket_service.dart';
 export 'public_practice_service.dart';
 export 'public_queue_summary_service.dart';
+export 'medication_service.dart';
 
 // Document Requests & Consultations
 export 'document_request_service.dart';

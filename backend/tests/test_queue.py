@@ -16,11 +16,14 @@ async def get_auth_headers(client: AsyncClient) -> dict:
         "role": "mfa",
     }
     await client.post("/api/v1/auth/register", json=user_data)
-    
-    login_response = await client.post("/api/v1/auth/login", json={
-        "email": user_data["email"],
-        "password": user_data["password"],
-    })
+
+    login_response = await client.post(
+        "/api/v1/auth/login",
+        json={
+            "email": user_data["email"],
+            "password": user_data["password"],
+        },
+    )
     token = login_response.json()["access_token"]
     return {"Authorization": f"Bearer {token}"}
 
@@ -39,7 +42,7 @@ async def test_list_queues_empty(client: AsyncClient) -> None:
 async def test_create_ticket(client: AsyncClient) -> None:
     """Test creating a new ticket."""
     headers = await get_auth_headers(client)
-    
+
     # Create ticket
     ticket_data = {
         "patient_name": "Max Mustermann",
@@ -47,12 +50,8 @@ async def test_create_ticket(client: AsyncClient) -> None:
         "priority": "normal",
         "notes": "Routine checkup",
     }
-    
-    response = await client.post(
-        "/api/v1/tickets",
-        json=ticket_data,
-        headers=headers
-    )
+
+    response = await client.post("/api/v1/tickets", json=ticket_data, headers=headers)
     # queue_id is required by schema; without it FastAPI returns 422
     assert response.status_code in [201, 400, 404, 422]
 

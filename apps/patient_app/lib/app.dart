@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sanad_core/sanad_core.dart';
 import 'package:sanad_ui/sanad_ui.dart';
@@ -20,6 +21,10 @@ class _PatientAppState extends ConsumerState<PatientApp> {
   @override
   void initState() {
     super.initState();
+    if (kIsWeb) {
+      ref.read(pushInitializedProvider.notifier).state = true;
+      return;
+    }
     _initializePush();
   }
 
@@ -41,11 +46,10 @@ class _PatientAppState extends ConsumerState<PatientApp> {
     if (payload.type == PushNotificationType.ticketCalled) {
       _showTicketCalledDialog(payload);
     } else if (payload.type == PushNotificationType.checkInSuccess) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(payload.body),
-          backgroundColor: Colors.green,
-        ),
+      ModernSnackBar.show(
+        context,
+        message: payload.body,
+        type: SnackBarType.success,
       );
     }
   }

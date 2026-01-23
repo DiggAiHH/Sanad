@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../theme/app_colors.dart';
+import 'app_colors.dart';
 
 /// Dark theme aware color getter
 extension AppColorsTheme on AppColors {

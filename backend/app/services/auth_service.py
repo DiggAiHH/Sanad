@@ -29,13 +29,13 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 def hash_password(password: str) -> str:
     """
     Hash a password using bcrypt.
-    
+
     Args:
         password: Plain text password.
-        
+
     Returns:
         str: Bcrypt hashed password.
-        
+
     Security Implications:
         - Uses bcrypt with default cost factor.
         - Resistant to rainbow table attacks.
@@ -46,14 +46,14 @@ def hash_password(password: str) -> str:
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     """
     Verify a password against a hash.
-    
+
     Args:
         plain_password: Plain text password to verify.
         hashed_password: Stored bcrypt hash.
-        
+
     Returns:
         bool: True if password matches.
-        
+
     Security Implications:
         - Constant-time comparison prevents timing attacks.
     """
@@ -63,14 +63,14 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 def create_access_token(user_id: uuid.UUID, role: UserRole) -> str:
     """
     Create a JWT access token.
-    
+
     Args:
         user_id: User's UUID.
         role: User's role for authorization.
-        
+
     Returns:
         str: Signed JWT access token.
-        
+
     Security Implications:
         - Short expiration time (30 minutes default).
         - Contains only non-sensitive data (id, role).
@@ -85,19 +85,21 @@ def create_access_token(user_id: uuid.UUID, role: UserRole) -> str:
         "role": role.value,
         "type": "access",
     }
-    return jwt.encode(payload, settings.JWT_SECRET_KEY, algorithm=settings.JWT_ALGORITHM)
+    return jwt.encode(
+        payload, settings.JWT_SECRET_KEY, algorithm=settings.JWT_ALGORITHM
+    )
 
 
 def create_refresh_token(user_id: uuid.UUID) -> str:
     """
     Create a JWT refresh token.
-    
+
     Args:
         user_id: User's UUID.
-        
+
     Returns:
         str: Signed JWT refresh token.
-        
+
     Security Implications:
         - Longer expiration (7 days default).
         - Should be stored securely on client.
@@ -111,19 +113,21 @@ def create_refresh_token(user_id: uuid.UUID) -> str:
         "iat": datetime.now(timezone.utc),
         "type": "refresh",
     }
-    return jwt.encode(payload, settings.JWT_SECRET_KEY, algorithm=settings.JWT_ALGORITHM)
+    return jwt.encode(
+        payload, settings.JWT_SECRET_KEY, algorithm=settings.JWT_ALGORITHM
+    )
 
 
 def decode_token(token: str) -> Optional[TokenPayload]:
     """
     Decode and validate a JWT token.
-    
+
     Args:
         token: JWT token string.
-        
+
     Returns:
         TokenPayload: Decoded payload or None if invalid.
-        
+
     Security Implications:
         - Validates signature and expiration.
         - Returns None for any invalid token.
@@ -150,35 +154,33 @@ async def authenticate_user(
 ) -> Optional[User]:
     """
     Authenticate a user by email and password.
-    
+
     Args:
         db: Database session.
         email: User's email address.
         password: Plain text password.
-        
+
     Returns:
         User: Authenticated user or None.
-        
+
     Security Implications:
         - Constant-time password comparison.
         - Does not reveal which field was incorrect.
     """
-    result = await db.execute(
-        select(User).where(User.email == email.lower())
-    )
+    result = await db.execute(select(User).where(User.email == email.lower()))
     user = result.scalar_one_or_none()
-    
+
     if not user:
         # Perform dummy hash to prevent timing attacks
         pwd_context.hash("dummy")
         return None
-    
+
     if not verify_password(password, user.hashed_password):
         return None
-    
+
     if not user.is_active:
         return None
-    
+
     return user
 
 
@@ -193,7 +195,7 @@ async def create_user(
 ) -> User:
     """
     Create a new user.
-    
+
     Args:
         db: Database session.
         email: User's email address.
@@ -202,24 +204,22 @@ async def create_user(
         last_name: User's last name.
         role: User's role (default: patient).
         phone: Optional phone number.
-        
+
     Returns:
         User: Created user.
-        
+
     Raises:
         ValueError: If email already exists.
-        
+
     Security Implications:
         - Password is immediately hashed.
         - Email is normalized to lowercase.
     """
     # Check if email exists
-    existing = await db.execute(
-        select(User).where(User.email == email.lower())
-    )
+    existing = await db.execute(select(User).where(User.email == email.lower()))
     if existing.scalar_one_or_none():
         raise ValueError("Email already registered")
-    
+
     user = User(
         email=email.lower(),
         hashed_password=hash_password(password),
@@ -237,16 +237,16 @@ async def create_user(
 def generate_tokens(user: User) -> TokenResponse:
     """
     Generate access and refresh tokens for a user.
-    
+
     Args:
         user: Authenticated user.
-        
+
     Returns:
         TokenResponse: Access and refresh tokens.
     """
     access_token = create_access_token(user.id, user.role)
     refresh_token = create_refresh_token(user.id)
-    
+
     return TokenResponse(
         access_token=access_token,
         refresh_token=refresh_token,

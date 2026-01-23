@@ -4,7 +4,6 @@ Push notification API endpoints.
 Handles device token registration and management.
 """
 
-from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -13,7 +12,6 @@ from app.database import get_db
 from app.dependencies import get_current_user
 from app.models.models import User, UserRole
 from app.schemas.schemas import (
-    DevicePlatform,
     MessageResponse,
     RegisterDeviceTokenRequest,
     RegisterDeviceTokenResponse,
@@ -37,13 +35,13 @@ async def register_device_token(
 ):
     """
     Register device token for push notifications.
-    
+
     - Token is associated with current authenticated user
     - If token already exists, ownership is transferred
     - One user can have multiple devices (iOS, Android, Web)
     """
     service = PushNotificationService(db)
-    
+
     token_record = await service.register_token(
         user_id=current_user.id,
         fcm_token=request.fcm_token,
@@ -51,7 +49,7 @@ async def register_device_token(
         device_name=request.device_name,
         app_version=request.app_version,
     )
-    
+
     return RegisterDeviceTokenResponse(
         success=True,
         device_id=token_record.id,
@@ -72,20 +70,20 @@ async def unregister_device_token(
 ):
     """
     Unregister device from push notifications.
-    
+
     Should be called on:
     - User logout
     - App uninstall detection
     - Token refresh (old token)
     """
     service = PushNotificationService(db)
-    
+
     success = await service.unregister_token(request.fcm_token)
-    
+
     if not success:
         # Token not found - still return success (idempotent)
         return MessageResponse(message="Token bereits entfernt oder nicht gefunden")
-    
+
     return MessageResponse(message="Gerät erfolgreich abgemeldet")
 
 
@@ -101,7 +99,7 @@ async def list_devices(
     """List all registered devices for current user."""
     service = PushNotificationService(db)
     tokens = await service.get_user_tokens(current_user.id)
-    
+
     return {
         "devices": [
             {
@@ -128,9 +126,9 @@ async def get_push_status(
 ):
     """
     Get Firebase/FCM status for health monitoring.
-    
+
     Admin-only endpoint for debugging push notification issues.
-    
+
     Returns:
         initialized: Whether Firebase SDK is ready
         enabled: Whether credentials are configured
@@ -141,5 +139,5 @@ async def get_push_status(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Admin access required",
         )
-    
+
     return get_firebase_status()

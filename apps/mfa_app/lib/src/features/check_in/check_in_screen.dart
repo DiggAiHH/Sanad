@@ -12,7 +12,7 @@ class CheckInScreen extends StatefulWidget {
 
 class _CheckInScreenState extends State<CheckInScreen> {
   String? _selectedCategory;
-  final _searchController = TextEditingController();
+  String _searchQuery = '';
   bool _isNewPatient = false;
 
   final _categories = [
@@ -22,9 +22,26 @@ class _CheckInScreenState extends State<CheckInScreen> {
     {'id': 'D', 'name': 'Rezept abholen', 'color': AppColors.warning},
   ];
 
+  final _patients = [
+    {
+      'name': 'Max Mustermann',
+      'dob': '15.03.1985',
+      'insurance': 'AOK',
+    },
+    {
+      'name': 'Lea Hoffmann',
+      'dob': '22.08.1992',
+      'insurance': 'TK',
+    },
+    {
+      'name': 'Ahmet Yilmaz',
+      'dob': '03.11.1978',
+      'insurance': 'Barmer',
+    },
+  ];
+
   @override
   void dispose() {
-    _searchController.dispose();
     super.dispose();
   }
 
@@ -48,52 +65,58 @@ class _CheckInScreenState extends State<CheckInScreen> {
                   children: [
                     Text('Patient suchen', style: AppTextStyles.h5),
                     const SizedBox(height: 16),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: SearchInput(
-                            hint: 'Name, Versichertennummer oder Telefon...',
-                            onChanged: (value) {},
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        ElevatedButton.icon(
+                    LayoutBuilder(
+                      builder: (context, constraints) {
+                        final searchField = SearchInput(
+                          hint: 'Name, Versichertennummer oder Telefon...',
+                          onChanged: (value) {
+                            setState(() => _searchQuery = value.trim());
+                          },
+                          onClear: () => setState(() => _searchQuery = ''),
+                        );
+                        final qrButton = ElevatedButton.icon(
                           onPressed: () => context.push('/check-in/qr'),
                           icon: const Icon(Icons.qr_code_scanner),
                           label: const Text('QR Scan'),
-                        ),
-                        const SizedBox(width: 8),
-                        ElevatedButton.icon(
+                        );
+                        final nfcButton = ElevatedButton.icon(
                           onPressed: () => context.push('/check-in/nfc'),
                           icon: const Icon(Icons.nfc),
                           label: const Text('NFC'),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.success,
                           ),
-                        ),
-                      ],
+                        );
+                        if (constraints.maxWidth < 720) {
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              searchField,
+                              const SizedBox(height: 12),
+                              Row(
+                                children: [
+                                  Expanded(child: qrButton),
+                                  const SizedBox(width: 8),
+                                  Expanded(child: nfcButton),
+                                ],
+                              ),
+                            ],
+                          );
+                        }
+                        return Row(
+                          children: [
+                            Expanded(child: searchField),
+                            const SizedBox(width: 16),
+                            qrButton,
+                            const SizedBox(width: 8),
+                            nfcButton,
+                          ],
+                        );
+                      },
                     ),
                     const SizedBox(height: 16),
                     // Search results would go here
-                    if (!_isNewPatient) ...[
-                      ListTile(
-                        leading: const AppAvatar(name: 'Max Mustermann'),
-                        title: const Text('Max Mustermann'),
-                        subtitle: const Text('Geb. 15.03.1985 • Versichert: AOK'),
-                        trailing: ElevatedButton(
-                          onPressed: () => setState(() {}),
-                          child: const Text('Auswählen'),
-                        ),
-                      ),
-                      const Divider(),
-                      Center(
-                        child: TextButton.icon(
-                          onPressed: () => setState(() => _isNewPatient = true),
-                          icon: const Icon(Icons.person_add),
-                          label: const Text('Neuen Patienten anlegen'),
-                        ),
-                      ),
-                    ],
+                    if (!_isNewPatient) ..._buildSearchResults(),
                   ],
                 ),
               ),
@@ -101,6 +124,17 @@ class _CheckInScreenState extends State<CheckInScreen> {
             // New patient form
             if (_isNewPatient) ...[
               const SizedBox(height: 24),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton.icon(
+                    onPressed: () => setState(() => _isNewPatient = false),
+                    icon: const Icon(Icons.arrow_back),
+                    label: const Text('Zurück zur Suche'),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
               _buildNewPatientForm(),
             ],
             const SizedBox(height: 24),
@@ -177,6 +211,60 @@ class _CheckInScreenState extends State<CheckInScreen> {
         ),
       ),
     );
+  }
+
+  List<Widget> _buildSearchResults() {
+    final filtered = _patients.where((patient) {
+      if (_searchQuery.isEmpty) return true;
+      final name = (patient['name'] as String).toLowerCase();
+      return name.contains(_searchQuery.toLowerCase());
+    }).toList();
+
+    if (_searchQuery.isNotEmpty && filtered.isEmpty) {
+      return [
+        const SizedBox(height: 8),
+        EmptyStateWidget.noData(
+          title: 'Keine Treffer',
+          subtitle: 'Für die Suche wurden keine Patienten gefunden.',
+          actionLabel: 'Neuen Patienten anlegen',
+          onAction: () => setState(() => _isNewPatient = true),
+        ),
+      ];
+    }
+
+    return [
+      Align(
+        alignment: Alignment.centerRight,
+        child: Text(
+          'Treffer: ${filtered.length}',
+          style: AppTextStyles.bodySmall.copyWith(
+            color: AppColors.textSecondary,
+          ),
+        ),
+      ),
+      const SizedBox(height: 8),
+      ...filtered.map(
+        (patient) => ListTile(
+          leading: AppAvatar(name: patient['name'] as String),
+          title: Text(patient['name'] as String),
+          subtitle: Text(
+            'Geb. ${patient['dob']} • Versichert: ${patient['insurance']}',
+          ),
+          trailing: ElevatedButton(
+            onPressed: () => setState(() {}),
+            child: const Text('Auswählen'),
+          ),
+        ),
+      ),
+      const Divider(),
+      Center(
+        child: TextButton.icon(
+          onPressed: () => setState(() => _isNewPatient = true),
+          icon: const Icon(Icons.person_add),
+          label: const Text('Neuen Patienten anlegen'),
+        ),
+      ),
+    ];
   }
 
   Widget _buildNewPatientForm() {

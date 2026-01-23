@@ -35,30 +35,29 @@ def get_correlation_id() -> str:
 class CorrelationIdMiddleware(BaseHTTPMiddleware):
     """
     Middleware to generate and propagate correlation IDs.
-    
+
     Headers:
         X-Correlation-ID: Passed through from client or generated.
         X-Request-ID: Alias for correlation ID.
     """
-    
+
     HEADER_NAME = "X-Correlation-ID"
-    
+
     async def dispatch(self, request: Request, call_next: Callable) -> Response:
         # Get from header or generate new
         correlation_id = request.headers.get(
-            self.HEADER_NAME,
-            request.headers.get("X-Request-ID", str(uuid.uuid4()))
+            self.HEADER_NAME, request.headers.get("X-Request-ID", str(uuid.uuid4()))
         )
-        
+
         # Set in context var
         correlation_id_var.set(correlation_id)
-        
+
         # Process request
         response = await call_next(request)
-        
+
         # Add to response headers
         response.headers[self.HEADER_NAME] = correlation_id
-        
+
         return response
 
 
@@ -70,33 +69,33 @@ class CorrelationIdMiddleware(BaseHTTPMiddleware):
 class RequestLoggingMiddleware(BaseHTTPMiddleware):
     """
     Log all requests with structured data.
-    
+
     Logs:
         - Method, path, status code
         - Latency
         - Correlation ID
         - Client IP (masked)
     """
-    
+
     # Paths to skip logging (high frequency, low value)
     SKIP_PATHS = {"/health", "/", "/docs", "/openapi.json", "/redoc"}
-    
+
     # Sensitive headers to mask
     SENSITIVE_HEADERS = {"authorization", "x-device-secret", "cookie"}
-    
+
     async def dispatch(self, request: Request, call_next: Callable) -> Response:
         # Skip noisy endpoints
         if request.url.path in self.SKIP_PATHS:
             return await call_next(request)
-        
+
         start_time = time.perf_counter()
-        
+
         # Process request
         response = await call_next(request)
-        
+
         # Calculate latency
         latency_ms = (time.perf_counter() - start_time) * 1000
-        
+
         # Log request
         logger.info(
             "HTTP Request",
@@ -106,11 +105,13 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
                 "path": request.url.path,
                 "status_code": response.status_code,
                 "latency_ms": round(latency_ms, 2),
-                "client_ip": self._mask_ip(request.client.host if request.client else "unknown"),
+                "client_ip": self._mask_ip(
+                    request.client.host if request.client else "unknown"
+                ),
                 "user_agent": request.headers.get("user-agent", "")[:100],
-            }
+            },
         )
-        
+
         # Log slow requests
         if latency_ms > 1000:
             logger.warning(
@@ -119,11 +120,11 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
                     "correlation_id": get_correlation_id(),
                     "path": request.url.path,
                     "latency_ms": round(latency_ms, 2),
-                }
+                },
             )
-        
+
         return response
-    
+
     @staticmethod
     def _mask_ip(ip: str) -> str:
         """Mask last octet of IPv4 for privacy."""
@@ -140,105 +141,95 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
 
 
 try:
-    from prometheus_client import Counter, Histogram, generate_latest, CONTENT_TYPE_LATEST
-    
+    from prometheus_client import (
+        Counter,
+        Histogram,
+        generate_latest,
+        CONTENT_TYPE_LATEST,
+    )
+
     PROMETHEUS_AVAILABLE = True
-    
+
     # Define metrics
     REQUEST_COUNT = Counter(
-        "sanad_http_requests_total",
-        "Total HTTP requests",
-        ["method", "path", "status"]
+        "sanad_http_requests_total", "Total HTTP requests", ["method", "path", "status"]
     )
-    
+
     REQUEST_LATENCY = Histogram(
         "sanad_http_request_duration_seconds",
         "HTTP request latency",
         ["method", "path"],
-        buckets=[0.01, 0.05, 0.1, 0.25, 0.5, 1.0, 2.5, 5.0, 10.0]
+        buckets=[0.01, 0.05, 0.1, 0.25, 0.5, 1.0, 2.5, 5.0, 10.0],
     )
-    
+
     CHECKIN_COUNT = Counter(
         "sanad_nfc_checkins_total",
         "Total NFC check-ins",
-        ["status"]  # success, unknown_card, auth_failed
+        ["status"],  # success, unknown_card, auth_failed
     )
-    
+
     QUEUE_LENGTH = Counter(
-        "sanad_queue_tickets_created_total",
-        "Total tickets created",
-        ["queue_code"]
+        "sanad_queue_tickets_created_total", "Total tickets created", ["queue_code"]
     )
-    
+
     ERROR_COUNT = Counter(
-        "sanad_errors_total",
-        "Total application errors",
-        ["error_type", "path"]
+        "sanad_errors_total", "Total application errors", ["error_type", "path"]
     )
-    
+
     PUSH_NOTIFICATIONS = Counter(
         "sanad_push_notifications_total",
         "Total push notifications sent",
-        ["type", "status"]  # type=ticket_called|checkin, status=success|failed
+        ["type", "status"],  # type=ticket_called|checkin, status=success|failed
     )
-    
+
     ACTIVE_TICKETS = Counter(
-        "sanad_active_tickets",
-        "Currently active (waiting) tickets",
-        ["queue_code"]
+        "sanad_active_tickets", "Currently active (waiting) tickets", ["queue_code"]
     )
-    
+
     class PrometheusMiddleware(BaseHTTPMiddleware):
         """Collect Prometheus metrics for each request."""
-        
+
         SKIP_PATHS = {"/metrics", "/health"}
-        
+
         async def dispatch(self, request: Request, call_next: Callable) -> Response:
             if request.url.path in self.SKIP_PATHS:
                 return await call_next(request)
-            
+
             start_time = time.perf_counter()
             response = await call_next(request)
             latency = time.perf_counter() - start_time
-            
+
             # Normalize path (remove IDs)
             path = self._normalize_path(request.url.path)
-            
+
             # Record metrics
             REQUEST_COUNT.labels(
-                method=request.method,
-                path=path,
-                status=response.status_code
+                method=request.method, path=path, status=response.status_code
             ).inc()
-            
-            REQUEST_LATENCY.labels(
-                method=request.method,
-                path=path
-            ).observe(latency)
-            
+
+            REQUEST_LATENCY.labels(method=request.method, path=path).observe(latency)
+
             return response
-        
+
         @staticmethod
         def _normalize_path(path: str) -> str:
             """Replace UUIDs and IDs with placeholders."""
             import re
+
             # Replace UUIDs
             path = re.sub(
                 r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
                 "{id}",
                 path,
-                flags=re.IGNORECASE
+                flags=re.IGNORECASE,
             )
             # Replace numeric IDs
             path = re.sub(r"/\d+", "/{id}", path)
             return path
-    
+
     async def metrics_endpoint(request: Request) -> Response:
         """Prometheus metrics endpoint."""
-        return Response(
-            content=generate_latest(),
-            media_type=CONTENT_TYPE_LATEST
-        )
+        return Response(content=generate_latest(), media_type=CONTENT_TYPE_LATEST)
 
 except ImportError:
     PROMETHEUS_AVAILABLE = False
@@ -254,15 +245,15 @@ except ImportError:
 def configure_logging(json_format: bool = True) -> None:
     """
     Configure structured JSON logging.
-    
+
     Args:
         json_format: If True, use JSON format; otherwise plain text.
     """
     import json as json_lib
-    
+
     class StructuredFormatter(logging.Formatter):
         """JSON log formatter with correlation ID."""
-        
+
         def format(self, record: logging.LogRecord) -> str:
             log_data = {
                 "timestamp": self.formatTime(record),
@@ -271,40 +262,56 @@ def configure_logging(json_format: bool = True) -> None:
                 "logger": record.name,
                 "correlation_id": get_correlation_id(),
             }
-            
+
             # Add extra fields
             if hasattr(record, "__dict__"):
                 for key, value in record.__dict__.items():
                     if key not in {
-                        "name", "msg", "args", "created", "filename",
-                        "funcName", "levelname", "levelno", "lineno",
-                        "module", "msecs", "pathname", "process",
-                        "processName", "relativeCreated", "stack_info",
-                        "exc_info", "exc_text", "thread", "threadName",
-                        "message", "asctime"
+                        "name",
+                        "msg",
+                        "args",
+                        "created",
+                        "filename",
+                        "funcName",
+                        "levelname",
+                        "levelno",
+                        "lineno",
+                        "module",
+                        "msecs",
+                        "pathname",
+                        "process",
+                        "processName",
+                        "relativeCreated",
+                        "stack_info",
+                        "exc_info",
+                        "exc_text",
+                        "thread",
+                        "threadName",
+                        "message",
+                        "asctime",
                     }:
                         log_data[key] = value
-            
+
             return json_lib.dumps(log_data)
-    
+
     # Configure root logger
     root_logger = logging.getLogger()
     root_logger.setLevel(logging.INFO)
-    
+
     # Remove existing handlers
     root_logger.handlers.clear()
-    
+
     # Add handler
     handler = logging.StreamHandler()
     if json_format:
         handler.setFormatter(StructuredFormatter())
     else:
-        handler.setFormatter(logging.Formatter(
-            "%(asctime)s [%(levelname)s] %(name)s: %(message)s"
-        ))
-    
+        handler.setFormatter(
+            logging.Formatter("%(asctime)s [%(levelname)s] %(name)s: %(message)s")
+        )
+
     root_logger.addHandler(handler)
-    
+
     # Reduce noise from libraries
     logging.getLogger("uvicorn.access").setLevel(logging.WARNING)
     logging.getLogger("sqlalchemy.engine").setLevel(logging.WARNING)
@@ -337,6 +344,5 @@ def record_push_notification(notification_type: str, success: bool) -> None:
     """Record a push notification attempt for metrics."""
     if PROMETHEUS_AVAILABLE:
         PUSH_NOTIFICATIONS.labels(
-            type=notification_type,
-            status="success" if success else "failed"
+            type=notification_type, status="success" if success else "failed"
         ).inc()

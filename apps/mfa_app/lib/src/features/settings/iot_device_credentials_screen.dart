@@ -90,8 +90,10 @@ class _IotDeviceCredentialsScreenState
     if (idError != null || secretError != null) {
       final msg = [idError, secretError].whereType<String>().join('\n');
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(msg), backgroundColor: AppColors.error),
+      ModernSnackBar.show(
+        context,
+        message: msg,
+        type: SnackBarType.error,
       );
       return;
     }
@@ -110,11 +112,10 @@ class _IotDeviceCredentialsScreenState
 
     if (!mounted) return;
     setState(() => _loading = false);
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('IoT Geräte-Credentials gespeichert.'),
-        backgroundColor: AppColors.success,
-      ),
+    ModernSnackBar.show(
+      context,
+      message: 'IoT Geräte-Credentials gespeichert.',
+      type: SnackBarType.success,
     );
   }
 
@@ -130,11 +131,10 @@ class _IotDeviceCredentialsScreenState
 
     if (!mounted) return;
     setState(() => _loading = false);
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('IoT Geräte-Credentials gelöscht.'),
-        backgroundColor: AppColors.info,
-      ),
+    ModernSnackBar.show(
+      context,
+      message: 'IoT Geräte-Credentials gelöscht.',
+      type: SnackBarType.info,
     );
   }
 
@@ -144,100 +144,102 @@ class _IotDeviceCredentialsScreenState
       appBar: AppBar(
         title: const Text('IoT Gerät (NFC)'),
       ),
-      body: _loading
-          ? const Center(child: CircularProgressIndicator())
-          : ListView(
-              padding: const EdgeInsets.all(24),
-              children: [
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('Geräte-Credentials', style: AppTextStyles.h5),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Diese Werte identifizieren und autorisieren das Lesegerät gegenüber dem Backend.',
-                          style: AppTextStyles.bodySmall.copyWith(
-                            color: AppColors.textSecondary,
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        TextField(
-                          controller: _deviceIdController,
-                          decoration: const InputDecoration(
-                            labelText: 'Device ID (UUID)',
-                            hintText:
-                                '550e8400-e29b-41d4-a716-446655440000',
-                          ),
-                          textInputAction: TextInputAction.next,
-                        ),
-                        const SizedBox(height: 12),
-                        TextField(
-                          controller: _deviceSecretController,
-                          decoration: InputDecoration(
-                            labelText: 'Device Secret',
-                            suffixIcon: IconButton(
-                              icon: Icon(
-                                _showSecret
-                                    ? Icons.visibility_off
-                                    : Icons.visibility,
-                              ),
-                              onPressed: () {
-                                setState(() => _showSecret = !_showSecret);
-                              },
-                            ),
-                          ),
-                          obscureText: !_showSecret,
-                        ),
-                        const SizedBox(height: 20),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: PrimaryButton(
-                                label: 'Speichern',
-                                icon: Icons.save,
-                                onPressed: _save,
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: OutlinedButton.icon(
-                                onPressed: _clear,
-                                icon: const Icon(Icons.delete_outline),
-                                label: const Text('Löschen'),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
+      body: ScreenState(
+        isLoading: _loading,
+        loadingMessage: 'Lade Geräte-Credentials...',
+        child: ListView(
+          padding: const EdgeInsets.all(24),
+          children: [
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Geräte-Credentials', style: AppTextStyles.h5),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Diese Werte identifizieren und autorisieren das Lesegerät gegenüber dem Backend.',
+                      style: AppTextStyles.bodySmall.copyWith(
+                        color: AppColors.textSecondary,
+                      ),
                     ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    const SizedBox(height: 16),
+                    TextField(
+                      controller: _deviceIdController,
+                      decoration: const InputDecoration(
+                        labelText: 'Device ID (UUID)',
+                        hintText:
+                            '550e8400-e29b-41d4-a716-446655440000',
+                      ),
+                      textInputAction: TextInputAction.next,
+                    ),
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: _deviceSecretController,
+                      decoration: InputDecoration(
+                        labelText: 'Device Secret',
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _showSecret
+                                ? Icons.visibility_off
+                                : Icons.visibility,
+                          ),
+                          onPressed: () {
+                            setState(() => _showSecret = !_showSecret);
+                          },
+                        ),
+                      ),
+                      obscureText: !_showSecret,
+                    ),
+                    const SizedBox(height: 20),
+                    Row(
                       children: [
-                        Text('Hinweis', style: AppTextStyles.h6),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Keys in Secure Storage:\n'
-                          '- ${IotDeviceCredentialsScreen.deviceIdKey}\n'
-                          '- ${IotDeviceCredentialsScreen.deviceSecretKey}',
-                          style: AppTextStyles.bodySmall.copyWith(
-                            color: AppColors.textSecondary,
+                        Expanded(
+                          child: PrimaryButton(
+                            label: 'Speichern',
+                            icon: Icons.save,
+                            onPressed: _save,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: OutlinedButton.icon(
+                            onPressed: _clear,
+                            icon: const Icon(Icons.delete_outline),
+                            label: const Text('Löschen'),
                           ),
                         ),
                       ],
                     ),
-                  ),
+                  ],
                 ),
-              ],
+              ),
             ),
+            const SizedBox(height: 16),
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Hinweis', style: AppTextStyles.h6),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Keys in Secure Storage:\n'
+                      '- ${IotDeviceCredentialsScreen.deviceIdKey}\n'
+                      '- ${IotDeviceCredentialsScreen.deviceSecretKey}',
+                      style: AppTextStyles.bodySmall.copyWith(
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

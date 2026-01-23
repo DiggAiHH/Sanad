@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:dio/dio.dart';
 import 'package:logger/logger.dart';
 import 'auth_service.dart';
@@ -8,6 +10,15 @@ class ApiService {
   final AuthService _authService;
   final Logger _logger = Logger();
   final String baseUrl;
+  final Random _jitter = Random();
+
+  static const int _maxRetries = 2;
+  static const Duration _baseRetryDelay = Duration(milliseconds: 300);
+  static const Set<String> _idempotentMethods = {
+    'GET',
+    'HEAD',
+    'OPTIONS',
+  };
 
   ApiService({
     required this.baseUrl,
@@ -17,6 +28,7 @@ class ApiService {
       baseUrl: baseUrl,
       connectTimeout: const Duration(seconds: 30),
       receiveTimeout: const Duration(seconds: 30),
+      sendTimeout: const Duration(seconds: 30),
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
@@ -58,6 +70,13 @@ class ApiService {
                 handler.reject(error);
                 return;
               }
+            }
+          }
+
+          if (await _shouldRetry(error)) {
+            final response = await _retryRequest(error, handler);
+            if (response) {
+              return;
             }
           }
           handler.next(error);
@@ -113,5 +132,73 @@ class ApiService {
     Options? options,
   }) {
     return dio.delete<T>(path, data: data, queryParameters: queryParameters, options: options);
+  }
+
+  // =========================================================================
+  // Retry helpers
+  // =========================================================================
+
+  Future<bool> _shouldRetry(DioException error) async {
+    final request = error.requestOptions;
+    final retryCount = (request.extra['retryCount'] as int?) ?? 0;
+    if (retryCount >= _maxRetries) {
+      return false;
+    }
+
+    final isIdempotent = _idempotentMethods.contains(request.method.toUpperCase());
+    final allowRetry = (request.extra['retry'] as bool?) ?? isIdempotent;
+    if (!allowRetry) {
+      return false;
+    }
+
+    final statusCode = error.response?.statusCode;
+    if (statusCode != null) {
+      return statusCode == 408 ||
+          statusCode == 429 ||
+          statusCode == 500 ||
+          statusCode == 502 ||
+          statusCode == 503 ||
+          statusCode == 504;
+    }
+
+    return error.type == DioExceptionType.connectionTimeout ||
+        error.type == DioExceptionType.sendTimeout ||
+        error.type == DioExceptionType.receiveTimeout ||
+        error.type == DioExceptionType.connectionError ||
+        error.type == DioExceptionType.unknown;
+  }
+
+  Future<bool> _retryRequest(
+    DioException error,
+    ErrorInterceptorHandler handler,
+  ) async {
+    final request = error.requestOptions;
+    final retryCount = (request.extra['retryCount'] as int?) ?? 0;
+    final nextRetry = retryCount + 1;
+    request.extra['retryCount'] = nextRetry;
+
+    final delay = _backoffDelay(nextRetry);
+    _logger.w(
+      'Retrying request (${request.method} ${request.path}) in ${delay.inMilliseconds}ms',
+    );
+    await Future.delayed(delay);
+
+    try {
+      final response = await dio.fetch(request);
+      handler.resolve(response);
+      return true;
+    } on DioException catch (dioError) {
+      handler.reject(dioError);
+      return true;
+    } catch (_) {
+      handler.reject(error);
+      return true;
+    }
+  }
+
+  Duration _backoffDelay(int attempt) {
+    final exponential = _baseRetryDelay * (1 << (attempt - 1));
+    final jitterMs = _jitter.nextInt(120);
+    return exponential + Duration(milliseconds: jitterMs);
   }
 }

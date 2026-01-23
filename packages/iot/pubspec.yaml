@@ -41,4 +41,5 @@ dev_dependencies:
   json_serializable: ^6.7.1
   riverpod_generator: ^2.3.11
 
-flutter:
+# This package does not use Flutter-specific assets
+# flutter:

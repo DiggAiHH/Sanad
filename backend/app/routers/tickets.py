@@ -12,10 +12,9 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from app.dependencies import RequireMFA, RequireStaff, get_current_user
+from app.dependencies import get_current_user
 from app.models.models import Ticket, TicketStatus, User, UserRole
 from app.schemas.schemas import (
-    MessageResponse,
     TicketCreate,
     TicketListResponse,
     PublicTicketResponse,
@@ -45,7 +44,7 @@ async def list_tickets(
 ) -> TicketListResponse:
     """
     List tickets with filters.
-    
+
     Args:
         db: Database session.
         current_user: Authenticated user.
@@ -53,7 +52,7 @@ async def list_tickets(
         status_filter: Optional status filter.
         page: Page number.
         page_size: Items per page.
-        
+
     Returns:
         TicketListResponse: Paginated list of tickets.
     """
@@ -62,12 +61,12 @@ async def list_tickets(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="queue_id ist erforderlich",
         )
-    
+
     offset = (page - 1) * page_size
     tickets, total = await get_tickets_by_queue(
         db, queue_id, status_filter, page_size, offset
     )
-    
+
     return TicketListResponse(
         items=tickets,
         total=total,
@@ -83,22 +82,22 @@ async def get_ticket_by_display_number(
 ) -> Ticket:
     """
     Get a ticket by its display number (public endpoint for patients).
-    
+
     Args:
         ticket_number: Ticket display number (e.g., "A-001").
         db: Database session.
-        
+
     Returns:
         TicketResponse: Ticket data.
     """
     ticket = await get_ticket_by_number(db, ticket_number)
-    
+
     if not ticket:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Ticket nicht gefunden",
         )
-    
+
     return ticket
 
 
@@ -132,24 +131,24 @@ async def get_ticket(
 ) -> Ticket:
     """
     Get a specific ticket by ID.
-    
+
     Args:
         ticket_id: Ticket UUID.
         db: Database session.
         current_user: Authenticated user.
-        
+
     Returns:
         TicketResponse: Ticket data.
     """
     result = await db.execute(select(Ticket).where(Ticket.id == ticket_id))
     ticket = result.scalar_one_or_none()
-    
+
     if not ticket:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Ticket nicht gefunden",
         )
-    
+
     return ticket
 
 
@@ -161,12 +160,12 @@ async def create_new_ticket(
 ) -> Ticket:
     """
     Create a new ticket in a queue.
-    
+
     Args:
         request: Ticket creation data.
         db: Database session.
         current_user: Authenticated user.
-        
+
     Returns:
         TicketResponse: Created ticket.
     """
@@ -176,7 +175,7 @@ async def create_new_ticket(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Keine Berechtigung zum Erstellen von Tickets",
         )
-    
+
     try:
         ticket = await create_ticket(db, request, current_user.id)
         return ticket
@@ -196,27 +195,27 @@ async def update_ticket(
 ) -> Ticket:
     """
     Update a ticket.
-    
+
     Args:
         ticket_id: Ticket UUID.
         request: Ticket update data.
         db: Database session.
         current_user: Authenticated user.
-        
+
     Returns:
         TicketResponse: Updated ticket.
     """
     result = await db.execute(select(Ticket).where(Ticket.id == ticket_id))
     ticket = result.scalar_one_or_none()
-    
+
     if not ticket:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Ticket nicht gefunden",
         )
-    
+
     update_data = request.model_dump(exclude_unset=True)
-    
+
     if "status" in update_data:
         ticket = await update_ticket_status(
             db, ticket_id, update_data["status"], update_data.get("assigned_to_id")
@@ -226,7 +225,7 @@ async def update_ticket(
             setattr(ticket, field, value)
         await db.commit()
         await db.refresh(ticket)
-    
+
     return ticket
 
 
@@ -238,31 +237,36 @@ async def call_ticket(
 ) -> Ticket:
     """
     Call a specific ticket.
-    
+
     Args:
         ticket_id: Ticket UUID.
         db: Database session.
         current_user: Authenticated user (doctor/staff).
-        
+
     Returns:
         TicketResponse: Called ticket.
     """
-    if current_user.role not in [UserRole.ADMIN, UserRole.DOCTOR, UserRole.MFA, UserRole.STAFF]:
+    if current_user.role not in [
+        UserRole.ADMIN,
+        UserRole.DOCTOR,
+        UserRole.MFA,
+        UserRole.STAFF,
+    ]:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Keine Berechtigung",
         )
-    
+
     ticket = await update_ticket_status(
         db, ticket_id, TicketStatus.CALLED, current_user.id
     )
-    
+
     if not ticket:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Ticket nicht gefunden",
         )
-    
+
     return ticket
 
 
@@ -274,29 +278,34 @@ async def call_next_in_queue(
 ) -> Ticket:
     """
     Call the next waiting ticket in a queue.
-    
+
     Args:
         queue_id: Queue UUID.
         db: Database session.
         current_user: Authenticated user (doctor/staff).
-        
+
     Returns:
         TicketResponse: Called ticket.
     """
-    if current_user.role not in [UserRole.ADMIN, UserRole.DOCTOR, UserRole.MFA, UserRole.STAFF]:
+    if current_user.role not in [
+        UserRole.ADMIN,
+        UserRole.DOCTOR,
+        UserRole.MFA,
+        UserRole.STAFF,
+    ]:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Keine Berechtigung",
         )
-    
+
     ticket = await call_next_ticket(db, queue_id, current_user.id)
-    
+
     if not ticket:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Keine wartenden Tickets in dieser Warteschlange",
         )
-    
+
     return ticket
 
 
@@ -308,23 +317,23 @@ async def complete_ticket(
 ) -> Ticket:
     """
     Mark a ticket as completed.
-    
+
     Args:
         ticket_id: Ticket UUID.
         db: Database session.
         current_user: Authenticated user.
-        
+
     Returns:
         TicketResponse: Completed ticket.
     """
     ticket = await update_ticket_status(db, ticket_id, TicketStatus.COMPLETED)
-    
+
     if not ticket:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Ticket nicht gefunden",
         )
-    
+
     return ticket
 
 
@@ -336,23 +345,23 @@ async def cancel_ticket(
 ) -> Ticket:
     """
     Cancel a ticket.
-    
+
     Args:
         ticket_id: Ticket UUID.
         db: Database session.
         current_user: Authenticated user.
-        
+
     Returns:
         TicketResponse: Cancelled ticket.
     """
     ticket = await update_ticket_status(db, ticket_id, TicketStatus.CANCELLED)
-    
+
     if not ticket:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Ticket nicht gefunden",
         )
-    
+
     return ticket
 
 
@@ -364,21 +373,21 @@ async def mark_no_show(
 ) -> Ticket:
     """
     Mark a ticket as no-show.
-    
+
     Args:
         ticket_id: Ticket UUID.
         db: Database session.
         current_user: Authenticated user.
-        
+
     Returns:
         TicketResponse: No-show ticket.
     """
     ticket = await update_ticket_status(db, ticket_id, TicketStatus.NO_SHOW)
-    
+
     if not ticket:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Ticket nicht gefunden",
         )
-    
+
     return ticket

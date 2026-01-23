@@ -6,7 +6,8 @@ part of 'queue.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$QueueCategoryImpl _$$QueueCategoryImplFromJson(Map<String, dynamic> json) => _$QueueCategoryImpl(
+_$QueueCategoryImpl _$$QueueCategoryImplFromJson(Map<String, dynamic> json) =>
+    _$QueueCategoryImpl(
       id: json['id'] as String,
       name: json['name'] as String,
       prefix: json['prefix'] as String,
@@ -16,7 +17,8 @@ _$QueueCategoryImpl _$$QueueCategoryImplFromJson(Map<String, dynamic> json) => _
       color: json['color'] as String? ?? '#2196F3',
     );
 
-Map<String, dynamic> _$$QueueCategoryImplToJson(_$QueueCategoryImpl instance) => <String, dynamic>{
+Map<String, dynamic> _$$QueueCategoryImplToJson(_$QueueCategoryImpl instance) =>
+    <String, dynamic>{
       'id': instance.id,
       'name': instance.name,
       'prefix': instance.prefix,
@@ -26,7 +28,8 @@ Map<String, dynamic> _$$QueueCategoryImplToJson(_$QueueCategoryImpl instance) =>
       'color': instance.color,
     };
 
-_$QueueStateImpl _$$QueueStateImplFromJson(Map<String, dynamic> json) => _$QueueStateImpl(
+_$QueueStateImpl _$$QueueStateImplFromJson(Map<String, dynamic> json) =>
+    _$QueueStateImpl(
       practiceId: json['practiceId'] as String,
       categories: (json['categories'] as List<dynamic>)
           .map((e) => QueueCategory.fromJson(e as Map<String, dynamic>))
@@ -40,10 +43,11 @@ _$QueueStateImpl _$$QueueStateImplFromJson(Map<String, dynamic> json) => _$Queue
       lastUpdated: DateTime.parse(json['lastUpdated'] as String),
     );
 
-Map<String, dynamic> _$$QueueStateImplToJson(_$QueueStateImpl instance) => <String, dynamic>{
+Map<String, dynamic> _$$QueueStateImplToJson(_$QueueStateImpl instance) =>
+    <String, dynamic>{
       'practiceId': instance.practiceId,
-      'categories': instance.categories.map((e) => e.toJson()).toList(),
-      'activeTickets': instance.activeTickets.map((e) => e.toJson()).toList(),
+      'categories': instance.categories,
+      'activeTickets': instance.activeTickets,
       'totalWaiting': instance.totalWaiting,
       'totalInProgress': instance.totalInProgress,
       'averageWaitMinutes': instance.averageWaitMinutes,

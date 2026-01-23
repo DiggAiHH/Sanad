@@ -5,23 +5,43 @@ Run with: python -m app.seed_data
 """
 
 import asyncio
+import logging
+import hashlib
 import uuid
 from datetime import datetime, timedelta, timezone
 
 from passlib.context import CryptContext
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import get_settings
 from app.models.models import (
-    User, UserRole, Practice, Queue, Ticket, TicketStatus, TicketPriority,
-    Task, TaskStatus, TaskPriority, ChatRoom, ChatParticipant, ChatMessage
+    CheckInEvent,
+    CheckInMethod,
+    DeviceStatus,
+    DeviceType,
+    IoTDevice,
+    NFCCardType,
+    PatientNFCCard,
+    Practice,
+    Queue,
+    Task,
+    TaskPriority,
+    TaskStatus,
+    Ticket,
+    TicketPriority,
+    TicketStatus,
+    User,
+    UserRole,
+    ChatRoom,
+    ChatParticipant,
+    ChatMessage,
 )
-from app.database import async_session_maker, engine, Base
+from app.database import async_session_maker
 
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 settings = get_settings()
+logger = logging.getLogger(__name__)
 
 
 async def seed_database() -> None:
@@ -34,9 +54,9 @@ async def seed_database() -> None:
         if existing_user.scalar_one_or_none():
             logger.info("Seed-Daten existieren bereits, überspringe...")
             return
-        
+
         logger.info("Seeding database...")
-        
+
         # Create Practice
         practice = Practice(
             id=uuid.uuid4(),
@@ -44,12 +64,13 @@ async def seed_database() -> None:
             address="Hauptstraße 42, 80331 München",
             phone="+49 89 123456",
             email="praxis@dr-mueller.de",
+            website="https://www.praxis-dr-mueller.de",
             opening_hours="Mo-Fr: 08:00-18:00, Sa: 09:00-12:00",
             max_daily_tickets=50,
             average_wait_time_minutes=15,
         )
         db.add(practice)
-        
+
         # Create Users
         admin = User(
             id=uuid.uuid4(),
@@ -60,7 +81,7 @@ async def seed_database() -> None:
             role=UserRole.ADMIN,
             is_verified=True,
         )
-        
+
         doctor = User(
             id=uuid.uuid4(),
             email="arzt@sanad.de",
@@ -70,7 +91,7 @@ async def seed_database() -> None:
             role=UserRole.DOCTOR,
             is_verified=True,
         )
-        
+
         mfa = User(
             id=uuid.uuid4(),
             email="mfa@sanad.de",
@@ -80,7 +101,7 @@ async def seed_database() -> None:
             role=UserRole.MFA,
             is_verified=True,
         )
-        
+
         staff = User(
             id=uuid.uuid4(),
             email="staff@sanad.de",
@@ -90,7 +111,7 @@ async def seed_database() -> None:
             role=UserRole.STAFF,
             is_verified=True,
         )
-        
+
         patient = User(
             id=uuid.uuid4(),
             email="patient@example.de",
@@ -100,9 +121,37 @@ async def seed_database() -> None:
             role=UserRole.PATIENT,
             is_verified=True,
         )
-        
+
         db.add_all([admin, doctor, mfa, staff, patient])
-        
+
+        # Create NFC device + card for analytics seed data
+        device_secret = "seed-device-secret"
+        nfc_uid = "04AABBCCDD1122"
+        nfc_uid_hash = hashlib.sha256(
+            nfc_uid.upper().replace(":", "").replace(" ", "").encode()
+        ).hexdigest()
+        nfc_device = IoTDevice(
+            id=uuid.uuid4(),
+            practice_id=practice.id,
+            device_type=DeviceType.NFC_READER,
+            device_name="Eingang NFC-Reader",
+            device_serial="NFC-SEED-001",
+            device_secret_hash=pwd_context.hash(device_secret),
+            location="Eingang",
+            status=DeviceStatus.ONLINE,
+            is_active=True,
+        )
+        nfc_card = PatientNFCCard(
+            id=uuid.uuid4(),
+            patient_id=patient.id,
+            nfc_uid_encrypted=f"enc:{nfc_uid}",
+            nfc_uid_hash=nfc_uid_hash,
+            card_type=NFCCardType.CUSTOM,
+            card_label="Hauptkarte",
+            is_active=True,
+        )
+        db.add_all([nfc_device, nfc_card])
+
         # Create Queue
         queue = Queue(
             id=uuid.uuid4(),
@@ -113,7 +162,7 @@ async def seed_database() -> None:
             current_number=0,
         )
         db.add(queue)
-        
+
         # Create Tickets
         now = datetime.now(timezone.utc)
         tickets = [
@@ -190,7 +239,58 @@ async def seed_database() -> None:
             ),
         ]
         db.add_all(tickets)
-        
+
+        # Create check-in events for analytics seed data
+        check_in_events = [
+            CheckInEvent(
+                id=uuid.uuid4(),
+                practice_id=practice.id,
+                ticket_id=tickets[0].id,
+                device_id=nfc_device.id,
+                nfc_card_id=nfc_card.id,
+                check_in_method=CheckInMethod.NFC,
+                patient_id=patient.id,
+                success=True,
+                checked_in_at=tickets[0].created_at,
+            ),
+            CheckInEvent(
+                id=uuid.uuid4(),
+                practice_id=practice.id,
+                ticket_id=tickets[1].id,
+                device_id=nfc_device.id,
+                nfc_card_id=nfc_card.id,
+                check_in_method=CheckInMethod.NFC,
+                patient_id=patient.id,
+                success=True,
+                checked_in_at=tickets[1].created_at,
+            ),
+            CheckInEvent(
+                id=uuid.uuid4(),
+                practice_id=practice.id,
+                ticket_id=tickets[2].id,
+                check_in_method=CheckInMethod.MANUAL,
+                success=True,
+                checked_in_at=tickets[2].created_at,
+            ),
+            CheckInEvent(
+                id=uuid.uuid4(),
+                practice_id=practice.id,
+                ticket_id=tickets[3].id,
+                check_in_method=CheckInMethod.MANUAL,
+                success=True,
+                checked_in_at=tickets[3].created_at,
+            ),
+            CheckInEvent(
+                id=uuid.uuid4(),
+                practice_id=practice.id,
+                ticket_id=tickets[4].id,
+                check_in_method=CheckInMethod.ONLINE,
+                success=True,
+                checked_in_at=tickets[4].created_at,
+            ),
+        ]
+        db.add_all(check_in_events)
+
         # Create Tasks
         tasks = [
             Task(
@@ -255,7 +355,7 @@ async def seed_database() -> None:
             ),
         ]
         db.add_all(tasks)
-        
+
         # Create Chat Room
         team_chat = ChatRoom(
             id=uuid.uuid4(),
@@ -264,7 +364,7 @@ async def seed_database() -> None:
             is_group=True,
         )
         db.add(team_chat)
-        
+
         # Add Participants
         participants = [
             ChatParticipant(
@@ -284,7 +384,7 @@ async def seed_database() -> None:
             ),
         ]
         db.add_all(participants)
-        
+
         # Create Messages
         messages = [
             ChatMessage(
@@ -357,7 +457,6 @@ async def seed_database() -> None:
                 content="Perfekt! Bitte auch Fatima Al-Hassan (B001) im Auge behalten - starke Kopfschmerzen, evtl. Migräne. Rufe sie als nächstes.",
                 created_at=now - timedelta(minutes=5),
             ),
-        ]
             ChatMessage(
                 id=uuid.uuid4(),
                 room_id=team_chat.id,
@@ -374,15 +473,15 @@ async def seed_database() -> None:
             ),
         ]
         db.add_all(messages)
-        
+
         await db.commit()
-        
+
         logger.info("Seed data created successfully!")
         logger.info("Test Accounts:")
         logger.info("   Admin:      admin@sanad.de / Admin123!")
         logger.info("   Arzt:       arzt@sanad.de / Arzt123!")
         logger.info("   MFA:        mfa@sanad.de / Mfa123!")
-        logger.info("   Mitarbeiter: mitarbeiter@sanad.de / Staff123!")
+        logger.info("   Mitarbeiter: staff@sanad.de / Staff123!")
         logger.info("   Patient:    patient@example.de / Patient123!")
 
 

@@ -228,4 +228,216 @@ void main() {
       );
     });
   });
+
+  // ==========================================================================
+  // Schritt 17: Consultation Model Tests
+  // ==========================================================================
+
+  group('Consultation Model', () {
+    test('fromJson creates Consultation correctly', () {
+      final json = {
+        'id': 'consult-001',
+        'patient_id': 'patient-123',
+        'practice_id': 'practice-abc',
+        'doctor_id': 'doctor-456',
+        'consultation_type': 'video_call',
+        'status': 'scheduled',
+        'priority': 'routine',
+        'reason': 'Kopfschmerzen',
+        'symptoms': 'Migräne seit 3 Tagen',
+        'created_at': '2025-01-15T10:00:00.000Z',
+        'doctor_name': 'Dr. med. Schmidt',
+      };
+
+      final consultation = Consultation.fromJson(json);
+
+      expect(consultation.id, 'consult-001');
+      expect(consultation.patientId, 'patient-123');
+      expect(consultation.consultationType, ConsultationType.videoCall);
+      expect(consultation.status, ConsultationStatus.scheduled);
+      expect(consultation.priority, ConsultationPriority.routine);
+      expect(consultation.reason, 'Kopfschmerzen');
+      expect(consultation.doctorName, 'Dr. med. Schmidt');
+    });
+
+    test('toJson serializes Consultation correctly', () {
+      final consultation = Consultation(
+        id: 'consult-002',
+        patientId: 'patient-789',
+        practiceId: 'practice-xyz',
+        consultationType: ConsultationType.chat,
+        status: ConsultationStatus.inProgress,
+        reason: 'Rezeptanfrage',
+        createdAt: DateTime.utc(2025, 1, 15, 11, 0),
+      );
+
+      final json = consultation.toJson();
+
+      expect(json['id'], 'consult-002');
+      expect(json['consultationType'], 'chat');
+      expect(json['status'], 'in_progress');
+    });
+
+    test('copyWith creates modified consultation', () {
+      final consultation = Consultation(
+        id: 'consult-003',
+        patientId: 'patient-001',
+        practiceId: 'practice-001',
+        consultationType: ConsultationType.voiceCall,
+        status: ConsultationStatus.requested,
+        createdAt: DateTime.now(),
+      );
+
+      final updated = consultation.copyWith(
+        status: ConsultationStatus.scheduled,
+        doctorId: 'doctor-assigned',
+      );
+
+      expect(updated.status, ConsultationStatus.scheduled);
+      expect(updated.doctorId, 'doctor-assigned');
+      expect(updated.id, 'consult-003'); // Unchanged
+    });
+
+    test('ConsultationType enum maps correctly', () {
+      expect(ConsultationType.videoCall.name, 'videoCall');
+      expect(ConsultationType.voiceCall.name, 'voiceCall');
+      expect(ConsultationType.chat.name, 'chat');
+      expect(ConsultationType.callbackRequest.name, 'callbackRequest');
+    });
+
+    test('ConsultationStatus enum maps correctly', () {
+      expect(ConsultationStatus.requested.name, 'requested');
+      expect(ConsultationStatus.inProgress.name, 'inProgress');
+      expect(ConsultationStatus.completed.name, 'completed');
+      expect(ConsultationStatus.cancelled.name, 'cancelled');
+    });
+  });
+
+  group('ConsultationCreate Model', () {
+    test('toBackendJson maps reason to subject', () {
+      final create = ConsultationCreate(
+        consultationType: ConsultationType.videoCall,
+        priority: ConsultationPriority.sameDay,
+        reason: 'Akute Rückenschmerzen',
+        symptoms: 'Schmerzen beim Bücken',
+      );
+
+      final json = create.toBackendJson();
+
+      expect(json['consultation_type'], 'videoCall');
+      expect(json['priority'], 'sameDay');
+      expect(json['subject'], 'Akute Rückenschmerzen'); // Mapped from reason
+      expect(json['symptoms'], 'Schmerzen beim Bücken');
+    });
+  });
+
+  group('ConsultationMessage Model', () {
+    test('fromJson creates ConsultationMessage correctly', () {
+      final json = {
+        'id': 'msg-consult-001',
+        'consultation_id': 'consult-001',
+        'sender_id': 'user-patient',
+        'sender_role': 'patient',
+        'content': 'Hallo Herr Doktor',
+        'is_read': true,
+        'created_at': '2025-01-15T12:00:00.000Z',
+        'sender_name': 'Max Mustermann',
+      };
+
+      final message = ConsultationMessage.fromJson(json);
+
+      expect(message.id, 'msg-consult-001');
+      expect(message.content, 'Hallo Herr Doktor');
+      expect(message.senderRole, 'patient');
+      expect(message.isRead, true);
+    });
+  });
+
+  group('WebRTCRoom Model', () {
+    test('fromJson creates WebRTCRoom with ICE/TURN servers', () {
+      final json = {
+        'room_id': 'room-webrtc-001',
+        'consultation_id': 'consult-001',
+        'ice_servers': [
+          {'urls': ['stun:stun.l.google.com:19302']},
+        ],
+        'turn_servers': [
+          {
+            'urls': ['turn:turn.sanad.de:3478'],
+            'username': 'user123',
+            'credential': 'secret456',
+          },
+        ],
+      };
+
+      final room = WebRTCRoom.fromJson(json);
+
+      expect(room.roomId, 'room-webrtc-001');
+      expect(room.consultationId, 'consult-001');
+      expect(room.iceServers.length, 1);
+      expect(room.iceServers.first.urls, ['stun:stun.l.google.com:19302']);
+      expect(room.turnServers, isNotNull);
+      expect(room.turnServers!.first.username, 'user123');
+    });
+
+    test('WebRTCRoom handles missing TURN servers', () {
+      final json = {
+        'room_id': 'room-no-turn',
+        'consultation_id': 'consult-002',
+        'ice_servers': [
+          {'urls': ['stun:stun1.l.google.com:19302']},
+        ],
+      };
+
+      final room = WebRTCRoom.fromJson(json);
+
+      expect(room.turnServers, isNull);
+      expect(room.iceServers.isNotEmpty, true);
+    });
+  });
+
+  group('WebRTC Signaling Models', () {
+    test('WebRTCOffer fromJson works', () {
+      final json = {'sdp': 'v=0...', 'type': 'offer'};
+      final offer = WebRTCOffer.fromJson(json);
+
+      expect(offer.sdp, 'v=0...');
+      expect(offer.type, 'offer');
+    });
+
+    test('WebRTCAnswer fromJson works', () {
+      final json = {'sdp': 'v=0...answer', 'type': 'answer'};
+      final answer = WebRTCAnswer.fromJson(json);
+
+      expect(answer.sdp, 'v=0...answer');
+      expect(answer.type, 'answer');
+    });
+
+    test('WebRTCIceCandidate fromJson works', () {
+      final json = {
+        'candidate': 'candidate:0 1 UDP ...',
+        'sdp_mid': 'audio',
+        'sdp_m_line_index': 0,
+      };
+      final candidate = WebRTCIceCandidate.fromJson(json);
+
+      expect(candidate.candidate, contains('candidate:'));
+      expect(candidate.sdpMid, 'audio');
+      expect(candidate.sdpMLineIndex, 0);
+    });
+
+    test('WebRTCSignal fromJson works', () {
+      final json = {
+        'signal_type': 'offer',
+        'payload': {'sdp': 'test', 'type': 'offer'},
+        'sender_id': 'user-123',
+        'timestamp': '2025-01-15T12:00:00.000Z',
+      };
+      final signal = WebRTCSignal.fromJson(json);
+
+      expect(signal.signalType, 'offer');
+      expect(signal.senderId, 'user-123');
+      expect(signal.payload['sdp'], 'test');
+    });
+  });
 }

@@ -15,12 +15,17 @@ from app.config import get_settings
 settings = get_settings()
 
 # Use the async-compatible URL
+_engine_kwargs = {
+    "echo": settings.DEBUG,
+    "pool_pre_ping": True,
+}
+
+if not settings.async_database_url.startswith("sqlite"):
+    _engine_kwargs.update({"pool_size": 10, "max_overflow": 20})
+
 engine = create_async_engine(
     settings.async_database_url,
-    echo=settings.DEBUG,
-    pool_pre_ping=True,
-    pool_size=10,
-    max_overflow=20,
+    **_engine_kwargs,
 )
 
 async_session_maker = async_sessionmaker(
@@ -34,16 +39,17 @@ async_session_maker = async_sessionmaker(
 
 class Base(DeclarativeBase):
     """Base class for all SQLAlchemy models."""
+
     pass
 
 
 async def get_db() -> AsyncGenerator[AsyncSession, None]:
     """
     Dependency for getting database sessions.
-    
+
     Yields:
         AsyncSession: Database session for the request.
-        
+
     Security Implications:
         - Sessions are automatically closed after request.
         - Connection pooling prevents resource exhaustion.
@@ -57,3 +63,14 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
             raise
         finally:
             await session.close()
+
+
+async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
+    """
+    Compatibility alias for async session dependency.
+
+    Returns:
+        AsyncSession: Database session.
+    """
+    async for session in get_db():
+        yield session

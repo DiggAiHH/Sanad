@@ -41,7 +41,6 @@ build_app() {
     flutter build web \
         --release \
         --dart-define=API_BASE_URL="$API_URL" \
-        --web-renderer canvaskit \
         --base-href "/"
     
     # Copy to output directory

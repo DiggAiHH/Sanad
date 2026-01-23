@@ -39,8 +39,23 @@ _pwd_ctx = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 def _hash_nfc_uid(nfc_uid: str) -> str:
-    """SHA-256 hash of NFC UID for lookup."""
-    return hashlib.sha256(nfc_uid.encode()).hexdigest()
+    """
+    SHA-256 hash of NFC UID for lookup (normalized to match NFCService).
+
+    Params:
+        nfc_uid: Raw NFC UID string from the reader.
+
+    Returns:
+        Hex-encoded SHA-256 hash of the normalized UID.
+
+    Raises:
+        None.
+
+    Security Implications:
+        - Uses hashing to avoid storing raw UIDs in test fixtures.
+    """
+    normalized = nfc_uid.upper().replace(":", "").replace(" ", "")
+    return hashlib.sha256(normalized.encode()).hexdigest()
 
 
 @pytest_asyncio.fixture
@@ -49,8 +64,9 @@ async def practice(db_session: AsyncSession) -> Practice:
     p = Practice(
         id=uuid.uuid4(),
         name="Test Praxis",
-        slug="test-praxis",
-        timezone="Europe/Berlin",
+        address="Teststrasse 1, 12345 Teststadt",
+        phone="+49 30 123456",
+        email="praxis@test.de",
         is_active=True,
     )
     db_session.add(p)
@@ -77,7 +93,9 @@ async def queue(db_session: AsyncSession, practice: Practice) -> Queue:
 
 
 @pytest_asyncio.fixture
-async def iot_device(db_session: AsyncSession, practice: Practice) -> tuple[IoTDevice, str]:
+async def iot_device(
+    db_session: AsyncSession, practice: Practice
+) -> tuple[IoTDevice, str]:
     """Create a test IoT device. Returns (device, plain_secret)."""
     plain_secret = "test-device-secret-12345"
     device = IoTDevice(
@@ -102,9 +120,8 @@ async def patient(db_session: AsyncSession, practice: Practice) -> User:
     """Create a test patient user."""
     u = User(
         id=uuid.uuid4(),
-        practice_id=practice.id,
         email="patient@test.de",
-        password_hash=_pwd_ctx.hash("password123"),
+        hashed_password=_pwd_ctx.hash("password123"),
         first_name="Max",
         last_name="Mustermann",
         role=UserRole.PATIENT,
@@ -154,19 +171,19 @@ async def test_nfc_checkin_success(
     """Test successful NFC check-in creates ticket."""
     device, device_secret = iot_device
     _, nfc_uid = nfc_card
-    
+
     response = await client.post(
-        "/api/nfc/check-in",
+        "/api/v1/nfc/check-in",
         json={
             "nfc_uid": nfc_uid,
             "device_id": str(device.id),
             "device_secret": device_secret,
         },
     )
-    
+
     assert response.status_code == 200, f"Unexpected: {response.text}"
     data = response.json()
-    
+
     assert data["success"] is True
     assert data["ticket_number"] is not None
     assert data["queue_name"] is not None
@@ -186,16 +203,16 @@ async def test_nfc_checkin_returns_wayfinding_route_id(
     """Test check-in response includes wayfinding_route_id field."""
     device, device_secret = iot_device
     _, nfc_uid = nfc_card
-    
+
     response = await client.post(
-        "/api/nfc/check-in",
+        "/api/v1/nfc/check-in",
         json={
             "nfc_uid": nfc_uid,
             "device_id": str(device.id),
             "device_secret": device_secret,
         },
     )
-    
+
     data = response.json()
     # Field should be present (may be null if no route configured)
     assert "wayfinding_route_id" in data
@@ -214,16 +231,16 @@ async def test_nfc_checkin_unknown_device_returns_401(
     """Test that unknown device_id returns 401."""
     _, nfc_uid = nfc_card
     fake_device_id = str(uuid.uuid4())
-    
+
     response = await client.post(
-        "/api/nfc/check-in",
+        "/api/v1/nfc/check-in",
         json={
             "nfc_uid": nfc_uid,
             "device_id": fake_device_id,
             "device_secret": "any-secret",
         },
     )
-    
+
     assert response.status_code == 401
     assert "Ungültiges Gerät" in response.json()["detail"]
 
@@ -237,16 +254,16 @@ async def test_nfc_checkin_wrong_secret_returns_401(
     """Test that wrong device_secret returns 401."""
     device, _ = iot_device
     _, nfc_uid = nfc_card
-    
+
     response = await client.post(
-        "/api/nfc/check-in",
+        "/api/v1/nfc/check-in",
         json={
             "nfc_uid": nfc_uid,
             "device_id": str(device.id),
             "device_secret": "wrong-secret",
         },
     )
-    
+
     assert response.status_code == 401
     assert "Ungültiges Gerät" in response.json()["detail"]
 
@@ -261,20 +278,20 @@ async def test_nfc_checkin_inactive_device_returns_403(
     """Test that inactive device returns 403."""
     device, device_secret = iot_device
     _, nfc_uid = nfc_card
-    
+
     # Deactivate device
     device.is_active = False
     await db_session.commit()
-    
+
     response = await client.post(
-        "/api/nfc/check-in",
+        "/api/v1/nfc/check-in",
         json={
             "nfc_uid": nfc_uid,
             "device_id": str(device.id),
             "device_secret": device_secret,
         },
     )
-    
+
     # Could be 401 or 403 depending on implementation
     assert response.status_code in [401, 403]
 
@@ -292,16 +309,16 @@ async def test_nfc_checkin_unknown_card_returns_404(
     """Test that unknown NFC card returns 404."""
     device, device_secret = iot_device
     unknown_uid = "FF:FF:FF:FF:FF:FF:FF"
-    
+
     response = await client.post(
-        "/api/nfc/check-in",
+        "/api/v1/nfc/check-in",
         json={
             "nfc_uid": unknown_uid,
             "device_id": str(device.id),
             "device_secret": device_secret,
         },
     )
-    
+
     # API may return 404 or 200 with success=False
     if response.status_code == 200:
         assert response.json()["success"] is False
@@ -319,25 +336,28 @@ async def test_nfc_checkin_expired_card_rejected(
     """Test that expired NFC card is rejected."""
     device, device_secret = iot_device
     card, nfc_uid = nfc_card
-    
+
     # Expire the card
     card.expires_at = datetime.now(timezone.utc) - timedelta(days=1)
     await db_session.commit()
-    
+
     response = await client.post(
-        "/api/nfc/check-in",
+        "/api/v1/nfc/check-in",
         json={
             "nfc_uid": nfc_uid,
             "device_id": str(device.id),
             "device_secret": device_secret,
         },
     )
-    
+
     # API may return 403 or 200 with success=False
     if response.status_code == 200:
         data = response.json()
         assert data["success"] is False
-        assert "abgelaufen" in data["message"].lower() or "expired" in data["message"].lower()
+        assert (
+            "abgelaufen" in data["message"].lower()
+            or "expired" in data["message"].lower()
+        )
     else:
         assert response.status_code == 403
 
@@ -352,20 +372,20 @@ async def test_nfc_checkin_inactive_card_rejected(
     """Test that inactive NFC card is rejected."""
     device, device_secret = iot_device
     card, nfc_uid = nfc_card
-    
+
     # Deactivate the card
     card.is_active = False
     await db_session.commit()
-    
+
     response = await client.post(
-        "/api/nfc/check-in",
+        "/api/v1/nfc/check-in",
         json={
             "nfc_uid": nfc_uid,
             "device_id": str(device.id),
             "device_secret": device_secret,
         },
     )
-    
+
     # API may return 403 or 200 with success=False
     if response.status_code == 200:
         data = response.json()
@@ -390,7 +410,7 @@ async def test_nfc_checkin_wait_time_increases_with_queue(
 ):
     """Test that estimated_wait_minutes reflects queue length."""
     device, device_secret = iot_device
-    
+
     # Create 3 waiting tickets
     for i in range(3):
         ticket = Ticket(
@@ -401,7 +421,7 @@ async def test_nfc_checkin_wait_time_increases_with_queue(
         )
         db_session.add(ticket)
     await db_session.commit()
-    
+
     # Create a new NFC card for check-in
     new_uid = "04:B1:C2:D3:E4:F5:00"
     new_card = PatientNFCCard(
@@ -414,16 +434,16 @@ async def test_nfc_checkin_wait_time_increases_with_queue(
     )
     db_session.add(new_card)
     await db_session.commit()
-    
+
     response = await client.post(
-        "/api/nfc/check-in",
+        "/api/v1/nfc/check-in",
         json={
             "nfc_uid": new_uid,
             "device_id": str(device.id),
             "device_secret": device_secret,
         },
     )
-    
+
     if response.status_code == 200 and response.json()["success"]:
         data = response.json()
         # 3 waiting tickets × 5 min average = 15 min expected
@@ -443,16 +463,16 @@ async def test_nfc_checkin_empty_uid_rejected(
 ):
     """Test that empty NFC UID is rejected."""
     device, device_secret = iot_device
-    
+
     response = await client.post(
-        "/api/nfc/check-in",
+        "/api/v1/nfc/check-in",
         json={
             "nfc_uid": "",
             "device_id": str(device.id),
             "device_secret": device_secret,
         },
     )
-    
+
     # Should fail validation (422) or return error
     assert response.status_code in [400, 422] or (
         response.status_code == 200 and response.json()["success"] is False
@@ -465,12 +485,12 @@ async def test_nfc_checkin_malformed_device_id(
 ):
     """Test that malformed device_id is rejected."""
     response = await client.post(
-        "/api/nfc/check-in",
+        "/api/v1/nfc/check-in",
         json={
             "nfc_uid": "04:A3:5B:1A:7C:8D:90",
             "device_id": "not-a-uuid",
             "device_secret": "secret",
         },
     )
-    
+
     assert response.status_code == 422  # Pydantic validation error

@@ -16,17 +16,26 @@ _$TicketImpl _$$TicketImplFromJson(Map<String, dynamic> json) => _$TicketImpl(
       assignedStaffId: json['assignedStaffId'] as String?,
       roomNumber: json['roomNumber'] as String?,
       status: $enumDecode(_$TicketStatusEnumMap, json['status']),
-      priority: $enumDecodeNullable(_$TicketPriorityEnumMap, json['priority']) ?? TicketPriority.normal,
+      priority:
+          $enumDecodeNullable(_$TicketPriorityEnumMap, json['priority']) ??
+              TicketPriority.normal,
       visitReason: json['visitReason'] as String?,
       issuedAt: DateTime.parse(json['issuedAt'] as String),
-      calledAt: json['calledAt'] == null ? null : DateTime.parse(json['calledAt'] as String),
-      startedAt: json['startedAt'] == null ? null : DateTime.parse(json['startedAt'] as String),
-      completedAt: json['completedAt'] == null ? null : DateTime.parse(json['completedAt'] as String),
+      calledAt: json['calledAt'] == null
+          ? null
+          : DateTime.parse(json['calledAt'] as String),
+      startedAt: json['startedAt'] == null
+          ? null
+          : DateTime.parse(json['startedAt'] as String),
+      completedAt: json['completedAt'] == null
+          ? null
+          : DateTime.parse(json['completedAt'] as String),
       estimatedWaitMinutes: (json['estimatedWaitMinutes'] as num?)?.toInt(),
       notes: json['notes'] as String?,
     );
 
-Map<String, dynamic> _$$TicketImplToJson(_$TicketImpl instance) => <String, dynamic>{
+Map<String, dynamic> _$$TicketImplToJson(_$TicketImpl instance) =>
+    <String, dynamic>{
       'id': instance.id,
       'ticketNumber': instance.ticketNumber,
       'prefix': instance.prefix,

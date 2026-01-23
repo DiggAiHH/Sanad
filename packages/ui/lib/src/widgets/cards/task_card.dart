@@ -154,7 +154,7 @@ class TaskCard extends StatelessWidget {
         Icon(Icons.schedule, size: 14, color: color),
         const SizedBox(width: 4),
         Text(
-          Formatters.dateTime(task.dueAt!),
+          Formatters.formatDateTime(task.dueAt!),
           style: AppTextStyles.bodySmall.copyWith(color: color),
         ),
       ],

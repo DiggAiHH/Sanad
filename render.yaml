@@ -36,10 +36,16 @@ services:
       - key: JWT_REFRESH_TOKEN_EXPIRE_DAYS
         value: "7"
       - key: DEBUG
-        value: "true"
+        value: "false"
       - key: CORS_ORIGINS
-        value: "https://sanad-admin.netlify.app,https://sanad-mfa.netlify.app,https://sanad-staff.netlify.app,https://sanad-patient.netlify.app,http://localhost:3000,http://localhost:8080"
+        value: "https://sanad-admin.netlify.app,https://sanad-mfa.netlify.app,https://sanad-staff.netlify.app,https://sanad-patient.netlify.app,https://sanad-admin.pages.dev,https://sanad-mfa.pages.dev,https://sanad-staff.pages.dev,https://sanad-patient.pages.dev,http://localhost:3000,http://localhost:8080"
       - key: SEED_ON_STARTUP
+        value: "true"
+      - key: RATE_LIMIT_PER_MINUTE
+        value: "60"
+      - key: MAX_REQUEST_SIZE_MB
+        value: "5"
+      - key: ENABLE_HSTS
         value: "true"
 
 databases:

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sanad_core/sanad_core.dart';
 import 'package:sanad_ui/sanad_ui.dart';
@@ -19,6 +20,10 @@ class _MfaAppState extends ConsumerState<MfaApp> {
   @override
   void initState() {
     super.initState();
+    if (kIsWeb) {
+      ref.read(pushInitializedProvider.notifier).state = true;
+      return;
+    }
     _initializePush();
   }
 
@@ -41,17 +46,15 @@ class _MfaAppState extends ConsumerState<MfaApp> {
   void _handleForegroundNotification(PushNotificationPayload payload) {
     // Show in-app notification for new tickets
     if (payload.type == PushNotificationType.ticketCreated) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('${payload.title}: ${payload.body}'),
-          action: SnackBarAction(
-            label: 'Anzeigen',
-            onPressed: () {
-              // Navigate to queue screen
-              ref.read(routerProvider).go('/queue');
-            },
-          ),
-        ),
+      ModernSnackBar.show(
+        context,
+        message: '${payload.title}: ${payload.body}',
+        type: SnackBarType.info,
+        actionLabel: 'Anzeigen',
+        onAction: () {
+          // Navigate to queue screen
+          ref.read(routerProvider).go('/queue');
+        },
       );
     }
   }

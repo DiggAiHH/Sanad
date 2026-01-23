@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:sanad_core/sanad_core.dart';
 
 import 'app.dart';
@@ -8,9 +7,6 @@ import 'app.dart';
 /// Sanad Patient App - Patienten-App für Wartezeit und Ticket-Status.
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
-  // Initialize Firebase
-  await Firebase.initializeApp();
   
   // Initialize storage
   final storage = StorageService();

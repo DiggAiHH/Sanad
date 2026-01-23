@@ -47,20 +47,19 @@ abstract class $UserCopyWith<$Res> {
   factory $UserCopyWith(User value, $Res Function(User) then) =
       _$UserCopyWithImpl<$Res, User>;
   @useResult
-  $Res call({
-    String id,
-    String email,
-    String firstName,
-    String lastName,
-    UserRole role,
-    String? phoneNumber,
-    String? avatarUrl,
-    String practiceId,
-    bool isActive,
-    DateTime? lastLoginAt,
-    DateTime createdAt,
-    DateTime? updatedAt,
-  });
+  $Res call(
+      {String id,
+      String email,
+      String firstName,
+      String lastName,
+      UserRole role,
+      String? phoneNumber,
+      String? avatarUrl,
+      String practiceId,
+      bool isActive,
+      DateTime? lastLoginAt,
+      DateTime createdAt,
+      DateTime? updatedAt});
 }
 
 /// @nodoc
@@ -151,20 +150,19 @@ abstract class _$$UserImplCopyWith<$Res> implements $UserCopyWith<$Res> {
       __$$UserImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({
-    String id,
-    String email,
-    String firstName,
-    String lastName,
-    UserRole role,
-    String? phoneNumber,
-    String? avatarUrl,
-    String practiceId,
-    bool isActive,
-    DateTime? lastLoginAt,
-    DateTime createdAt,
-    DateTime? updatedAt,
-  });
+  $Res call(
+      {String id,
+      String email,
+      String firstName,
+      String lastName,
+      UserRole role,
+      String? phoneNumber,
+      String? avatarUrl,
+      String practiceId,
+      bool isActive,
+      DateTime? lastLoginAt,
+      DateTime createdAt,
+      DateTime? updatedAt});
 }
 
 /// @nodoc
@@ -248,20 +246,19 @@ class __$$UserImplCopyWithImpl<$Res>
 /// @nodoc
 @JsonSerializable()
 class _$UserImpl implements _User {
-  const _$UserImpl({
-    required this.id,
-    required this.email,
-    required this.firstName,
-    required this.lastName,
-    required this.role,
-    this.phoneNumber,
-    this.avatarUrl,
-    required this.practiceId,
-    this.isActive = true,
-    this.lastLoginAt,
-    required this.createdAt,
-    this.updatedAt,
-  });
+  const _$UserImpl(
+      {required this.id,
+      required this.email,
+      required this.firstName,
+      required this.lastName,
+      required this.role,
+      this.phoneNumber,
+      this.avatarUrl,
+      required this.practiceId,
+      this.isActive = true,
+      this.lastLoginAt,
+      required this.createdAt,
+      this.updatedAt});
 
   factory _$UserImpl.fromJson(Map<String, dynamic> json) =>
       _$$UserImplFromJson(json);
@@ -352,25 +349,26 @@ class _$UserImpl implements _User {
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$UserImplToJson(this);
+    return _$$UserImplToJson(
+      this,
+    );
   }
 }
 
 abstract class _User implements User {
-  const factory _User({
-    required final String id,
-    required final String email,
-    required final String firstName,
-    required final String lastName,
-    required final UserRole role,
-    final String? phoneNumber,
-    final String? avatarUrl,
-    required final String practiceId,
-    final bool isActive,
-    final DateTime? lastLoginAt,
-    required final DateTime createdAt,
-    final DateTime? updatedAt,
-  }) = _$UserImpl;
+  const factory _User(
+      {required final String id,
+      required final String email,
+      required final String firstName,
+      required final String lastName,
+      required final UserRole role,
+      final String? phoneNumber,
+      final String? avatarUrl,
+      required final String practiceId,
+      final bool isActive,
+      final DateTime? lastLoginAt,
+      required final DateTime createdAt,
+      final DateTime? updatedAt}) = _$UserImpl;
 
   factory _User.fromJson(Map<String, dynamic> json) = _$UserImpl.fromJson;
 

@@ -28,17 +28,17 @@ async def get_current_user(
 ) -> User:
     """
     Get the current authenticated user from JWT token.
-    
+
     Args:
         credentials: HTTP Bearer token.
         db: Database session.
-        
+
     Returns:
         User: Authenticated user.
-        
+
     Raises:
         HTTPException: If token is invalid or user not found.
-        
+
     Security Implications:
         - Validates token signature and expiration.
         - Verifies user exists and is active.
@@ -52,7 +52,7 @@ async def get_current_user(
 
     token = credentials.credentials
     payload = decode_token(token)
-    
+
     if not payload:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -66,7 +66,7 @@ async def get_current_user(
             detail="Ungültiger Token-Typ",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    
+
     try:
         user_id = uuid.UUID(payload.sub)
     except ValueError:
@@ -75,43 +75,45 @@ async def get_current_user(
             detail="Ungültiges Token-Format",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    
+
     result = await db.execute(select(User).where(User.id == user_id))
     user = result.scalar_one_or_none()
-    
+
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Benutzer nicht gefunden",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    
+
     if not user.is_active:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Benutzer ist deaktiviert",
         )
-    
+
     return user
 
 
 async def get_current_user_optional(
-    credentials: Annotated[Optional[HTTPAuthorizationCredentials], Depends(HTTPBearer(auto_error=False))],
+    credentials: Annotated[
+        Optional[HTTPAuthorizationCredentials], Depends(HTTPBearer(auto_error=False))
+    ],
     db: Annotated[AsyncSession, Depends(get_db)],
 ) -> Optional[User]:
     """
     Get the current user if authenticated, otherwise None.
-    
+
     Args:
         credentials: Optional HTTP Bearer token.
         db: Database session.
-        
+
     Returns:
         User: Authenticated user or None.
     """
     if not credentials:
         return None
-    
+
     try:
         return await get_current_user(credentials, db)
     except HTTPException:
@@ -121,16 +123,17 @@ async def get_current_user_optional(
 def require_role(*roles: UserRole):
     """
     Dependency factory for role-based access control.
-    
+
     Args:
         *roles: Allowed roles.
-        
+
     Returns:
         Dependency function.
-        
+
     Example:
         @router.get("/admin", dependencies=[Depends(require_role(UserRole.ADMIN))])
     """
+
     async def role_checker(
         current_user: Annotated[User, Depends(get_current_user)]
     ) -> User:
@@ -140,12 +143,14 @@ def require_role(*roles: UserRole):
                 detail="Keine Berechtigung für diese Aktion",
             )
         return current_user
-    
+
     return role_checker
 
 
 # Pre-defined role dependencies
 RequireAdmin = Depends(require_role(UserRole.ADMIN))
 RequireDoctor = Depends(require_role(UserRole.ADMIN, UserRole.DOCTOR))
-RequireStaff = Depends(require_role(UserRole.ADMIN, UserRole.DOCTOR, UserRole.MFA, UserRole.STAFF))
+RequireStaff = Depends(
+    require_role(UserRole.ADMIN, UserRole.DOCTOR, UserRole.MFA, UserRole.STAFF)
+)
 RequireMFA = Depends(require_role(UserRole.ADMIN, UserRole.MFA))

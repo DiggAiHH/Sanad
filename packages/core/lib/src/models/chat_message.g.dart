@@ -6,7 +6,8 @@ part of 'chat_message.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$ChatMessageImpl _$$ChatMessageImplFromJson(Map<String, dynamic> json) => _$ChatMessageImpl(
+_$ChatMessageImpl _$$ChatMessageImplFromJson(Map<String, dynamic> json) =>
+    _$ChatMessageImpl(
       id: json['id'] as String,
       roomId: json['roomId'] as String,
       senderId: json['senderId'] as String,
@@ -16,13 +17,19 @@ _$ChatMessageImpl _$$ChatMessageImplFromJson(Map<String, dynamic> json) => _$Cha
       attachmentName: json['attachmentName'] as String?,
       replyToMessageId: json['replyToMessageId'] as String?,
       status: $enumDecode(_$MessageStatusEnumMap, json['status']),
-      readBy: (json['readBy'] as List<dynamic>?)?.map((e) => e as String).toList() ?? const [],
+      readBy: (json['readBy'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          const [],
       createdAt: DateTime.parse(json['createdAt'] as String),
-      editedAt: json['editedAt'] == null ? null : DateTime.parse(json['editedAt'] as String),
+      editedAt: json['editedAt'] == null
+          ? null
+          : DateTime.parse(json['editedAt'] as String),
       isDeleted: json['isDeleted'] as bool? ?? false,
     );
 
-Map<String, dynamic> _$$ChatMessageImplToJson(_$ChatMessageImpl instance) => <String, dynamic>{
+Map<String, dynamic> _$$ChatMessageImplToJson(_$ChatMessageImpl instance) =>
+    <String, dynamic>{
       'id': instance.id,
       'roomId': instance.roomId,
       'senderId': instance.senderId,

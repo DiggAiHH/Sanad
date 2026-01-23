@@ -14,7 +14,14 @@ from alembic import context
 from app.config import get_settings
 from app.database import Base
 from app.models.models import (
-    User, Practice, Queue, Ticket, Task, ChatRoom, ChatParticipant, ChatMessage
+    User,
+    Practice,
+    Queue,
+    Ticket,
+    Task,
+    ChatRoom,
+    ChatParticipant,
+    ChatMessage,
 )
 
 config = context.config

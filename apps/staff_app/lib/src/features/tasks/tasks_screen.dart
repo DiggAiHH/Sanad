@@ -12,6 +12,8 @@ class TasksScreen extends StatefulWidget {
 
 class _TasksScreenState extends State<TasksScreen> with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  DateTime _lastUpdated = DateTime.now();
+  String _query = '';
 
   @override
   void initState() {
@@ -43,6 +45,10 @@ class _TasksScreenState extends State<TasksScreen> with SingleTickerProviderStat
             icon: const Icon(Icons.filter_list),
             onPressed: () {},
           ),
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: _refresh,
+          ),
         ],
       ),
       body: TabBarView(
@@ -62,82 +68,89 @@ class _TasksScreenState extends State<TasksScreen> with SingleTickerProviderStat
   }
 
   Widget _buildTaskList(String status) {
-    final tasks = _getTasks(status);
+    final tasks = _filterTasks(_getTasks(status));
 
-    if (tasks.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.task_alt, size: 64, color: AppColors.textSecondary.withOpacity(0.5)),
-            const SizedBox(height: 16),
-            Text(
-              'Keine Aufgaben',
-              style: AppTextStyles.bodyLarge.copyWith(color: AppColors.textSecondary),
-            ),
-          ],
-        ),
-      );
-    }
-
-    return ListView.builder(
-      padding: const EdgeInsets.all(16),
-      itemCount: tasks.length,
-      itemBuilder: (context, index) {
-        final task = tasks[index];
-        return Card(
-          margin: const EdgeInsets.only(bottom: 12),
-          child: InkWell(
-            onTap: () => context.go('/tasks/${task['id']}'),
-            borderRadius: BorderRadius.circular(12),
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      _buildPriorityIndicator(task['priority'] as String),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Text(
-                          task['title'] as String,
-                          style: AppTextStyles.labelLarge,
+    return RefreshIndicator(
+      onRefresh: _refreshAsync,
+      child: ListView.builder(
+        padding: const EdgeInsets.all(16),
+        itemCount: tasks.length + 1,
+        itemBuilder: (context, index) {
+          if (index == 0) {
+            return Column(
+              children: [
+                _buildListHeader(tasks.length),
+                const SizedBox(height: 12),
+                if (tasks.isEmpty)
+                  ScreenState(
+                    isEmpty: true,
+                    emptyTitle: 'Keine Aufgaben',
+                    emptySubtitle: 'Für diesen Status sind aktuell keine Aufgaben vorhanden.',
+                    emptyActionLabel: 'Aktualisieren',
+                    onAction: _refresh,
+                    child: const SizedBox.shrink(),
+                  ),
+              ],
+            );
+          }
+          if (tasks.isEmpty) {
+            return const SizedBox.shrink();
+          }
+          final task = tasks[index - 1];
+          return Card(
+            margin: const EdgeInsets.only(bottom: 12),
+            child: InkWell(
+              onTap: () => context.go('/tasks/${task['id']}'),
+              borderRadius: BorderRadius.circular(12),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        _buildPriorityIndicator(task['priority'] as String),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            task['title'] as String,
+                            style: AppTextStyles.labelLarge,
+                          ),
                         ),
-                      ),
-                      if (status != 'completed')
-                        IconButton(
-                          icon: const Icon(Icons.check_circle_outline),
-                          onPressed: () {},
-                          color: AppColors.success,
-                        ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    task['description'] as String,
-                    style: AppTextStyles.bodySmall,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      const Icon(Icons.person_outline, size: 16, color: AppColors.textSecondary),
-                      const SizedBox(width: 4),
-                      Text('Von: ${task['from']}', style: AppTextStyles.labelSmall),
-                      const Spacer(),
-                      const Icon(Icons.schedule, size: 16, color: AppColors.textSecondary),
-                      const SizedBox(width: 4),
-                      Text(task['time'] as String, style: AppTextStyles.labelSmall),
-                    ],
-                  ),
-                ],
+                        if (status != 'completed')
+                          IconButton(
+                            icon: const Icon(Icons.check_circle_outline),
+                            onPressed: () {},
+                            color: AppColors.success,
+                          ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      task['description'] as String,
+                      style: AppTextStyles.bodySmall,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        const Icon(Icons.person_outline, size: 16, color: AppColors.textSecondary),
+                        const SizedBox(width: 4),
+                        Text('Von: ${task['from']}', style: AppTextStyles.labelSmall),
+                        const Spacer(),
+                        const Icon(Icons.schedule, size: 16, color: AppColors.textSecondary),
+                        const SizedBox(width: 4),
+                        Text(task['time'] as String, style: AppTextStyles.labelSmall),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 
@@ -185,6 +198,77 @@ class _TasksScreenState extends State<TasksScreen> with SingleTickerProviderStat
       ];
     }
     return [];
+  }
+
+  List<Map<String, dynamic>> _filterTasks(List<Map<String, dynamic>> tasks) {
+    if (_query.isEmpty) return tasks;
+    final lowered = _query.toLowerCase();
+    return tasks.where((task) {
+      final title = (task['title'] as String).toLowerCase();
+      final description = (task['description'] as String).toLowerCase();
+      return title.contains(lowered) || description.contains(lowered);
+    }).toList();
+  }
+
+  void _refresh() {
+    setState(() => _lastUpdated = DateTime.now());
+  }
+
+  Future<void> _refreshAsync() async {
+    await Future.delayed(const Duration(milliseconds: 300));
+    if (mounted) {
+      _refresh();
+    }
+  }
+
+  Widget _buildLastUpdated() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        const Icon(Icons.update, size: 16, color: AppColors.textSecondary),
+        const SizedBox(width: 6),
+        Text(
+          'Aktualisiert: ${_formatTime(_lastUpdated)}',
+          style: AppTextStyles.bodySmall.copyWith(
+            color: AppColors.textSecondary,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildListHeader(int count) {
+    return Column(
+      children: [
+        SearchInput(
+          hint: 'Aufgaben durchsuchen...',
+          onChanged: (value) => setState(() => _query = value.trim()),
+          onClear: () => setState(() => _query = ''),
+        ),
+        const SizedBox(height: 12),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Ergebnisse: $count',
+              style: AppTextStyles.bodySmall.copyWith(
+                color: AppColors.textSecondary,
+              ),
+            ),
+            _buildLastUpdated(),
+          ],
+        ),
+      ],
+    );
+  }
+
+  String _formatTime(DateTime time) {
+    final localizations = MaterialLocalizations.of(context);
+    final timeOfDay = TimeOfDay.fromDateTime(time);
+    return localizations.formatTimeOfDay(
+      timeOfDay,
+      alwaysUse24HourFormat: MediaQuery.of(context).alwaysUse24HourFormat,
+    );
   }
 
   void _createTask(BuildContext context) {

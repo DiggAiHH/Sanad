@@ -3,8 +3,15 @@ import 'package:go_router/go_router.dart';
 import 'package:sanad_ui/sanad_ui.dart';
 
 /// Staff home screen with overview
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  DateTime _lastUpdated = DateTime.now();
 
   @override
   Widget build(BuildContext context) {
@@ -33,84 +40,116 @@ class HomeScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Queue status
-            const QueueStatus(
-              waitingCount: 8,
-              inProgressCount: 2,
-              averageWaitMinutes: 12,
-            ),
-            const SizedBox(height: 24),
-            // Quick actions
-            Text('Schnellzugriff', style: AppTextStyles.h5),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(
-                  child: _buildQuickAction(
-                    context,
-                    icon: Icons.campaign,
-                    label: 'Nächsten\naufrufen',
-                    color: AppColors.primary,
-                    onTap: () => _callNext(context),
+      body: RefreshIndicator(
+        onRefresh: _refreshAsync,
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Queue status
+              const QueueStatus(
+                waitingCount: 8,
+                inProgressCount: 2,
+                averageWaitMinutes: 12,
+              ),
+              const SizedBox(height: 8),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  const Icon(Icons.update, size: 16, color: AppColors.textSecondary),
+                  const SizedBox(width: 6),
+                  Text(
+                    'Aktualisiert: ${_formatTime(context, _lastUpdated)}',
+                    style: AppTextStyles.bodySmall.copyWith(
+                      color: AppColors.textSecondary,
+                    ),
                   ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _buildQuickAction(
-                    context,
-                    icon: Icons.chat,
-                    label: 'Neue\nNachricht',
-                    color: AppColors.secondary,
-                    badgeCount: 3,
-                    onTap: () => context.go('/chat'),
+                ],
+              ),
+              const SizedBox(height: 24),
+              // Quick actions
+              Text('Schnellzugriff', style: AppTextStyles.h5),
+              const SizedBox(height: 12),
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  final actions = [
+                    _buildQuickAction(
+                      context,
+                      icon: Icons.campaign,
+                      label: 'Nächsten\naufrufen',
+                      color: AppColors.primary,
+                      onTap: () => _callNext(context),
+                    ),
+                    _buildQuickAction(
+                      context,
+                      icon: Icons.chat,
+                      label: 'Neue\nNachricht',
+                      color: AppColors.secondary,
+                      badgeCount: 3,
+                      onTap: () => context.go('/chat'),
+                    ),
+                    _buildQuickAction(
+                      context,
+                      icon: Icons.add_task,
+                      label: 'Aufgabe\nerstellen',
+                      color: AppColors.success,
+                      onTap: () => _createTask(context),
+                    ),
+                  ];
+                  if (constraints.maxWidth < 700) {
+                    return Wrap(
+                      spacing: 12,
+                      runSpacing: 12,
+                      children: actions
+                          .map((action) => SizedBox(
+                                width: (constraints.maxWidth - 12) / 2,
+                                child: action,
+                              ))
+                          .toList(),
+                    );
+                  }
+                  return Row(
+                    children: [
+                      for (int i = 0; i < actions.length; i++) ...[
+                        Expanded(child: actions[i]),
+                        if (i != actions.length - 1) const SizedBox(width: 12),
+                      ],
+                    ],
+                  );
+                },
+              ),
+              const SizedBox(height: 24),
+              // Pending tasks
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('Offene Aufgaben', style: AppTextStyles.h5),
+                  TextButton(
+                    onPressed: () => context.go('/tasks'),
+                    child: const Text('Alle anzeigen'),
                   ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _buildQuickAction(
-                    context,
-                    icon: Icons.add_task,
-                    label: 'Aufgabe\nerstellen',
-                    color: AppColors.success,
-                    onTap: () => _createTask(context),
+                ],
+              ),
+              const SizedBox(height: 12),
+              ...List.generate(3, (index) => _buildTaskItem(context, index)),
+              const SizedBox(height: 24),
+              // Recent messages
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('Neue Nachrichten', style: AppTextStyles.h5),
+                  TextButton(
+                    onPressed: () => context.go('/chat'),
+                    child: const Text('Alle anzeigen'),
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 24),
-            // Pending tasks
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text('Offene Aufgaben', style: AppTextStyles.h5),
-                TextButton(
-                  onPressed: () => context.go('/tasks'),
-                  child: const Text('Alle anzeigen'),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            ...List.generate(3, (index) => _buildTaskItem(context, index)),
-            const SizedBox(height: 24),
-            // Recent messages
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text('Neue Nachrichten', style: AppTextStyles.h5),
-                TextButton(
-                  onPressed: () => context.go('/chat'),
-                  child: const Text('Alle anzeigen'),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            ...List.generate(2, (index) => _buildChatItem(context, index)),
-          ],
+                ],
+              ),
+              const SizedBox(height: 12),
+              ...List.generate(2, (index) => _buildChatItem(context, index)),
+            ],
+          ),
         ),
       ),
     );
@@ -304,6 +343,22 @@ class HomeScreen extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  Future<void> _refreshAsync() async {
+    await Future.delayed(const Duration(milliseconds: 300));
+    if (mounted) {
+      setState(() => _lastUpdated = DateTime.now());
+    }
+  }
+
+  String _formatTime(BuildContext context, DateTime time) {
+    final localizations = MaterialLocalizations.of(context);
+    final timeOfDay = TimeOfDay.fromDateTime(time);
+    return localizations.formatTimeOfDay(
+      timeOfDay,
+      alwaysUse24HourFormat: MediaQuery.of(context).alwaysUse24HourFormat,
     );
   }
 }

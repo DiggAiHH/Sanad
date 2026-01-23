@@ -22,32 +22,50 @@ QueueCategory _$QueueCategoryFromJson(Map<String, dynamic> json) {
 mixin _$QueueCategory {
   String get id => throw _privateConstructorUsedError;
   String get name => throw _privateConstructorUsedError;
-  String get prefix => throw _privateConstructorUsedError;
+  String get prefix => throw _privateConstructorUsedError; // A, B, C, etc.
   String? get description => throw _privateConstructorUsedError;
   int get currentNumber => throw _privateConstructorUsedError;
   bool get isActive => throw _privateConstructorUsedError;
   String get color => throw _privateConstructorUsedError;
 
+  /// Serializes this QueueCategory to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of QueueCategory
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
-  $QueueCategoryCopyWith<QueueCategory> get copyWith => throw _privateConstructorUsedError;
+  $QueueCategoryCopyWith<QueueCategory> get copyWith =>
+      throw _privateConstructorUsedError;
 }
 
 /// @nodoc
 abstract class $QueueCategoryCopyWith<$Res> {
-  factory $QueueCategoryCopyWith(QueueCategory value, $Res Function(QueueCategory) then) =
+  factory $QueueCategoryCopyWith(
+          QueueCategory value, $Res Function(QueueCategory) then) =
       _$QueueCategoryCopyWithImpl<$Res, QueueCategory>;
   @useResult
-  $Res call({String id, String name, String prefix, String? description, int currentNumber, bool isActive, String color});
+  $Res call(
+      {String id,
+      String name,
+      String prefix,
+      String? description,
+      int currentNumber,
+      bool isActive,
+      String color});
 }
 
 /// @nodoc
-class _$QueueCategoryCopyWithImpl<$Res, $Val extends QueueCategory> implements $QueueCategoryCopyWith<$Res> {
+class _$QueueCategoryCopyWithImpl<$Res, $Val extends QueueCategory>
+    implements $QueueCategoryCopyWith<$Res> {
   _$QueueCategoryCopyWithImpl(this._value, this._then);
 
+  // ignore: unused_field
   final $Val _value;
+  // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of QueueCategory
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -60,31 +78,66 @@ class _$QueueCategoryCopyWithImpl<$Res, $Val extends QueueCategory> implements $
     Object? color = null,
   }) {
     return _then(_value.copyWith(
-      id: null == id ? _value.id : id as String,
-      name: null == name ? _value.name : name as String,
-      prefix: null == prefix ? _value.prefix : prefix as String,
-      description: freezed == description ? _value.description : description as String?,
-      currentNumber: null == currentNumber ? _value.currentNumber : currentNumber as int,
-      isActive: null == isActive ? _value.isActive : isActive as bool,
-      color: null == color ? _value.color : color as String,
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      name: null == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      prefix: null == prefix
+          ? _value.prefix
+          : prefix // ignore: cast_nullable_to_non_nullable
+              as String,
+      description: freezed == description
+          ? _value.description
+          : description // ignore: cast_nullable_to_non_nullable
+              as String?,
+      currentNumber: null == currentNumber
+          ? _value.currentNumber
+          : currentNumber // ignore: cast_nullable_to_non_nullable
+              as int,
+      isActive: null == isActive
+          ? _value.isActive
+          : isActive // ignore: cast_nullable_to_non_nullable
+              as bool,
+      color: null == color
+          ? _value.color
+          : color // ignore: cast_nullable_to_non_nullable
+              as String,
     ) as $Val);
   }
 }
 
 /// @nodoc
-abstract class _$$QueueCategoryImplCopyWith<$Res> implements $QueueCategoryCopyWith<$Res> {
-  factory _$$QueueCategoryImplCopyWith(_$QueueCategoryImpl value, $Res Function(_$QueueCategoryImpl) then) =
+abstract class _$$QueueCategoryImplCopyWith<$Res>
+    implements $QueueCategoryCopyWith<$Res> {
+  factory _$$QueueCategoryImplCopyWith(
+          _$QueueCategoryImpl value, $Res Function(_$QueueCategoryImpl) then) =
       __$$QueueCategoryImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String id, String name, String prefix, String? description, int currentNumber, bool isActive, String color});
+  $Res call(
+      {String id,
+      String name,
+      String prefix,
+      String? description,
+      int currentNumber,
+      bool isActive,
+      String color});
 }
 
 /// @nodoc
-class __$$QueueCategoryImplCopyWithImpl<$Res> extends _$QueueCategoryCopyWithImpl<$Res, _$QueueCategoryImpl>
+class __$$QueueCategoryImplCopyWithImpl<$Res>
+    extends _$QueueCategoryCopyWithImpl<$Res, _$QueueCategoryImpl>
     implements _$$QueueCategoryImplCopyWith<$Res> {
-  __$$QueueCategoryImplCopyWithImpl(_$QueueCategoryImpl _value, $Res Function(_$QueueCategoryImpl) _then) : super(_value, _then);
+  __$$QueueCategoryImplCopyWithImpl(
+      _$QueueCategoryImpl _value, $Res Function(_$QueueCategoryImpl) _then)
+      : super(_value, _then);
 
+  /// Create a copy of QueueCategory
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -97,13 +150,34 @@ class __$$QueueCategoryImplCopyWithImpl<$Res> extends _$QueueCategoryCopyWithImp
     Object? color = null,
   }) {
     return _then(_$QueueCategoryImpl(
-      id: null == id ? _value.id : id as String,
-      name: null == name ? _value.name : name as String,
-      prefix: null == prefix ? _value.prefix : prefix as String,
-      description: freezed == description ? _value.description : description as String?,
-      currentNumber: null == currentNumber ? _value.currentNumber : currentNumber as int,
-      isActive: null == isActive ? _value.isActive : isActive as bool,
-      color: null == color ? _value.color : color as String,
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      name: null == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      prefix: null == prefix
+          ? _value.prefix
+          : prefix // ignore: cast_nullable_to_non_nullable
+              as String,
+      description: freezed == description
+          ? _value.description
+          : description // ignore: cast_nullable_to_non_nullable
+              as String?,
+      currentNumber: null == currentNumber
+          ? _value.currentNumber
+          : currentNumber // ignore: cast_nullable_to_non_nullable
+              as int,
+      isActive: null == isActive
+          ? _value.isActive
+          : isActive // ignore: cast_nullable_to_non_nullable
+              as bool,
+      color: null == color
+          ? _value.color
+          : color // ignore: cast_nullable_to_non_nullable
+              as String,
     ));
   }
 }
@@ -111,17 +185,17 @@ class __$$QueueCategoryImplCopyWithImpl<$Res> extends _$QueueCategoryCopyWithImp
 /// @nodoc
 @JsonSerializable()
 class _$QueueCategoryImpl implements _QueueCategory {
-  const _$QueueCategoryImpl({
-    required this.id,
-    required this.name,
-    required this.prefix,
-    this.description,
-    this.currentNumber = 0,
-    this.isActive = true,
-    this.color = '#2196F3',
-  });
+  const _$QueueCategoryImpl(
+      {required this.id,
+      required this.name,
+      required this.prefix,
+      this.description,
+      this.currentNumber = 0,
+      this.isActive = true,
+      this.color = '#2196F3'});
 
-  factory _$QueueCategoryImpl.fromJson(Map<String, dynamic> json) => _$$QueueCategoryImplFromJson(json);
+  factory _$QueueCategoryImpl.fromJson(Map<String, dynamic> json) =>
+      _$$QueueCategoryImplFromJson(json);
 
   @override
   final String id;
@@ -129,6 +203,7 @@ class _$QueueCategoryImpl implements _QueueCategory {
   final String name;
   @override
   final String prefix;
+// A, B, C, etc.
   @override
   final String? description;
   @override
@@ -154,16 +229,22 @@ class _$QueueCategoryImpl implements _QueueCategory {
             (identical(other.id, id) || other.id == id) &&
             (identical(other.name, name) || other.name == name) &&
             (identical(other.prefix, prefix) || other.prefix == prefix) &&
-            (identical(other.description, description) || other.description == description) &&
-            (identical(other.currentNumber, currentNumber) || other.currentNumber == currentNumber) &&
-            (identical(other.isActive, isActive) || other.isActive == isActive) &&
+            (identical(other.description, description) ||
+                other.description == description) &&
+            (identical(other.currentNumber, currentNumber) ||
+                other.currentNumber == currentNumber) &&
+            (identical(other.isActive, isActive) ||
+                other.isActive == isActive) &&
             (identical(other.color, color) || other.color == color));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, id, name, prefix, description, currentNumber, isActive, color);
+  int get hashCode => Object.hash(runtimeType, id, name, prefix, description,
+      currentNumber, isActive, color);
 
+  /// Create a copy of QueueCategory
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
@@ -172,33 +253,46 @@ class _$QueueCategoryImpl implements _QueueCategory {
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$QueueCategoryImplToJson(this);
+    return _$$QueueCategoryImplToJson(
+      this,
+    );
   }
 }
 
 abstract class _QueueCategory implements QueueCategory {
-  const factory _QueueCategory({
-    required final String id,
-    required final String name,
-    required final String prefix,
-    final String? description,
-    final int currentNumber,
-    final bool isActive,
-    final String color,
-  }) = _$QueueCategoryImpl;
+  const factory _QueueCategory(
+      {required final String id,
+      required final String name,
+      required final String prefix,
+      final String? description,
+      final int currentNumber,
+      final bool isActive,
+      final String color}) = _$QueueCategoryImpl;
 
-  factory _QueueCategory.fromJson(Map<String, dynamic> json) = _$QueueCategoryImpl.fromJson;
+  factory _QueueCategory.fromJson(Map<String, dynamic> json) =
+      _$QueueCategoryImpl.fromJson;
 
-  @override String get id;
-  @override String get name;
-  @override String get prefix;
-  @override String? get description;
-  @override int get currentNumber;
-  @override bool get isActive;
-  @override String get color;
+  @override
+  String get id;
+  @override
+  String get name;
+  @override
+  String get prefix; // A, B, C, etc.
+  @override
+  String? get description;
+  @override
+  int get currentNumber;
+  @override
+  bool get isActive;
+  @override
+  String get color;
+
+  /// Create a copy of QueueCategory
+  /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$QueueCategoryImplCopyWith<_$QueueCategoryImpl> get copyWith => throw _privateConstructorUsedError;
+  _$$QueueCategoryImplCopyWith<_$QueueCategoryImpl> get copyWith =>
+      throw _privateConstructorUsedError;
 }
 
 QueueState _$QueueStateFromJson(Map<String, dynamic> json) {
@@ -215,34 +309,44 @@ mixin _$QueueState {
   int? get averageWaitMinutes => throw _privateConstructorUsedError;
   DateTime get lastUpdated => throw _privateConstructorUsedError;
 
+  /// Serializes this QueueState to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of QueueState
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
-  $QueueStateCopyWith<QueueState> get copyWith => throw _privateConstructorUsedError;
+  $QueueStateCopyWith<QueueState> get copyWith =>
+      throw _privateConstructorUsedError;
 }
 
 /// @nodoc
 abstract class $QueueStateCopyWith<$Res> {
-  factory $QueueStateCopyWith(QueueState value, $Res Function(QueueState) then) =
+  factory $QueueStateCopyWith(
+          QueueState value, $Res Function(QueueState) then) =
       _$QueueStateCopyWithImpl<$Res, QueueState>;
   @useResult
-  $Res call({
-    String practiceId,
-    List<QueueCategory> categories,
-    List<Ticket> activeTickets,
-    int totalWaiting,
-    int totalInProgress,
-    int? averageWaitMinutes,
-    DateTime lastUpdated,
-  });
+  $Res call(
+      {String practiceId,
+      List<QueueCategory> categories,
+      List<Ticket> activeTickets,
+      int totalWaiting,
+      int totalInProgress,
+      int? averageWaitMinutes,
+      DateTime lastUpdated});
 }
 
 /// @nodoc
-class _$QueueStateCopyWithImpl<$Res, $Val extends QueueState> implements $QueueStateCopyWith<$Res> {
+class _$QueueStateCopyWithImpl<$Res, $Val extends QueueState>
+    implements $QueueStateCopyWith<$Res> {
   _$QueueStateCopyWithImpl(this._value, this._then);
 
+  // ignore: unused_field
   final $Val _value;
+  // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of QueueState
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -255,39 +359,66 @@ class _$QueueStateCopyWithImpl<$Res, $Val extends QueueState> implements $QueueS
     Object? lastUpdated = null,
   }) {
     return _then(_value.copyWith(
-      practiceId: null == practiceId ? _value.practiceId : practiceId as String,
-      categories: null == categories ? _value.categories : categories as List<QueueCategory>,
-      activeTickets: null == activeTickets ? _value.activeTickets : activeTickets as List<Ticket>,
-      totalWaiting: null == totalWaiting ? _value.totalWaiting : totalWaiting as int,
-      totalInProgress: null == totalInProgress ? _value.totalInProgress : totalInProgress as int,
-      averageWaitMinutes: freezed == averageWaitMinutes ? _value.averageWaitMinutes : averageWaitMinutes as int?,
-      lastUpdated: null == lastUpdated ? _value.lastUpdated : lastUpdated as DateTime,
+      practiceId: null == practiceId
+          ? _value.practiceId
+          : practiceId // ignore: cast_nullable_to_non_nullable
+              as String,
+      categories: null == categories
+          ? _value.categories
+          : categories // ignore: cast_nullable_to_non_nullable
+              as List<QueueCategory>,
+      activeTickets: null == activeTickets
+          ? _value.activeTickets
+          : activeTickets // ignore: cast_nullable_to_non_nullable
+              as List<Ticket>,
+      totalWaiting: null == totalWaiting
+          ? _value.totalWaiting
+          : totalWaiting // ignore: cast_nullable_to_non_nullable
+              as int,
+      totalInProgress: null == totalInProgress
+          ? _value.totalInProgress
+          : totalInProgress // ignore: cast_nullable_to_non_nullable
+              as int,
+      averageWaitMinutes: freezed == averageWaitMinutes
+          ? _value.averageWaitMinutes
+          : averageWaitMinutes // ignore: cast_nullable_to_non_nullable
+              as int?,
+      lastUpdated: null == lastUpdated
+          ? _value.lastUpdated
+          : lastUpdated // ignore: cast_nullable_to_non_nullable
+              as DateTime,
     ) as $Val);
   }
 }
 
 /// @nodoc
-abstract class _$$QueueStateImplCopyWith<$Res> implements $QueueStateCopyWith<$Res> {
-  factory _$$QueueStateImplCopyWith(_$QueueStateImpl value, $Res Function(_$QueueStateImpl) then) =
+abstract class _$$QueueStateImplCopyWith<$Res>
+    implements $QueueStateCopyWith<$Res> {
+  factory _$$QueueStateImplCopyWith(
+          _$QueueStateImpl value, $Res Function(_$QueueStateImpl) then) =
       __$$QueueStateImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({
-    String practiceId,
-    List<QueueCategory> categories,
-    List<Ticket> activeTickets,
-    int totalWaiting,
-    int totalInProgress,
-    int? averageWaitMinutes,
-    DateTime lastUpdated,
-  });
+  $Res call(
+      {String practiceId,
+      List<QueueCategory> categories,
+      List<Ticket> activeTickets,
+      int totalWaiting,
+      int totalInProgress,
+      int? averageWaitMinutes,
+      DateTime lastUpdated});
 }
 
 /// @nodoc
-class __$$QueueStateImplCopyWithImpl<$Res> extends _$QueueStateCopyWithImpl<$Res, _$QueueStateImpl>
+class __$$QueueStateImplCopyWithImpl<$Res>
+    extends _$QueueStateCopyWithImpl<$Res, _$QueueStateImpl>
     implements _$$QueueStateImplCopyWith<$Res> {
-  __$$QueueStateImplCopyWithImpl(_$QueueStateImpl _value, $Res Function(_$QueueStateImpl) _then) : super(_value, _then);
+  __$$QueueStateImplCopyWithImpl(
+      _$QueueStateImpl _value, $Res Function(_$QueueStateImpl) _then)
+      : super(_value, _then);
 
+  /// Create a copy of QueueState
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -300,13 +431,34 @@ class __$$QueueStateImplCopyWithImpl<$Res> extends _$QueueStateCopyWithImpl<$Res
     Object? lastUpdated = null,
   }) {
     return _then(_$QueueStateImpl(
-      practiceId: null == practiceId ? _value.practiceId : practiceId as String,
-      categories: null == categories ? _value._categories : categories as List<QueueCategory>,
-      activeTickets: null == activeTickets ? _value._activeTickets : activeTickets as List<Ticket>,
-      totalWaiting: null == totalWaiting ? _value.totalWaiting : totalWaiting as int,
-      totalInProgress: null == totalInProgress ? _value.totalInProgress : totalInProgress as int,
-      averageWaitMinutes: freezed == averageWaitMinutes ? _value.averageWaitMinutes : averageWaitMinutes as int?,
-      lastUpdated: null == lastUpdated ? _value.lastUpdated : lastUpdated as DateTime,
+      practiceId: null == practiceId
+          ? _value.practiceId
+          : practiceId // ignore: cast_nullable_to_non_nullable
+              as String,
+      categories: null == categories
+          ? _value._categories
+          : categories // ignore: cast_nullable_to_non_nullable
+              as List<QueueCategory>,
+      activeTickets: null == activeTickets
+          ? _value._activeTickets
+          : activeTickets // ignore: cast_nullable_to_non_nullable
+              as List<Ticket>,
+      totalWaiting: null == totalWaiting
+          ? _value.totalWaiting
+          : totalWaiting // ignore: cast_nullable_to_non_nullable
+              as int,
+      totalInProgress: null == totalInProgress
+          ? _value.totalInProgress
+          : totalInProgress // ignore: cast_nullable_to_non_nullable
+              as int,
+      averageWaitMinutes: freezed == averageWaitMinutes
+          ? _value.averageWaitMinutes
+          : averageWaitMinutes // ignore: cast_nullable_to_non_nullable
+              as int?,
+      lastUpdated: null == lastUpdated
+          ? _value.lastUpdated
+          : lastUpdated // ignore: cast_nullable_to_non_nullable
+              as DateTime,
     ));
   }
 }
@@ -314,31 +466,36 @@ class __$$QueueStateImplCopyWithImpl<$Res> extends _$QueueStateCopyWithImpl<$Res
 /// @nodoc
 @JsonSerializable()
 class _$QueueStateImpl implements _QueueState {
-  const _$QueueStateImpl({
-    required this.practiceId,
-    required final List<QueueCategory> categories,
-    required final List<Ticket> activeTickets,
-    required this.totalWaiting,
-    required this.totalInProgress,
-    this.averageWaitMinutes,
-    required this.lastUpdated,
-  })  : _categories = categories,
+  const _$QueueStateImpl(
+      {required this.practiceId,
+      required final List<QueueCategory> categories,
+      required final List<Ticket> activeTickets,
+      required this.totalWaiting,
+      required this.totalInProgress,
+      this.averageWaitMinutes,
+      required this.lastUpdated})
+      : _categories = categories,
         _activeTickets = activeTickets;
 
-  factory _$QueueStateImpl.fromJson(Map<String, dynamic> json) => _$$QueueStateImplFromJson(json);
+  factory _$QueueStateImpl.fromJson(Map<String, dynamic> json) =>
+      _$$QueueStateImplFromJson(json);
 
   @override
   final String practiceId;
   final List<QueueCategory> _categories;
   @override
   List<QueueCategory> get categories {
-    return List.unmodifiable(_categories);
+    if (_categories is EqualUnmodifiableListView) return _categories;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_categories);
   }
 
   final List<Ticket> _activeTickets;
   @override
   List<Ticket> get activeTickets {
-    return List.unmodifiable(_activeTickets);
+    if (_activeTickets is EqualUnmodifiableListView) return _activeTickets;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_activeTickets);
   }
 
   @override
@@ -360,13 +517,20 @@ class _$QueueStateImpl implements _QueueState {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$QueueStateImpl &&
-            (identical(other.practiceId, practiceId) || other.practiceId == practiceId) &&
-            const DeepCollectionEquality().equals(other._categories, _categories) &&
-            const DeepCollectionEquality().equals(other._activeTickets, _activeTickets) &&
-            (identical(other.totalWaiting, totalWaiting) || other.totalWaiting == totalWaiting) &&
-            (identical(other.totalInProgress, totalInProgress) || other.totalInProgress == totalInProgress) &&
-            (identical(other.averageWaitMinutes, averageWaitMinutes) || other.averageWaitMinutes == averageWaitMinutes) &&
-            (identical(other.lastUpdated, lastUpdated) || other.lastUpdated == lastUpdated));
+            (identical(other.practiceId, practiceId) ||
+                other.practiceId == practiceId) &&
+            const DeepCollectionEquality()
+                .equals(other._categories, _categories) &&
+            const DeepCollectionEquality()
+                .equals(other._activeTickets, _activeTickets) &&
+            (identical(other.totalWaiting, totalWaiting) ||
+                other.totalWaiting == totalWaiting) &&
+            (identical(other.totalInProgress, totalInProgress) ||
+                other.totalInProgress == totalInProgress) &&
+            (identical(other.averageWaitMinutes, averageWaitMinutes) ||
+                other.averageWaitMinutes == averageWaitMinutes) &&
+            (identical(other.lastUpdated, lastUpdated) ||
+                other.lastUpdated == lastUpdated));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -381,6 +545,8 @@ class _$QueueStateImpl implements _QueueState {
       averageWaitMinutes,
       lastUpdated);
 
+  /// Create a copy of QueueState
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
@@ -389,31 +555,44 @@ class _$QueueStateImpl implements _QueueState {
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$QueueStateImplToJson(this);
+    return _$$QueueStateImplToJson(
+      this,
+    );
   }
 }
 
 abstract class _QueueState implements QueueState {
-  const factory _QueueState({
-    required final String practiceId,
-    required final List<QueueCategory> categories,
-    required final List<Ticket> activeTickets,
-    required final int totalWaiting,
-    required final int totalInProgress,
-    final int? averageWaitMinutes,
-    required final DateTime lastUpdated,
-  }) = _$QueueStateImpl;
+  const factory _QueueState(
+      {required final String practiceId,
+      required final List<QueueCategory> categories,
+      required final List<Ticket> activeTickets,
+      required final int totalWaiting,
+      required final int totalInProgress,
+      final int? averageWaitMinutes,
+      required final DateTime lastUpdated}) = _$QueueStateImpl;
 
-  factory _QueueState.fromJson(Map<String, dynamic> json) = _$QueueStateImpl.fromJson;
+  factory _QueueState.fromJson(Map<String, dynamic> json) =
+      _$QueueStateImpl.fromJson;
 
-  @override String get practiceId;
-  @override List<QueueCategory> get categories;
-  @override List<Ticket> get activeTickets;
-  @override int get totalWaiting;
-  @override int get totalInProgress;
-  @override int? get averageWaitMinutes;
-  @override DateTime get lastUpdated;
+  @override
+  String get practiceId;
+  @override
+  List<QueueCategory> get categories;
+  @override
+  List<Ticket> get activeTickets;
+  @override
+  int get totalWaiting;
+  @override
+  int get totalInProgress;
+  @override
+  int? get averageWaitMinutes;
+  @override
+  DateTime get lastUpdated;
+
+  /// Create a copy of QueueState
+  /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$QueueStateImplCopyWith<_$QueueStateImpl> get copyWith => throw _privateConstructorUsedError;
+  _$$QueueStateImplCopyWith<_$QueueStateImpl> get copyWith =>
+      throw _privateConstructorUsedError;
 }

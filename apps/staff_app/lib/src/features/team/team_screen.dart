@@ -3,70 +3,84 @@ import 'package:go_router/go_router.dart';
 import 'package:sanad_ui/sanad_ui.dart';
 
 /// Team overview screen
-class TeamScreen extends StatelessWidget {
+class TeamScreen extends StatefulWidget {
   const TeamScreen({super.key});
 
   @override
+  State<TeamScreen> createState() => _TeamScreenState();
+}
+
+class _TeamScreenState extends State<TeamScreen> {
+  String _query = '';
+  DateTime _lastUpdated = DateTime.now();
+
+  final List<_StaffMember> _members = const [
+    _StaffMember(name: 'Dr. Meier', role: 'Arzt', room: 'Raum 1', isOnline: true),
+    _StaffMember(name: 'MFA Müller', role: 'Med. Fachangestellte', room: 'Empfang', isOnline: true),
+    _StaffMember(name: 'MFA Schmidt', role: 'Med. Fachangestellte', room: 'Raum 3', isOnline: true),
+    _StaffMember(name: 'MFA Weber', role: 'Med. Fachangestellte', room: 'Labor', isOnline: true),
+    _StaffMember(name: 'Dr. Schmidt', role: 'Arzt', room: '-', isOnline: false),
+    _StaffMember(name: 'MFA Bauer', role: 'Med. Fachangestellte', room: '-', isOnline: false),
+  ];
+
+  @override
   Widget build(BuildContext context) {
+    final filtered = _filteredMembers();
+    final online = filtered.where((member) => member.isOnline).toList();
+    final offline = filtered.where((member) => !member.isOnline).toList();
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Team'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.search),
-            onPressed: () {},
+            icon: const Icon(Icons.refresh),
+            onPressed: _refresh,
+            tooltip: 'Aktualisieren',
           ),
         ],
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          // Online section
-          _buildSectionHeader('Online (4)'),
-          _buildStaffItem(
-            context,
-            name: 'Dr. Meier',
-            role: 'Arzt',
-            room: 'Raum 1',
-            isOnline: true,
-          ),
-          _buildStaffItem(
-            context,
-            name: 'MFA Müller',
-            role: 'Med. Fachangestellte',
-            room: 'Empfang',
-            isOnline: true,
-          ),
-          _buildStaffItem(
-            context,
-            name: 'MFA Schmidt',
-            role: 'Med. Fachangestellte',
-            room: 'Raum 3',
-            isOnline: true,
-          ),
-          _buildStaffItem(
-            context,
-            name: 'MFA Weber',
-            role: 'Med. Fachangestellte',
-            room: 'Labor',
-            isOnline: true,
+          SearchInput(
+            hint: 'Team durchsuchen...',
+            onChanged: (value) => setState(() => _query = value.trim()),
+            onClear: () => setState(() => _query = ''),
           ),
           const SizedBox(height: 16),
-          // Offline section
-          _buildSectionHeader('Offline (2)'),
-          _buildStaffItem(
-            context,
-            name: 'Dr. Schmidt',
-            role: 'Arzt',
-            room: '-',
-            isOnline: false,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Ergebnisse: ${filtered.length}',
+                style: AppTextStyles.bodySmall.copyWith(
+                  color: AppColors.textSecondary,
+                ),
+              ),
+              _buildLastUpdated(context),
+            ],
           ),
-          _buildStaffItem(
-            context,
-            name: 'MFA Bauer',
-            role: 'Med. Fachangestellte',
-            room: '-',
-            isOnline: false,
+          const SizedBox(height: 12),
+          ScreenState(
+            isEmpty: filtered.isEmpty,
+            emptyTitle: 'Niemand gefunden',
+            emptySubtitle: 'Bitte passen Sie die Suche an.',
+            emptyActionLabel: 'Suche löschen',
+            onAction: () => setState(() => _query = ''),
+            child: Column(
+              children: [
+                if (online.isNotEmpty) ...[
+                  _buildSectionHeader('Online (${online.length})'),
+                  ...online.map((member) => _buildStaffItem(context, member)),
+                ],
+                if (offline.isNotEmpty) ...[
+                  const SizedBox(height: 16),
+                  _buildSectionHeader('Offline (${offline.length})'),
+                  ...offline.map((member) => _buildStaffItem(context, member)),
+                ],
+              ],
+            ),
           ),
         ],
       ),
@@ -80,19 +94,34 @@ class TeamScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildStaffItem(
-    BuildContext context, {
-    required String name,
-    required String role,
-    required String room,
-    required bool isOnline,
-  }) {
+  Widget _buildLastUpdated(BuildContext context) {
+    final localizations = MaterialLocalizations.of(context);
+    final timeOfDay = TimeOfDay.fromDateTime(_lastUpdated);
+    final formatted = localizations.formatTimeOfDay(
+      timeOfDay,
+      alwaysUse24HourFormat: MediaQuery.of(context).alwaysUse24HourFormat,
+    );
+    return Row(
+      children: [
+        const Icon(Icons.update, size: 16, color: AppColors.textSecondary),
+        const SizedBox(width: 6),
+        Text(
+          'Aktualisiert: $formatted',
+          style: AppTextStyles.bodySmall.copyWith(
+            color: AppColors.textSecondary,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildStaffItem(BuildContext context, _StaffMember member) {
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
       child: ListTile(
         leading: Stack(
           children: [
-            AppAvatar(name: name),
+            AppAvatar(name: member.name),
             Positioned(
               right: 0,
               bottom: 0,
@@ -100,7 +129,7 @@ class TeamScreen extends StatelessWidget {
                 width: 12,
                 height: 12,
                 decoration: BoxDecoration(
-                  color: isOnline ? AppColors.success : AppColors.textSecondary,
+                  color: member.isOnline ? AppColors.success : AppColors.textSecondary,
                   shape: BoxShape.circle,
                   border: Border.all(color: Colors.white, width: 2),
                 ),
@@ -108,13 +137,13 @@ class TeamScreen extends StatelessWidget {
             ),
           ],
         ),
-        title: Text(name, style: AppTextStyles.labelLarge),
+        title: Text(member.name, style: AppTextStyles.labelLarge),
         subtitle: Row(
           children: [
-            Text(role),
-            if (room != '-') ...[
+            Text(member.role),
+            if (member.room != '-') ...[
               const Text(' • '),
-              Text(room),
+              Text(member.room),
             ],
           ],
         ),
@@ -123,12 +152,12 @@ class TeamScreen extends StatelessWidget {
           children: [
             IconButton(
               icon: const Icon(Icons.chat_bubble_outline),
-              onPressed: () => context.go('/chat/$name'),
+              onPressed: () => context.go('/chat/${member.name}'),
               color: AppColors.primary,
             ),
             IconButton(
               icon: const Icon(Icons.add_task),
-              onPressed: () => _assignTask(context, name),
+              onPressed: () => _assignTask(context, member.name),
               color: AppColors.secondary,
             ),
           ],
@@ -178,8 +207,10 @@ class TeamScreen extends StatelessWidget {
                   child: ElevatedButton(
                     onPressed: () {
                       Navigator.pop(context);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Aufgabe an $staffName gesendet')),
+                      ModernSnackBar.show(
+                        context,
+                        message: 'Aufgabe an $staffName gesendet',
+                        type: SnackBarType.success,
                       );
                     },
                     child: const Text('Senden'),
@@ -193,4 +224,34 @@ class TeamScreen extends StatelessWidget {
       ),
     );
   }
+
+  List<_StaffMember> _filteredMembers() {
+    if (_query.isEmpty) {
+      return _members;
+    }
+    final lowered = _query.toLowerCase();
+    return _members.where((member) {
+      return member.name.toLowerCase().contains(lowered) ||
+          member.role.toLowerCase().contains(lowered) ||
+          member.room.toLowerCase().contains(lowered);
+    }).toList();
+  }
+
+  void _refresh() {
+    setState(() => _lastUpdated = DateTime.now());
+  }
+}
+
+class _StaffMember {
+  final String name;
+  final String role;
+  final String room;
+  final bool isOnline;
+
+  const _StaffMember({
+    required this.name,
+    required this.role,
+    required this.room,
+    required this.isOnline,
+  });
 }

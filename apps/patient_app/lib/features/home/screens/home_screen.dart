@@ -1,15 +1,34 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:sanad_core/sanad_core.dart';
 import 'package:sanad_ui/sanad_ui.dart';
+
+import '../../../providers/last_ticket_provider.dart';
+
+final publicQueueSummaryProvider =
+    FutureProvider.autoDispose<PublicQueueSummary>((ref) async {
+  final service = ref.watch(publicQueueSummaryServiceProvider);
+  return service.getSummary();
+});
 
 /// Home screen for the patient app.
 /// 
 /// Provides quick access to ticket status check and practice information.
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final summaryAsync = ref.watch(publicQueueSummaryProvider);
+    final lastTicketNumber = ref.watch(lastTicketNumberProvider);
+    final summary = summaryAsync.asData?.value;
+    final openingHours = summary?.openingHours ?? 'Bitte erfragen';
+    final averageWait = summary == null
+        ? '—'
+        : '${summary.averageWaitTimeMinutes} Min.';
+    final nowServing = summary?.nowServingTicket ?? '—';
+
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
@@ -90,6 +109,44 @@ class HomeScreen extends StatelessWidget {
               ),
               const SizedBox(height: 32),
               
+              // Quick Stats
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  final isCompact = constraints.maxWidth < 520;
+                  final cardWidth = isCompact
+                      ? constraints.maxWidth
+                      : (constraints.maxWidth - 12) / 2;
+                  return Wrap(
+                    spacing: 12,
+                    runSpacing: 12,
+                    children: [
+                      _QuickStatCard(
+                        icon: Icons.schedule,
+                        title: 'Heute',
+                        value: openingHours,
+                        color: AppColors.primary,
+                        width: cardWidth,
+                      ),
+                      _QuickStatCard(
+                        icon: Icons.timer,
+                        title: 'Ø Wartezeit',
+                        value: averageWait,
+                        color: AppColors.warning,
+                        width: cardWidth,
+                      ),
+                      _QuickStatCard(
+                        icon: Icons.campaign,
+                        title: 'Jetzt dran',
+                        value: nowServing,
+                        color: AppColors.success,
+                        width: cardWidth,
+                      ),
+                    ],
+                  );
+                },
+              ),
+              const SizedBox(height: 32),
+
               // Main Actions
               _ActionCard(
                 icon: Icons.confirmation_number,
@@ -98,6 +155,37 @@ class HomeScreen extends StatelessWidget {
                 buttonText: 'Status prüfen',
                 onPressed: () => context.push('/ticket-entry'),
                 isPrimary: true,
+              ),
+              if (lastTicketNumber != null && lastTicketNumber.isNotEmpty) ...[
+                const SizedBox(height: 16),
+                _ActionCard(
+                  icon: Icons.history,
+                  title: 'Letztes Ticket',
+                  description:
+                      'Zuletzt geprüft: $lastTicketNumber. Jetzt den Status erneut prüfen.',
+                  buttonText: 'Letztes Ticket öffnen',
+                  onPressed: () => context.push('/ticket/$lastTicketNumber'),
+                ),
+              ],
+              const SizedBox(height: 16),
+              
+              // NEW: Document Request Action
+              _ActionCard(
+                icon: Icons.description,
+                title: 'Dokumente anfordern',
+                description: 'Rezepte, Überweisungen, AU-Bescheinigungen und andere Dokumente anfragen.',
+                buttonText: 'Dokument anfragen',
+                onPressed: () => context.push('/documents'),
+              ),
+              const SizedBox(height: 16),
+              
+              // NEW: Consultation Action
+              _ActionCard(
+                icon: Icons.medical_services,
+                title: 'Arzt kontaktieren',
+                description: 'Chat, Video- oder Telefonsprechstunde mit Ihrem Arzt vereinbaren.',
+                buttonText: 'Kontakt aufnehmen',
+                onPressed: () => context.push('/consultation'),
               ),
               const SizedBox(height: 16),
               _ActionCard(
@@ -109,7 +197,7 @@ class HomeScreen extends StatelessWidget {
               ),
               const SizedBox(height: 32),
               
-              // Current Queue Overview (Demo Data)
+              // Current Queue Overview
               Text(
                 'Aktuelle Wartezeiten',
                 style: AppTextStyles.titleMedium.copyWith(
@@ -117,32 +205,122 @@ class HomeScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 12),
-              _WaitTimeCard(
-                category: 'Allgemeinmedizin',
-                code: 'A',
-                waitTime: 15,
-                waitingCount: 3,
-                color: AppColors.primary,
-              ),
-              const SizedBox(height: 8),
-              _WaitTimeCard(
-                category: 'Labor',
-                code: 'L',
-                waitTime: 10,
-                waitingCount: 2,
-                color: AppColors.success,
-              ),
-              const SizedBox(height: 8),
-              _WaitTimeCard(
-                category: 'Röntgen',
-                code: 'R',
-                waitTime: 25,
-                waitingCount: 5,
-                color: AppColors.warning,
+              summaryAsync.when(
+                data: (summary) {
+                  if (summary.queues.isEmpty) {
+                    return Text(
+                      'Derzeit sind keine Warteschlangen aktiv.',
+                      style: AppTextStyles.bodyMedium.copyWith(
+                        color: AppColors.textSecondary,
+                      ),
+                    );
+                  }
+                  return Column(
+                    children: summary.queues.map((queue) {
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: _WaitTimeCard(
+                          category: queue.name,
+                          code: queue.code,
+                          waitTime: queue.averageWaitMinutes,
+                          waitingCount: queue.waitingCount,
+                          color: _colorFromHex(queue.color),
+                        ),
+                      );
+                    }).toList(),
+                  );
+                },
+                loading: () => const Center(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(vertical: 12),
+                    child: CircularProgressIndicator(),
+                  ),
+                ),
+                error: (error, _) => Text(
+                  'Wartezeiten konnten nicht geladen werden.',
+                  style: AppTextStyles.bodyMedium.copyWith(
+                    color: AppColors.error,
+                  ),
+                ),
               ),
               const SizedBox(height: 32),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Color _colorFromHex(String hex) {
+    final buffer = StringBuffer();
+    if (hex.length == 6 || hex.length == 7) {
+      buffer.write('ff');
+    }
+    buffer.write(hex.replaceFirst('#', ''));
+    return Color(int.parse(buffer.toString(), radix: 16));
+  }
+}
+
+class _QuickStatCard extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String value;
+  final Color color;
+  final double width;
+
+  const _QuickStatCard({
+    required this.icon,
+    required this.title,
+    required this.value,
+    required this.color,
+    required this.width,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: width,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: AppColors.border),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.12),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(icon, color: color, size: 18),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: AppTextStyles.bodySmall.copyWith(
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    value,
+                    style: AppTextStyles.titleSmall.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );

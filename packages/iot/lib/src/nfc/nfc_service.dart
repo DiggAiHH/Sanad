@@ -1,8 +1,9 @@
-import 'dart:async';
+import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:nfc_manager/nfc_manager.dart';
+import 'package:nfc_manager/platform_tags.dart';
 import 'package:dio/dio.dart';
 
 import 'nfc_models.dart';

@@ -35,6 +35,11 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/ticket/:ticketNumber',
+        redirect: (context, state) {
+          final ticketNumber = state.pathParameters['ticketNumber'] ?? '';
+          final isValid = RegExp(r'^[A-Za-z]-?\d{1,4}$').hasMatch(ticketNumber);
+          return isValid ? null : '/check-in';
+        },
         builder: (context, state) {
           final ticketNumber = state.pathParameters['ticketNumber']!;
           final extraMap = state.extra as Map<String, dynamic>?;

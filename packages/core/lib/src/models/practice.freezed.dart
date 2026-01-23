@@ -34,41 +34,51 @@ mixin _$Practice {
   DateTime get createdAt => throw _privateConstructorUsedError;
   DateTime? get updatedAt => throw _privateConstructorUsedError;
 
+  /// Serializes this Practice to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of Practice
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
-  $PracticeCopyWith<Practice> get copyWith => throw _privateConstructorUsedError;
+  $PracticeCopyWith<Practice> get copyWith =>
+      throw _privateConstructorUsedError;
 }
 
 /// @nodoc
 abstract class $PracticeCopyWith<$Res> {
-  factory $PracticeCopyWith(Practice value, $Res Function(Practice) then) = _$PracticeCopyWithImpl<$Res, Practice>;
+  factory $PracticeCopyWith(Practice value, $Res Function(Practice) then) =
+      _$PracticeCopyWithImpl<$Res, Practice>;
   @useResult
-  $Res call({
-    String id,
-    String name,
-    String address,
-    String city,
-    String postalCode,
-    String? phoneNumber,
-    String? email,
-    String? website,
-    String? logoUrl,
-    List<String> specializations,
-    PracticeSettings settings,
-    DateTime createdAt,
-    DateTime? updatedAt,
-  });
+  $Res call(
+      {String id,
+      String name,
+      String address,
+      String city,
+      String postalCode,
+      String? phoneNumber,
+      String? email,
+      String? website,
+      String? logoUrl,
+      List<String> specializations,
+      PracticeSettings settings,
+      DateTime createdAt,
+      DateTime? updatedAt});
 
   $PracticeSettingsCopyWith<$Res> get settings;
 }
 
 /// @nodoc
-class _$PracticeCopyWithImpl<$Res, $Val extends Practice> implements $PracticeCopyWith<$Res> {
+class _$PracticeCopyWithImpl<$Res, $Val extends Practice>
+    implements $PracticeCopyWith<$Res> {
   _$PracticeCopyWithImpl(this._value, this._then);
 
+  // ignore: unused_field
   final $Val _value;
+  // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of Practice
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -87,22 +97,63 @@ class _$PracticeCopyWithImpl<$Res, $Val extends Practice> implements $PracticeCo
     Object? updatedAt = freezed,
   }) {
     return _then(_value.copyWith(
-      id: null == id ? _value.id : id as String,
-      name: null == name ? _value.name : name as String,
-      address: null == address ? _value.address : address as String,
-      city: null == city ? _value.city : city as String,
-      postalCode: null == postalCode ? _value.postalCode : postalCode as String,
-      phoneNumber: freezed == phoneNumber ? _value.phoneNumber : phoneNumber as String?,
-      email: freezed == email ? _value.email : email as String?,
-      website: freezed == website ? _value.website : website as String?,
-      logoUrl: freezed == logoUrl ? _value.logoUrl : logoUrl as String?,
-      specializations: null == specializations ? _value.specializations : specializations as List<String>,
-      settings: null == settings ? _value.settings : settings as PracticeSettings,
-      createdAt: null == createdAt ? _value.createdAt : createdAt as DateTime,
-      updatedAt: freezed == updatedAt ? _value.updatedAt : updatedAt as DateTime?,
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      name: null == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      address: null == address
+          ? _value.address
+          : address // ignore: cast_nullable_to_non_nullable
+              as String,
+      city: null == city
+          ? _value.city
+          : city // ignore: cast_nullable_to_non_nullable
+              as String,
+      postalCode: null == postalCode
+          ? _value.postalCode
+          : postalCode // ignore: cast_nullable_to_non_nullable
+              as String,
+      phoneNumber: freezed == phoneNumber
+          ? _value.phoneNumber
+          : phoneNumber // ignore: cast_nullable_to_non_nullable
+              as String?,
+      email: freezed == email
+          ? _value.email
+          : email // ignore: cast_nullable_to_non_nullable
+              as String?,
+      website: freezed == website
+          ? _value.website
+          : website // ignore: cast_nullable_to_non_nullable
+              as String?,
+      logoUrl: freezed == logoUrl
+          ? _value.logoUrl
+          : logoUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+      specializations: null == specializations
+          ? _value.specializations
+          : specializations // ignore: cast_nullable_to_non_nullable
+              as List<String>,
+      settings: null == settings
+          ? _value.settings
+          : settings // ignore: cast_nullable_to_non_nullable
+              as PracticeSettings,
+      createdAt: null == createdAt
+          ? _value.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      updatedAt: freezed == updatedAt
+          ? _value.updatedAt
+          : updatedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
     ) as $Val);
   }
 
+  /// Create a copy of Practice
+  /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
   $PracticeSettingsCopyWith<$Res> get settings {
@@ -113,34 +164,42 @@ class _$PracticeCopyWithImpl<$Res, $Val extends Practice> implements $PracticeCo
 }
 
 /// @nodoc
-abstract class _$$PracticeImplCopyWith<$Res> implements $PracticeCopyWith<$Res> {
-  factory _$$PracticeImplCopyWith(_$PracticeImpl value, $Res Function(_$PracticeImpl) then) = __$$PracticeImplCopyWithImpl<$Res>;
+abstract class _$$PracticeImplCopyWith<$Res>
+    implements $PracticeCopyWith<$Res> {
+  factory _$$PracticeImplCopyWith(
+          _$PracticeImpl value, $Res Function(_$PracticeImpl) then) =
+      __$$PracticeImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({
-    String id,
-    String name,
-    String address,
-    String city,
-    String postalCode,
-    String? phoneNumber,
-    String? email,
-    String? website,
-    String? logoUrl,
-    List<String> specializations,
-    PracticeSettings settings,
-    DateTime createdAt,
-    DateTime? updatedAt,
-  });
+  $Res call(
+      {String id,
+      String name,
+      String address,
+      String city,
+      String postalCode,
+      String? phoneNumber,
+      String? email,
+      String? website,
+      String? logoUrl,
+      List<String> specializations,
+      PracticeSettings settings,
+      DateTime createdAt,
+      DateTime? updatedAt});
 
   @override
   $PracticeSettingsCopyWith<$Res> get settings;
 }
 
 /// @nodoc
-class __$$PracticeImplCopyWithImpl<$Res> extends _$PracticeCopyWithImpl<$Res, _$PracticeImpl> implements _$$PracticeImplCopyWith<$Res> {
-  __$$PracticeImplCopyWithImpl(_$PracticeImpl _value, $Res Function(_$PracticeImpl) _then) : super(_value, _then);
+class __$$PracticeImplCopyWithImpl<$Res>
+    extends _$PracticeCopyWithImpl<$Res, _$PracticeImpl>
+    implements _$$PracticeImplCopyWith<$Res> {
+  __$$PracticeImplCopyWithImpl(
+      _$PracticeImpl _value, $Res Function(_$PracticeImpl) _then)
+      : super(_value, _then);
 
+  /// Create a copy of Practice
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -159,19 +218,58 @@ class __$$PracticeImplCopyWithImpl<$Res> extends _$PracticeCopyWithImpl<$Res, _$
     Object? updatedAt = freezed,
   }) {
     return _then(_$PracticeImpl(
-      id: null == id ? _value.id : id as String,
-      name: null == name ? _value.name : name as String,
-      address: null == address ? _value.address : address as String,
-      city: null == city ? _value.city : city as String,
-      postalCode: null == postalCode ? _value.postalCode : postalCode as String,
-      phoneNumber: freezed == phoneNumber ? _value.phoneNumber : phoneNumber as String?,
-      email: freezed == email ? _value.email : email as String?,
-      website: freezed == website ? _value.website : website as String?,
-      logoUrl: freezed == logoUrl ? _value.logoUrl : logoUrl as String?,
-      specializations: null == specializations ? _value._specializations : specializations as List<String>,
-      settings: null == settings ? _value.settings : settings as PracticeSettings,
-      createdAt: null == createdAt ? _value.createdAt : createdAt as DateTime,
-      updatedAt: freezed == updatedAt ? _value.updatedAt : updatedAt as DateTime?,
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      name: null == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      address: null == address
+          ? _value.address
+          : address // ignore: cast_nullable_to_non_nullable
+              as String,
+      city: null == city
+          ? _value.city
+          : city // ignore: cast_nullable_to_non_nullable
+              as String,
+      postalCode: null == postalCode
+          ? _value.postalCode
+          : postalCode // ignore: cast_nullable_to_non_nullable
+              as String,
+      phoneNumber: freezed == phoneNumber
+          ? _value.phoneNumber
+          : phoneNumber // ignore: cast_nullable_to_non_nullable
+              as String?,
+      email: freezed == email
+          ? _value.email
+          : email // ignore: cast_nullable_to_non_nullable
+              as String?,
+      website: freezed == website
+          ? _value.website
+          : website // ignore: cast_nullable_to_non_nullable
+              as String?,
+      logoUrl: freezed == logoUrl
+          ? _value.logoUrl
+          : logoUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+      specializations: null == specializations
+          ? _value._specializations
+          : specializations // ignore: cast_nullable_to_non_nullable
+              as List<String>,
+      settings: null == settings
+          ? _value.settings
+          : settings // ignore: cast_nullable_to_non_nullable
+              as PracticeSettings,
+      createdAt: null == createdAt
+          ? _value.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      updatedAt: freezed == updatedAt
+          ? _value.updatedAt
+          : updatedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
     ));
   }
 }
@@ -179,23 +277,24 @@ class __$$PracticeImplCopyWithImpl<$Res> extends _$PracticeCopyWithImpl<$Res, _$
 /// @nodoc
 @JsonSerializable()
 class _$PracticeImpl implements _Practice {
-  const _$PracticeImpl({
-    required this.id,
-    required this.name,
-    required this.address,
-    required this.city,
-    required this.postalCode,
-    this.phoneNumber,
-    this.email,
-    this.website,
-    this.logoUrl,
-    final List<String> specializations = const [],
-    required this.settings,
-    required this.createdAt,
-    this.updatedAt,
-  }) : _specializations = specializations;
+  const _$PracticeImpl(
+      {required this.id,
+      required this.name,
+      required this.address,
+      required this.city,
+      required this.postalCode,
+      this.phoneNumber,
+      this.email,
+      this.website,
+      this.logoUrl,
+      final List<String> specializations = const [],
+      required this.settings,
+      required this.createdAt,
+      this.updatedAt})
+      : _specializations = specializations;
 
-  factory _$PracticeImpl.fromJson(Map<String, dynamic> json) => _$$PracticeImplFromJson(json);
+  factory _$PracticeImpl.fromJson(Map<String, dynamic> json) =>
+      _$$PracticeImplFromJson(json);
 
   @override
   final String id;
@@ -218,7 +317,12 @@ class _$PracticeImpl implements _Practice {
   final List<String> _specializations;
   @override
   @JsonKey()
-  List<String> get specializations => List.unmodifiable(_specializations);
+  List<String> get specializations {
+    if (_specializations is EqualUnmodifiableListView) return _specializations;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_specializations);
+  }
+
   @override
   final PracticeSettings settings;
   @override
@@ -240,67 +344,109 @@ class _$PracticeImpl implements _Practice {
             (identical(other.name, name) || other.name == name) &&
             (identical(other.address, address) || other.address == address) &&
             (identical(other.city, city) || other.city == city) &&
-            (identical(other.postalCode, postalCode) || other.postalCode == postalCode) &&
-            (identical(other.phoneNumber, phoneNumber) || other.phoneNumber == phoneNumber) &&
+            (identical(other.postalCode, postalCode) ||
+                other.postalCode == postalCode) &&
+            (identical(other.phoneNumber, phoneNumber) ||
+                other.phoneNumber == phoneNumber) &&
             (identical(other.email, email) || other.email == email) &&
             (identical(other.website, website) || other.website == website) &&
             (identical(other.logoUrl, logoUrl) || other.logoUrl == logoUrl) &&
-            const DeepCollectionEquality().equals(other._specializations, _specializations) &&
-            (identical(other.settings, settings) || other.settings == settings) &&
-            (identical(other.createdAt, createdAt) || other.createdAt == createdAt) &&
-            (identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
+            const DeepCollectionEquality()
+                .equals(other._specializations, _specializations) &&
+            (identical(other.settings, settings) ||
+                other.settings == settings) &&
+            (identical(other.createdAt, createdAt) ||
+                other.createdAt == createdAt) &&
+            (identical(other.updatedAt, updatedAt) ||
+                other.updatedAt == updatedAt));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, id, name, address, city, postalCode, phoneNumber, email, website, logoUrl, const DeepCollectionEquality().hash(_specializations), settings, createdAt, updatedAt);
+  int get hashCode => Object.hash(
+      runtimeType,
+      id,
+      name,
+      address,
+      city,
+      postalCode,
+      phoneNumber,
+      email,
+      website,
+      logoUrl,
+      const DeepCollectionEquality().hash(_specializations),
+      settings,
+      createdAt,
+      updatedAt);
 
+  /// Create a copy of Practice
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
-  _$$PracticeImplCopyWith<_$PracticeImpl> get copyWith => __$$PracticeImplCopyWithImpl<_$PracticeImpl>(this, _$identity);
+  _$$PracticeImplCopyWith<_$PracticeImpl> get copyWith =>
+      __$$PracticeImplCopyWithImpl<_$PracticeImpl>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$PracticeImplToJson(this);
+    return _$$PracticeImplToJson(
+      this,
+    );
   }
 }
 
 abstract class _Practice implements Practice {
-  const factory _Practice({
-    required final String id,
-    required final String name,
-    required final String address,
-    required final String city,
-    required final String postalCode,
-    final String? phoneNumber,
-    final String? email,
-    final String? website,
-    final String? logoUrl,
-    final List<String> specializations,
-    required final PracticeSettings settings,
-    required final DateTime createdAt,
-    final DateTime? updatedAt,
-  }) = _$PracticeImpl;
+  const factory _Practice(
+      {required final String id,
+      required final String name,
+      required final String address,
+      required final String city,
+      required final String postalCode,
+      final String? phoneNumber,
+      final String? email,
+      final String? website,
+      final String? logoUrl,
+      final List<String> specializations,
+      required final PracticeSettings settings,
+      required final DateTime createdAt,
+      final DateTime? updatedAt}) = _$PracticeImpl;
 
-  factory _Practice.fromJson(Map<String, dynamic> json) = _$PracticeImpl.fromJson;
+  factory _Practice.fromJson(Map<String, dynamic> json) =
+      _$PracticeImpl.fromJson;
 
-  @override String get id;
-  @override String get name;
-  @override String get address;
-  @override String get city;
-  @override String get postalCode;
-  @override String? get phoneNumber;
-  @override String? get email;
-  @override String? get website;
-  @override String? get logoUrl;
-  @override List<String> get specializations;
-  @override PracticeSettings get settings;
-  @override DateTime get createdAt;
-  @override DateTime? get updatedAt;
+  @override
+  String get id;
+  @override
+  String get name;
+  @override
+  String get address;
+  @override
+  String get city;
+  @override
+  String get postalCode;
+  @override
+  String? get phoneNumber;
+  @override
+  String? get email;
+  @override
+  String? get website;
+  @override
+  String? get logoUrl;
+  @override
+  List<String> get specializations;
+  @override
+  PracticeSettings get settings;
+  @override
+  DateTime get createdAt;
+  @override
+  DateTime? get updatedAt;
+
+  /// Create a copy of Practice
+  /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$PracticeImplCopyWith<_$PracticeImpl> get copyWith => throw _privateConstructorUsedError;
+  _$$PracticeImplCopyWith<_$PracticeImpl> get copyWith =>
+      throw _privateConstructorUsedError;
 }
 
 PracticeSettings _$PracticeSettingsFromJson(Map<String, dynamic> json) {
@@ -314,40 +460,52 @@ mixin _$PracticeSettings {
   int get defaultAppointmentDuration => throw _privateConstructorUsedError;
   String get openingTime => throw _privateConstructorUsedError;
   String get closingTime => throw _privateConstructorUsedError;
-  List<int> get workingDays => throw _privateConstructorUsedError;
+  List<int> get workingDays =>
+      throw _privateConstructorUsedError; // 1=Mon, 7=Sun
   String get defaultLanguage => throw _privateConstructorUsedError;
   bool get patientEducationEnabled => throw _privateConstructorUsedError;
   bool get videoContentEnabled => throw _privateConstructorUsedError;
 
+  /// Serializes this PracticeSettings to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of PracticeSettings
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
-  $PracticeSettingsCopyWith<PracticeSettings> get copyWith => throw _privateConstructorUsedError;
+  $PracticeSettingsCopyWith<PracticeSettings> get copyWith =>
+      throw _privateConstructorUsedError;
 }
 
 /// @nodoc
 abstract class $PracticeSettingsCopyWith<$Res> {
-  factory $PracticeSettingsCopyWith(PracticeSettings value, $Res Function(PracticeSettings) then) = _$PracticeSettingsCopyWithImpl<$Res, PracticeSettings>;
+  factory $PracticeSettingsCopyWith(
+          PracticeSettings value, $Res Function(PracticeSettings) then) =
+      _$PracticeSettingsCopyWithImpl<$Res, PracticeSettings>;
   @useResult
-  $Res call({
-    bool qrCodeEnabled,
-    bool nfcEnabled,
-    int defaultAppointmentDuration,
-    String openingTime,
-    String closingTime,
-    List<int> workingDays,
-    String defaultLanguage,
-    bool patientEducationEnabled,
-    bool videoContentEnabled,
-  });
+  $Res call(
+      {bool qrCodeEnabled,
+      bool nfcEnabled,
+      int defaultAppointmentDuration,
+      String openingTime,
+      String closingTime,
+      List<int> workingDays,
+      String defaultLanguage,
+      bool patientEducationEnabled,
+      bool videoContentEnabled});
 }
 
 /// @nodoc
-class _$PracticeSettingsCopyWithImpl<$Res, $Val extends PracticeSettings> implements $PracticeSettingsCopyWith<$Res> {
+class _$PracticeSettingsCopyWithImpl<$Res, $Val extends PracticeSettings>
+    implements $PracticeSettingsCopyWith<$Res> {
   _$PracticeSettingsCopyWithImpl(this._value, this._then);
 
+  // ignore: unused_field
   final $Val _value;
+  // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of PracticeSettings
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -362,41 +520,76 @@ class _$PracticeSettingsCopyWithImpl<$Res, $Val extends PracticeSettings> implem
     Object? videoContentEnabled = null,
   }) {
     return _then(_value.copyWith(
-      qrCodeEnabled: null == qrCodeEnabled ? _value.qrCodeEnabled : qrCodeEnabled as bool,
-      nfcEnabled: null == nfcEnabled ? _value.nfcEnabled : nfcEnabled as bool,
-      defaultAppointmentDuration: null == defaultAppointmentDuration ? _value.defaultAppointmentDuration : defaultAppointmentDuration as int,
-      openingTime: null == openingTime ? _value.openingTime : openingTime as String,
-      closingTime: null == closingTime ? _value.closingTime : closingTime as String,
-      workingDays: null == workingDays ? _value.workingDays : workingDays as List<int>,
-      defaultLanguage: null == defaultLanguage ? _value.defaultLanguage : defaultLanguage as String,
-      patientEducationEnabled: null == patientEducationEnabled ? _value.patientEducationEnabled : patientEducationEnabled as bool,
-      videoContentEnabled: null == videoContentEnabled ? _value.videoContentEnabled : videoContentEnabled as bool,
+      qrCodeEnabled: null == qrCodeEnabled
+          ? _value.qrCodeEnabled
+          : qrCodeEnabled // ignore: cast_nullable_to_non_nullable
+              as bool,
+      nfcEnabled: null == nfcEnabled
+          ? _value.nfcEnabled
+          : nfcEnabled // ignore: cast_nullable_to_non_nullable
+              as bool,
+      defaultAppointmentDuration: null == defaultAppointmentDuration
+          ? _value.defaultAppointmentDuration
+          : defaultAppointmentDuration // ignore: cast_nullable_to_non_nullable
+              as int,
+      openingTime: null == openingTime
+          ? _value.openingTime
+          : openingTime // ignore: cast_nullable_to_non_nullable
+              as String,
+      closingTime: null == closingTime
+          ? _value.closingTime
+          : closingTime // ignore: cast_nullable_to_non_nullable
+              as String,
+      workingDays: null == workingDays
+          ? _value.workingDays
+          : workingDays // ignore: cast_nullable_to_non_nullable
+              as List<int>,
+      defaultLanguage: null == defaultLanguage
+          ? _value.defaultLanguage
+          : defaultLanguage // ignore: cast_nullable_to_non_nullable
+              as String,
+      patientEducationEnabled: null == patientEducationEnabled
+          ? _value.patientEducationEnabled
+          : patientEducationEnabled // ignore: cast_nullable_to_non_nullable
+              as bool,
+      videoContentEnabled: null == videoContentEnabled
+          ? _value.videoContentEnabled
+          : videoContentEnabled // ignore: cast_nullable_to_non_nullable
+              as bool,
     ) as $Val);
   }
 }
 
 /// @nodoc
-abstract class _$$PracticeSettingsImplCopyWith<$Res> implements $PracticeSettingsCopyWith<$Res> {
-  factory _$$PracticeSettingsImplCopyWith(_$PracticeSettingsImpl value, $Res Function(_$PracticeSettingsImpl) then) = __$$PracticeSettingsImplCopyWithImpl<$Res>;
+abstract class _$$PracticeSettingsImplCopyWith<$Res>
+    implements $PracticeSettingsCopyWith<$Res> {
+  factory _$$PracticeSettingsImplCopyWith(_$PracticeSettingsImpl value,
+          $Res Function(_$PracticeSettingsImpl) then) =
+      __$$PracticeSettingsImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({
-    bool qrCodeEnabled,
-    bool nfcEnabled,
-    int defaultAppointmentDuration,
-    String openingTime,
-    String closingTime,
-    List<int> workingDays,
-    String defaultLanguage,
-    bool patientEducationEnabled,
-    bool videoContentEnabled,
-  });
+  $Res call(
+      {bool qrCodeEnabled,
+      bool nfcEnabled,
+      int defaultAppointmentDuration,
+      String openingTime,
+      String closingTime,
+      List<int> workingDays,
+      String defaultLanguage,
+      bool patientEducationEnabled,
+      bool videoContentEnabled});
 }
 
 /// @nodoc
-class __$$PracticeSettingsImplCopyWithImpl<$Res> extends _$PracticeSettingsCopyWithImpl<$Res, _$PracticeSettingsImpl> implements _$$PracticeSettingsImplCopyWith<$Res> {
-  __$$PracticeSettingsImplCopyWithImpl(_$PracticeSettingsImpl _value, $Res Function(_$PracticeSettingsImpl) _then) : super(_value, _then);
+class __$$PracticeSettingsImplCopyWithImpl<$Res>
+    extends _$PracticeSettingsCopyWithImpl<$Res, _$PracticeSettingsImpl>
+    implements _$$PracticeSettingsImplCopyWith<$Res> {
+  __$$PracticeSettingsImplCopyWithImpl(_$PracticeSettingsImpl _value,
+      $Res Function(_$PracticeSettingsImpl) _then)
+      : super(_value, _then);
 
+  /// Create a copy of PracticeSettings
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -411,15 +604,42 @@ class __$$PracticeSettingsImplCopyWithImpl<$Res> extends _$PracticeSettingsCopyW
     Object? videoContentEnabled = null,
   }) {
     return _then(_$PracticeSettingsImpl(
-      qrCodeEnabled: null == qrCodeEnabled ? _value.qrCodeEnabled : qrCodeEnabled as bool,
-      nfcEnabled: null == nfcEnabled ? _value.nfcEnabled : nfcEnabled as bool,
-      defaultAppointmentDuration: null == defaultAppointmentDuration ? _value.defaultAppointmentDuration : defaultAppointmentDuration as int,
-      openingTime: null == openingTime ? _value.openingTime : openingTime as String,
-      closingTime: null == closingTime ? _value.closingTime : closingTime as String,
-      workingDays: null == workingDays ? _value._workingDays : workingDays as List<int>,
-      defaultLanguage: null == defaultLanguage ? _value.defaultLanguage : defaultLanguage as String,
-      patientEducationEnabled: null == patientEducationEnabled ? _value.patientEducationEnabled : patientEducationEnabled as bool,
-      videoContentEnabled: null == videoContentEnabled ? _value.videoContentEnabled : videoContentEnabled as bool,
+      qrCodeEnabled: null == qrCodeEnabled
+          ? _value.qrCodeEnabled
+          : qrCodeEnabled // ignore: cast_nullable_to_non_nullable
+              as bool,
+      nfcEnabled: null == nfcEnabled
+          ? _value.nfcEnabled
+          : nfcEnabled // ignore: cast_nullable_to_non_nullable
+              as bool,
+      defaultAppointmentDuration: null == defaultAppointmentDuration
+          ? _value.defaultAppointmentDuration
+          : defaultAppointmentDuration // ignore: cast_nullable_to_non_nullable
+              as int,
+      openingTime: null == openingTime
+          ? _value.openingTime
+          : openingTime // ignore: cast_nullable_to_non_nullable
+              as String,
+      closingTime: null == closingTime
+          ? _value.closingTime
+          : closingTime // ignore: cast_nullable_to_non_nullable
+              as String,
+      workingDays: null == workingDays
+          ? _value._workingDays
+          : workingDays // ignore: cast_nullable_to_non_nullable
+              as List<int>,
+      defaultLanguage: null == defaultLanguage
+          ? _value.defaultLanguage
+          : defaultLanguage // ignore: cast_nullable_to_non_nullable
+              as String,
+      patientEducationEnabled: null == patientEducationEnabled
+          ? _value.patientEducationEnabled
+          : patientEducationEnabled // ignore: cast_nullable_to_non_nullable
+              as bool,
+      videoContentEnabled: null == videoContentEnabled
+          ? _value.videoContentEnabled
+          : videoContentEnabled // ignore: cast_nullable_to_non_nullable
+              as bool,
     ));
   }
 }
@@ -427,19 +647,20 @@ class __$$PracticeSettingsImplCopyWithImpl<$Res> extends _$PracticeSettingsCopyW
 /// @nodoc
 @JsonSerializable()
 class _$PracticeSettingsImpl implements _PracticeSettings {
-  const _$PracticeSettingsImpl({
-    this.qrCodeEnabled = true,
-    this.nfcEnabled = true,
-    this.defaultAppointmentDuration = 30,
-    this.openingTime = '08:00',
-    this.closingTime = '18:00',
-    final List<int> workingDays = const [1, 2, 3, 4, 5],
-    this.defaultLanguage = 'de',
-    this.patientEducationEnabled = true,
-    this.videoContentEnabled = true,
-  }) : _workingDays = workingDays;
+  const _$PracticeSettingsImpl(
+      {this.qrCodeEnabled = true,
+      this.nfcEnabled = true,
+      this.defaultAppointmentDuration = 30,
+      this.openingTime = '08:00',
+      this.closingTime = '18:00',
+      final List<int> workingDays = const [1, 2, 3, 4, 5],
+      this.defaultLanguage = 'de',
+      this.patientEducationEnabled = true,
+      this.videoContentEnabled = true})
+      : _workingDays = workingDays;
 
-  factory _$PracticeSettingsImpl.fromJson(Map<String, dynamic> json) => _$$PracticeSettingsImplFromJson(json);
+  factory _$PracticeSettingsImpl.fromJson(Map<String, dynamic> json) =>
+      _$$PracticeSettingsImplFromJson(json);
 
   @override
   @JsonKey()
@@ -459,7 +680,13 @@ class _$PracticeSettingsImpl implements _PracticeSettings {
   final List<int> _workingDays;
   @override
   @JsonKey()
-  List<int> get workingDays => List.unmodifiable(_workingDays);
+  List<int> get workingDays {
+    if (_workingDays is EqualUnmodifiableListView) return _workingDays;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_workingDays);
+  }
+
+// 1=Mon, 7=Sun
   @override
   @JsonKey()
   final String defaultLanguage;
@@ -480,57 +707,98 @@ class _$PracticeSettingsImpl implements _PracticeSettings {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$PracticeSettingsImpl &&
-            (identical(other.qrCodeEnabled, qrCodeEnabled) || other.qrCodeEnabled == qrCodeEnabled) &&
-            (identical(other.nfcEnabled, nfcEnabled) || other.nfcEnabled == nfcEnabled) &&
-            (identical(other.defaultAppointmentDuration, defaultAppointmentDuration) || other.defaultAppointmentDuration == defaultAppointmentDuration) &&
-            (identical(other.openingTime, openingTime) || other.openingTime == openingTime) &&
-            (identical(other.closingTime, closingTime) || other.closingTime == closingTime) &&
-            const DeepCollectionEquality().equals(other._workingDays, _workingDays) &&
-            (identical(other.defaultLanguage, defaultLanguage) || other.defaultLanguage == defaultLanguage) &&
-            (identical(other.patientEducationEnabled, patientEducationEnabled) || other.patientEducationEnabled == patientEducationEnabled) &&
-            (identical(other.videoContentEnabled, videoContentEnabled) || other.videoContentEnabled == videoContentEnabled));
+            (identical(other.qrCodeEnabled, qrCodeEnabled) ||
+                other.qrCodeEnabled == qrCodeEnabled) &&
+            (identical(other.nfcEnabled, nfcEnabled) ||
+                other.nfcEnabled == nfcEnabled) &&
+            (identical(other.defaultAppointmentDuration,
+                    defaultAppointmentDuration) ||
+                other.defaultAppointmentDuration ==
+                    defaultAppointmentDuration) &&
+            (identical(other.openingTime, openingTime) ||
+                other.openingTime == openingTime) &&
+            (identical(other.closingTime, closingTime) ||
+                other.closingTime == closingTime) &&
+            const DeepCollectionEquality()
+                .equals(other._workingDays, _workingDays) &&
+            (identical(other.defaultLanguage, defaultLanguage) ||
+                other.defaultLanguage == defaultLanguage) &&
+            (identical(
+                    other.patientEducationEnabled, patientEducationEnabled) ||
+                other.patientEducationEnabled == patientEducationEnabled) &&
+            (identical(other.videoContentEnabled, videoContentEnabled) ||
+                other.videoContentEnabled == videoContentEnabled));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, qrCodeEnabled, nfcEnabled, defaultAppointmentDuration, openingTime, closingTime, const DeepCollectionEquality().hash(_workingDays), defaultLanguage, patientEducationEnabled, videoContentEnabled);
+  int get hashCode => Object.hash(
+      runtimeType,
+      qrCodeEnabled,
+      nfcEnabled,
+      defaultAppointmentDuration,
+      openingTime,
+      closingTime,
+      const DeepCollectionEquality().hash(_workingDays),
+      defaultLanguage,
+      patientEducationEnabled,
+      videoContentEnabled);
 
+  /// Create a copy of PracticeSettings
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
-  _$$PracticeSettingsImplCopyWith<_$PracticeSettingsImpl> get copyWith => __$$PracticeSettingsImplCopyWithImpl<_$PracticeSettingsImpl>(this, _$identity);
+  _$$PracticeSettingsImplCopyWith<_$PracticeSettingsImpl> get copyWith =>
+      __$$PracticeSettingsImplCopyWithImpl<_$PracticeSettingsImpl>(
+          this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$PracticeSettingsImplToJson(this);
+    return _$$PracticeSettingsImplToJson(
+      this,
+    );
   }
 }
 
 abstract class _PracticeSettings implements PracticeSettings {
-  const factory _PracticeSettings({
-    final bool qrCodeEnabled,
-    final bool nfcEnabled,
-    final int defaultAppointmentDuration,
-    final String openingTime,
-    final String closingTime,
-    final List<int> workingDays,
-    final String defaultLanguage,
-    final bool patientEducationEnabled,
-    final bool videoContentEnabled,
-  }) = _$PracticeSettingsImpl;
+  const factory _PracticeSettings(
+      {final bool qrCodeEnabled,
+      final bool nfcEnabled,
+      final int defaultAppointmentDuration,
+      final String openingTime,
+      final String closingTime,
+      final List<int> workingDays,
+      final String defaultLanguage,
+      final bool patientEducationEnabled,
+      final bool videoContentEnabled}) = _$PracticeSettingsImpl;
 
-  factory _PracticeSettings.fromJson(Map<String, dynamic> json) = _$PracticeSettingsImpl.fromJson;
+  factory _PracticeSettings.fromJson(Map<String, dynamic> json) =
+      _$PracticeSettingsImpl.fromJson;
 
-  @override bool get qrCodeEnabled;
-  @override bool get nfcEnabled;
-  @override int get defaultAppointmentDuration;
-  @override String get openingTime;
-  @override String get closingTime;
-  @override List<int> get workingDays;
-  @override String get defaultLanguage;
-  @override bool get patientEducationEnabled;
-  @override bool get videoContentEnabled;
+  @override
+  bool get qrCodeEnabled;
+  @override
+  bool get nfcEnabled;
+  @override
+  int get defaultAppointmentDuration;
+  @override
+  String get openingTime;
+  @override
+  String get closingTime;
+  @override
+  List<int> get workingDays; // 1=Mon, 7=Sun
+  @override
+  String get defaultLanguage;
+  @override
+  bool get patientEducationEnabled;
+  @override
+  bool get videoContentEnabled;
+
+  /// Create a copy of PracticeSettings
+  /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$PracticeSettingsImplCopyWith<_$PracticeSettingsImpl> get copyWith => throw _privateConstructorUsedError;
+  _$$PracticeSettingsImplCopyWith<_$PracticeSettingsImpl> get copyWith =>
+      throw _privateConstructorUsedError;
 }

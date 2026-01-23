@@ -22,7 +22,7 @@ StaffMember _$StaffMemberFromJson(Map<String, dynamic> json) {
 mixin _$StaffMember {
   String get id => throw _privateConstructorUsedError;
   User get user => throw _privateConstructorUsedError;
-  String? get title => throw _privateConstructorUsedError;
+  String? get title => throw _privateConstructorUsedError; // Dr., Prof., etc.
   Specialization? get specialization => throw _privateConstructorUsedError;
   String? get roomNumber => throw _privateConstructorUsedError;
   bool get acceptingPatients => throw _privateConstructorUsedError;
@@ -32,39 +32,50 @@ mixin _$StaffMember {
   DateTime? get availableFrom => throw _privateConstructorUsedError;
   DateTime? get availableUntil => throw _privateConstructorUsedError;
 
+  /// Serializes this StaffMember to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of StaffMember
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
-  $StaffMemberCopyWith<StaffMember> get copyWith => throw _privateConstructorUsedError;
+  $StaffMemberCopyWith<StaffMember> get copyWith =>
+      throw _privateConstructorUsedError;
 }
 
 /// @nodoc
 abstract class $StaffMemberCopyWith<$Res> {
-  factory $StaffMemberCopyWith(StaffMember value, $Res Function(StaffMember) then) = _$StaffMemberCopyWithImpl<$Res, StaffMember>;
+  factory $StaffMemberCopyWith(
+          StaffMember value, $Res Function(StaffMember) then) =
+      _$StaffMemberCopyWithImpl<$Res, StaffMember>;
   @useResult
-  $Res call({
-    String id,
-    User user,
-    String? title,
-    Specialization? specialization,
-    String? roomNumber,
-    bool acceptingPatients,
-    List<String> qualifications,
-    String? bio,
-    bool isAvailable,
-    DateTime? availableFrom,
-    DateTime? availableUntil,
-  });
+  $Res call(
+      {String id,
+      User user,
+      String? title,
+      Specialization? specialization,
+      String? roomNumber,
+      bool acceptingPatients,
+      List<String> qualifications,
+      String? bio,
+      bool isAvailable,
+      DateTime? availableFrom,
+      DateTime? availableUntil});
 
   $UserCopyWith<$Res> get user;
 }
 
 /// @nodoc
-class _$StaffMemberCopyWithImpl<$Res, $Val extends StaffMember> implements $StaffMemberCopyWith<$Res> {
+class _$StaffMemberCopyWithImpl<$Res, $Val extends StaffMember>
+    implements $StaffMemberCopyWith<$Res> {
   _$StaffMemberCopyWithImpl(this._value, this._then);
 
+  // ignore: unused_field
   final $Val _value;
+  // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of StaffMember
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -81,20 +92,55 @@ class _$StaffMemberCopyWithImpl<$Res, $Val extends StaffMember> implements $Staf
     Object? availableUntil = freezed,
   }) {
     return _then(_value.copyWith(
-      id: null == id ? _value.id : id as String,
-      user: null == user ? _value.user : user as User,
-      title: freezed == title ? _value.title : title as String?,
-      specialization: freezed == specialization ? _value.specialization : specialization as Specialization?,
-      roomNumber: freezed == roomNumber ? _value.roomNumber : roomNumber as String?,
-      acceptingPatients: null == acceptingPatients ? _value.acceptingPatients : acceptingPatients as bool,
-      qualifications: null == qualifications ? _value.qualifications : qualifications as List<String>,
-      bio: freezed == bio ? _value.bio : bio as String?,
-      isAvailable: null == isAvailable ? _value.isAvailable : isAvailable as bool,
-      availableFrom: freezed == availableFrom ? _value.availableFrom : availableFrom as DateTime?,
-      availableUntil: freezed == availableUntil ? _value.availableUntil : availableUntil as DateTime?,
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      user: null == user
+          ? _value.user
+          : user // ignore: cast_nullable_to_non_nullable
+              as User,
+      title: freezed == title
+          ? _value.title
+          : title // ignore: cast_nullable_to_non_nullable
+              as String?,
+      specialization: freezed == specialization
+          ? _value.specialization
+          : specialization // ignore: cast_nullable_to_non_nullable
+              as Specialization?,
+      roomNumber: freezed == roomNumber
+          ? _value.roomNumber
+          : roomNumber // ignore: cast_nullable_to_non_nullable
+              as String?,
+      acceptingPatients: null == acceptingPatients
+          ? _value.acceptingPatients
+          : acceptingPatients // ignore: cast_nullable_to_non_nullable
+              as bool,
+      qualifications: null == qualifications
+          ? _value.qualifications
+          : qualifications // ignore: cast_nullable_to_non_nullable
+              as List<String>,
+      bio: freezed == bio
+          ? _value.bio
+          : bio // ignore: cast_nullable_to_non_nullable
+              as String?,
+      isAvailable: null == isAvailable
+          ? _value.isAvailable
+          : isAvailable // ignore: cast_nullable_to_non_nullable
+              as bool,
+      availableFrom: freezed == availableFrom
+          ? _value.availableFrom
+          : availableFrom // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      availableUntil: freezed == availableUntil
+          ? _value.availableUntil
+          : availableUntil // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
     ) as $Val);
   }
 
+  /// Create a copy of StaffMember
+  /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
   $UserCopyWith<$Res> get user {
@@ -105,32 +151,40 @@ class _$StaffMemberCopyWithImpl<$Res, $Val extends StaffMember> implements $Staf
 }
 
 /// @nodoc
-abstract class _$$StaffMemberImplCopyWith<$Res> implements $StaffMemberCopyWith<$Res> {
-  factory _$$StaffMemberImplCopyWith(_$StaffMemberImpl value, $Res Function(_$StaffMemberImpl) then) = __$$StaffMemberImplCopyWithImpl<$Res>;
+abstract class _$$StaffMemberImplCopyWith<$Res>
+    implements $StaffMemberCopyWith<$Res> {
+  factory _$$StaffMemberImplCopyWith(
+          _$StaffMemberImpl value, $Res Function(_$StaffMemberImpl) then) =
+      __$$StaffMemberImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({
-    String id,
-    User user,
-    String? title,
-    Specialization? specialization,
-    String? roomNumber,
-    bool acceptingPatients,
-    List<String> qualifications,
-    String? bio,
-    bool isAvailable,
-    DateTime? availableFrom,
-    DateTime? availableUntil,
-  });
+  $Res call(
+      {String id,
+      User user,
+      String? title,
+      Specialization? specialization,
+      String? roomNumber,
+      bool acceptingPatients,
+      List<String> qualifications,
+      String? bio,
+      bool isAvailable,
+      DateTime? availableFrom,
+      DateTime? availableUntil});
 
   @override
   $UserCopyWith<$Res> get user;
 }
 
 /// @nodoc
-class __$$StaffMemberImplCopyWithImpl<$Res> extends _$StaffMemberCopyWithImpl<$Res, _$StaffMemberImpl> implements _$$StaffMemberImplCopyWith<$Res> {
-  __$$StaffMemberImplCopyWithImpl(_$StaffMemberImpl _value, $Res Function(_$StaffMemberImpl) _then) : super(_value, _then);
+class __$$StaffMemberImplCopyWithImpl<$Res>
+    extends _$StaffMemberCopyWithImpl<$Res, _$StaffMemberImpl>
+    implements _$$StaffMemberImplCopyWith<$Res> {
+  __$$StaffMemberImplCopyWithImpl(
+      _$StaffMemberImpl _value, $Res Function(_$StaffMemberImpl) _then)
+      : super(_value, _then);
 
+  /// Create a copy of StaffMember
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -147,17 +201,50 @@ class __$$StaffMemberImplCopyWithImpl<$Res> extends _$StaffMemberCopyWithImpl<$R
     Object? availableUntil = freezed,
   }) {
     return _then(_$StaffMemberImpl(
-      id: null == id ? _value.id : id as String,
-      user: null == user ? _value.user : user as User,
-      title: freezed == title ? _value.title : title as String?,
-      specialization: freezed == specialization ? _value.specialization : specialization as Specialization?,
-      roomNumber: freezed == roomNumber ? _value.roomNumber : roomNumber as String?,
-      acceptingPatients: null == acceptingPatients ? _value.acceptingPatients : acceptingPatients as bool,
-      qualifications: null == qualifications ? _value._qualifications : qualifications as List<String>,
-      bio: freezed == bio ? _value.bio : bio as String?,
-      isAvailable: null == isAvailable ? _value.isAvailable : isAvailable as bool,
-      availableFrom: freezed == availableFrom ? _value.availableFrom : availableFrom as DateTime?,
-      availableUntil: freezed == availableUntil ? _value.availableUntil : availableUntil as DateTime?,
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      user: null == user
+          ? _value.user
+          : user // ignore: cast_nullable_to_non_nullable
+              as User,
+      title: freezed == title
+          ? _value.title
+          : title // ignore: cast_nullable_to_non_nullable
+              as String?,
+      specialization: freezed == specialization
+          ? _value.specialization
+          : specialization // ignore: cast_nullable_to_non_nullable
+              as Specialization?,
+      roomNumber: freezed == roomNumber
+          ? _value.roomNumber
+          : roomNumber // ignore: cast_nullable_to_non_nullable
+              as String?,
+      acceptingPatients: null == acceptingPatients
+          ? _value.acceptingPatients
+          : acceptingPatients // ignore: cast_nullable_to_non_nullable
+              as bool,
+      qualifications: null == qualifications
+          ? _value._qualifications
+          : qualifications // ignore: cast_nullable_to_non_nullable
+              as List<String>,
+      bio: freezed == bio
+          ? _value.bio
+          : bio // ignore: cast_nullable_to_non_nullable
+              as String?,
+      isAvailable: null == isAvailable
+          ? _value.isAvailable
+          : isAvailable // ignore: cast_nullable_to_non_nullable
+              as bool,
+      availableFrom: freezed == availableFrom
+          ? _value.availableFrom
+          : availableFrom // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      availableUntil: freezed == availableUntil
+          ? _value.availableUntil
+          : availableUntil // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
     ));
   }
 }
@@ -165,21 +252,22 @@ class __$$StaffMemberImplCopyWithImpl<$Res> extends _$StaffMemberCopyWithImpl<$R
 /// @nodoc
 @JsonSerializable()
 class _$StaffMemberImpl implements _StaffMember {
-  const _$StaffMemberImpl({
-    required this.id,
-    required this.user,
-    this.title,
-    this.specialization,
-    this.roomNumber,
-    this.acceptingPatients = true,
-    final List<String> qualifications = const [],
-    this.bio,
-    this.isAvailable = true,
-    this.availableFrom,
-    this.availableUntil,
-  }) : _qualifications = qualifications;
+  const _$StaffMemberImpl(
+      {required this.id,
+      required this.user,
+      this.title,
+      this.specialization,
+      this.roomNumber,
+      this.acceptingPatients = true,
+      final List<String> qualifications = const [],
+      this.bio,
+      this.isAvailable = true,
+      this.availableFrom,
+      this.availableUntil})
+      : _qualifications = qualifications;
 
-  factory _$StaffMemberImpl.fromJson(Map<String, dynamic> json) => _$$StaffMemberImplFromJson(json);
+  factory _$StaffMemberImpl.fromJson(Map<String, dynamic> json) =>
+      _$$StaffMemberImplFromJson(json);
 
   @override
   final String id;
@@ -187,6 +275,7 @@ class _$StaffMemberImpl implements _StaffMember {
   final User user;
   @override
   final String? title;
+// Dr., Prof., etc.
   @override
   final Specialization? specialization;
   @override
@@ -197,7 +286,12 @@ class _$StaffMemberImpl implements _StaffMember {
   final List<String> _qualifications;
   @override
   @JsonKey()
-  List<String> get qualifications => List.unmodifiable(_qualifications);
+  List<String> get qualifications {
+    if (_qualifications is EqualUnmodifiableListView) return _qualifications;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_qualifications);
+  }
+
   @override
   final String? bio;
   @override
@@ -221,60 +315,99 @@ class _$StaffMemberImpl implements _StaffMember {
             (identical(other.id, id) || other.id == id) &&
             (identical(other.user, user) || other.user == user) &&
             (identical(other.title, title) || other.title == title) &&
-            (identical(other.specialization, specialization) || other.specialization == specialization) &&
-            (identical(other.roomNumber, roomNumber) || other.roomNumber == roomNumber) &&
-            (identical(other.acceptingPatients, acceptingPatients) || other.acceptingPatients == acceptingPatients) &&
-            const DeepCollectionEquality().equals(other._qualifications, _qualifications) &&
+            (identical(other.specialization, specialization) ||
+                other.specialization == specialization) &&
+            (identical(other.roomNumber, roomNumber) ||
+                other.roomNumber == roomNumber) &&
+            (identical(other.acceptingPatients, acceptingPatients) ||
+                other.acceptingPatients == acceptingPatients) &&
+            const DeepCollectionEquality()
+                .equals(other._qualifications, _qualifications) &&
             (identical(other.bio, bio) || other.bio == bio) &&
-            (identical(other.isAvailable, isAvailable) || other.isAvailable == isAvailable) &&
-            (identical(other.availableFrom, availableFrom) || other.availableFrom == availableFrom) &&
-            (identical(other.availableUntil, availableUntil) || other.availableUntil == availableUntil));
+            (identical(other.isAvailable, isAvailable) ||
+                other.isAvailable == isAvailable) &&
+            (identical(other.availableFrom, availableFrom) ||
+                other.availableFrom == availableFrom) &&
+            (identical(other.availableUntil, availableUntil) ||
+                other.availableUntil == availableUntil));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, id, user, title, specialization, roomNumber, acceptingPatients, const DeepCollectionEquality().hash(_qualifications), bio, isAvailable, availableFrom, availableUntil);
+  int get hashCode => Object.hash(
+      runtimeType,
+      id,
+      user,
+      title,
+      specialization,
+      roomNumber,
+      acceptingPatients,
+      const DeepCollectionEquality().hash(_qualifications),
+      bio,
+      isAvailable,
+      availableFrom,
+      availableUntil);
 
+  /// Create a copy of StaffMember
+  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
-  _$$StaffMemberImplCopyWith<_$StaffMemberImpl> get copyWith => __$$StaffMemberImplCopyWithImpl<_$StaffMemberImpl>(this, _$identity);
+  _$$StaffMemberImplCopyWith<_$StaffMemberImpl> get copyWith =>
+      __$$StaffMemberImplCopyWithImpl<_$StaffMemberImpl>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$StaffMemberImplToJson(this);
+    return _$$StaffMemberImplToJson(
+      this,
+    );
   }
 }
 
 abstract class _StaffMember implements StaffMember {
-  const factory _StaffMember({
-    required final String id,
-    required final User user,
-    final String? title,
-    final Specialization? specialization,
-    final String? roomNumber,
-    final bool acceptingPatients,
-    final List<String> qualifications,
-    final String? bio,
-    final bool isAvailable,
-    final DateTime? availableFrom,
-    final DateTime? availableUntil,
-  }) = _$StaffMemberImpl;
+  const factory _StaffMember(
+      {required final String id,
+      required final User user,
+      final String? title,
+      final Specialization? specialization,
+      final String? roomNumber,
+      final bool acceptingPatients,
+      final List<String> qualifications,
+      final String? bio,
+      final bool isAvailable,
+      final DateTime? availableFrom,
+      final DateTime? availableUntil}) = _$StaffMemberImpl;
 
-  factory _StaffMember.fromJson(Map<String, dynamic> json) = _$StaffMemberImpl.fromJson;
+  factory _StaffMember.fromJson(Map<String, dynamic> json) =
+      _$StaffMemberImpl.fromJson;
 
-  @override String get id;
-  @override User get user;
-  @override String? get title;
-  @override Specialization? get specialization;
-  @override String? get roomNumber;
-  @override bool get acceptingPatients;
-  @override List<String> get qualifications;
-  @override String? get bio;
-  @override bool get isAvailable;
-  @override DateTime? get availableFrom;
-  @override DateTime? get availableUntil;
+  @override
+  String get id;
+  @override
+  User get user;
+  @override
+  String? get title; // Dr., Prof., etc.
+  @override
+  Specialization? get specialization;
+  @override
+  String? get roomNumber;
+  @override
+  bool get acceptingPatients;
+  @override
+  List<String> get qualifications;
+  @override
+  String? get bio;
+  @override
+  bool get isAvailable;
+  @override
+  DateTime? get availableFrom;
+  @override
+  DateTime? get availableUntil;
+
+  /// Create a copy of StaffMember
+  /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$StaffMemberImplCopyWith<_$StaffMemberImpl> get copyWith => throw _privateConstructorUsedError;
+  _$$StaffMemberImplCopyWith<_$StaffMemberImpl> get copyWith =>
+      throw _privateConstructorUsedError;
 }

@@ -68,22 +68,52 @@ class HomeScreen extends ConsumerWidget {
         child: Column(
           children: [
             // Quick stats
-            Row(
-              children: [
-                Expanded(child: _buildStatCard('Wartend', '8', AppColors.waiting)),
-                const SizedBox(width: 16),
-                Expanded(child: _buildStatCard('Aufgerufen', '2', AppColors.called)),
-                const SizedBox(width: 16),
-                Expanded(child: _buildStatCard('Ø Wartezeit', '12 Min', AppColors.info)),
-              ],
+            LayoutBuilder(
+              builder: (context, constraints) {
+                final cards = [
+                  _buildStatCard('Wartend', '8', AppColors.waiting),
+                  _buildStatCard('Aufgerufen', '2', AppColors.called),
+                  _buildStatCard('Ø Wartezeit', '12 Min', AppColors.info),
+                ];
+                if (constraints.maxWidth < 800) {
+                  return Wrap(
+                    spacing: 16,
+                    runSpacing: 16,
+                    children: cards
+                        .map((card) => SizedBox(
+                              width: (constraints.maxWidth - 16) / 2,
+                              child: card,
+                            ))
+                        .toList(),
+                  );
+                }
+                return Row(
+                  children: [
+                    for (int i = 0; i < cards.length; i++) ...[
+                      Expanded(child: cards[i]),
+                      if (i != cards.length - 1) const SizedBox(width: 16),
+                    ],
+                  ],
+                );
+              },
+            ),
+            const SizedBox(height: 16),
+            iotConfigAsync.when(
+              data: (configured) => configured
+                  ? const SizedBox.shrink()
+                  : _IotSetupCard(
+                      onTap: () => context.push('/settings/iot-device'),
+                    ),
+              loading: () => const SizedBox.shrink(),
+              error: (_, __) => const SizedBox.shrink(),
             ),
             const SizedBox(height: 32),
             // Main actions
             Expanded(
-              child: Row(
-                children: [
-                  Expanded(
-                    child: _buildActionCard(
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final cards = [
+                    _buildActionCard(
                       context,
                       title: 'Neuer Patient',
                       subtitle: 'Check-In & Laufnummer vergeben',
@@ -91,10 +121,7 @@ class HomeScreen extends ConsumerWidget {
                       color: AppColors.primary,
                       onTap: () => context.push('/check-in'),
                     ),
-                  ),
-                  const SizedBox(width: 24),
-                  Expanded(
-                    child: _buildActionCard(
+                    _buildActionCard(
                       context,
                       title: 'Warteschlange',
                       subtitle: 'Aktuelle Warteschlange verwalten',
@@ -102,16 +129,32 @@ class HomeScreen extends ConsumerWidget {
                       color: AppColors.secondary,
                       onTap: () => context.push('/queue'),
                     ),
-                  ),
-                ],
+                  ];
+                  if (constraints.maxWidth < 900) {
+                    return Column(
+                      children: [
+                        Expanded(child: cards[0]),
+                        const SizedBox(height: 24),
+                        Expanded(child: cards[1]),
+                      ],
+                    );
+                  }
+                  return Row(
+                    children: [
+                      Expanded(child: cards[0]),
+                      const SizedBox(width: 24),
+                      Expanded(child: cards[1]),
+                    ],
+                  );
+                },
               ),
             ),
             const SizedBox(height: 24),
             Expanded(
-              child: Row(
-                children: [
-                  Expanded(
-                    child: _buildActionCard(
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final cards = [
+                    _buildActionCard(
                       context,
                       title: 'QR-Code Scan',
                       subtitle: 'Patient per QR-Code einchecken',
@@ -119,10 +162,7 @@ class HomeScreen extends ConsumerWidget {
                       color: AppColors.success,
                       onTap: () => context.push('/check-in/qr'),
                     ),
-                  ),
-                  const SizedBox(width: 24),
-                  Expanded(
-                    child: _buildActionCard(
+                    _buildActionCard(
                       context,
                       title: 'NFC Check-In',
                       subtitle: 'Patient per NFC-Karte einchecken',
@@ -130,8 +170,24 @@ class HomeScreen extends ConsumerWidget {
                       color: AppColors.warning,
                       onTap: () => _showNfcDialog(context),
                     ),
-                  ),
-                ],
+                  ];
+                  if (constraints.maxWidth < 900) {
+                    return Column(
+                      children: [
+                        Expanded(child: cards[0]),
+                        const SizedBox(height: 24),
+                        Expanded(child: cards[1]),
+                      ],
+                    );
+                  }
+                  return Row(
+                    children: [
+                      Expanded(child: cards[0]),
+                      const SizedBox(width: 24),
+                      Expanded(child: cards[1]),
+                    ],
+                  );
+                },
               ),
             ),
           ],
@@ -225,6 +281,40 @@ class HomeScreen extends ConsumerWidget {
             child: const Text('Abbrechen'),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _IotSetupCard extends StatelessWidget {
+  final VoidCallback onTap;
+
+  const _IotSetupCard({required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      color: AppColors.warning.withOpacity(0.08),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          children: [
+            const Icon(Icons.nfc, color: AppColors.warning),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                'NFC-Gerät ist noch nicht eingerichtet. Jetzt konfigurieren?',
+                style: AppTextStyles.bodySmall.copyWith(
+                  color: AppColors.textSecondary,
+                ),
+              ),
+            ),
+            TextButton(
+              onPressed: onTap,
+              child: const Text('Einrichten'),
+            ),
+          ],
+        ),
       ),
     );
   }

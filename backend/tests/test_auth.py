@@ -36,7 +36,7 @@ async def test_register_user(client: AsyncClient) -> None:
         "last_name": "User",
         "role": "patient",
     }
-    
+
     response = await client.post("/api/v1/auth/register", json=user_data)
     assert response.status_code == 201
     data = response.json()
@@ -55,11 +55,11 @@ async def test_register_duplicate_email(client: AsyncClient) -> None:
         "first_name": "Test",
         "last_name": "User",
     }
-    
+
     # First registration
     response1 = await client.post("/api/v1/auth/register", json=user_data)
     assert response1.status_code == 201
-    
+
     # Duplicate registration
     response2 = await client.post("/api/v1/auth/register", json=user_data)
     assert response2.status_code == 400
@@ -76,7 +76,7 @@ async def test_login_success(client: AsyncClient) -> None:
         "last_name": "User",
     }
     await client.post("/api/v1/auth/register", json=user_data)
-    
+
     # Then login
     login_data = {
         "email": user_data["email"],
@@ -147,17 +147,19 @@ async def test_protected_endpoint_with_token(client: AsyncClient) -> None:
         "last_name": "User",
     }
     await client.post("/api/v1/auth/register", json=user_data)
-    
-    login_response = await client.post("/api/v1/auth/login", json={
-        "email": user_data["email"],
-        "password": user_data["password"],
-    })
+
+    login_response = await client.post(
+        "/api/v1/auth/login",
+        json={
+            "email": user_data["email"],
+            "password": user_data["password"],
+        },
+    )
     token = login_response.json()["access_token"]
-    
+
     # Access protected endpoint
     response = await client.get(
-        "/api/v1/users/me",
-        headers={"Authorization": f"Bearer {token}"}
+        "/api/v1/users/me", headers={"Authorization": f"Bearer {token}"}
     )
     assert response.status_code == 200
     data = response.json()

@@ -1,20 +1,38 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:sanad_core/sanad_core.dart';
 import 'package:sanad_ui/sanad_ui.dart';
 
+import '../../../providers/last_ticket_provider.dart';
+
 /// Screen for entering ticket number to check status.
-class TicketEntryScreen extends StatefulWidget {
+class TicketEntryScreen extends ConsumerStatefulWidget {
   const TicketEntryScreen({super.key});
 
   @override
-  State<TicketEntryScreen> createState() => _TicketEntryScreenState();
+  ConsumerState<TicketEntryScreen> createState() => _TicketEntryScreenState();
 }
 
-class _TicketEntryScreenState extends State<TicketEntryScreen> {
+class _TicketEntryScreenState extends ConsumerState<TicketEntryScreen> {
   final _ticketController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-  bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _ticketController.addListener(() => setState(() {}));
+    _restoreLastTicket();
+  }
+
+  void _restoreLastTicket() {
+    final storage = ref.read(storageServiceProvider);
+    final lastTicket = storage.getString(AppConstants.keyLastTicketNumber);
+    if (lastTicket != null && lastTicket.isNotEmpty) {
+      _ticketController.text = lastTicket;
+    }
+  }
 
   @override
   void dispose() {
@@ -22,18 +40,16 @@ class _TicketEntryScreenState extends State<TicketEntryScreen> {
     super.dispose();
   }
 
-  void _checkTicketStatus() {
+  Future<void> _checkTicketStatus() async {
     if (_formKey.currentState?.validate() ?? false) {
-      setState(() => _isLoading = true);
-      
-      // Simulate API call
-      Future.delayed(const Duration(milliseconds: 500), () {
-        if (mounted) {
-          setState(() => _isLoading = false);
-          final ticketNumber = _ticketController.text.trim().toUpperCase();
-          context.push('/ticket/$ticketNumber');
-        }
-      });
+      final ticketNumber = _ticketController.text.trim().toUpperCase();
+      final storage = ref.read(storageServiceProvider);
+      await storage.setString(
+        AppConstants.keyLastTicketNumber,
+        ticketNumber,
+      );
+      ref.invalidate(lastTicketNumberProvider);
+      context.push('/ticket/$ticketNumber');
     }
   }
 
@@ -108,6 +124,7 @@ class _TicketEntryScreenState extends State<TicketEntryScreen> {
                       controller: _ticketController,
                       textAlign: TextAlign.center,
                       textCapitalization: TextCapitalization.characters,
+                      textInputAction: TextInputAction.search,
                       style: AppTextStyles.headlineMedium.copyWith(
                         fontWeight: FontWeight.bold,
                         letterSpacing: 4,
@@ -118,6 +135,7 @@ class _TicketEntryScreenState extends State<TicketEntryScreen> {
                           color: AppColors.textSecondary.withOpacity(0.4),
                           letterSpacing: 4,
                         ),
+                        helperText: 'Beispiel: A-042',
                         filled: true,
                         fillColor: Colors.white,
                         border: OutlineInputBorder(
@@ -140,10 +158,18 @@ class _TicketEntryScreenState extends State<TicketEntryScreen> {
                           horizontal: 24,
                           vertical: 20,
                         ),
+                        suffixIcon: _ticketController.text.isEmpty
+                            ? null
+                            : IconButton(
+                                icon: const Icon(Icons.clear),
+                                onPressed: () {
+                                  _ticketController.clear();
+                                },
+                              ),
                       ),
                       inputFormatters: [
-                        LengthLimitingTextInputFormatter(10),
-                        FilteringTextInputFormatter.allow(RegExp(r'[A-Za-z0-9-]')),
+                        LengthLimitingTextInputFormatter(6),
+                        _TicketNumberFormatter(),
                       ],
                       validator: (value) {
                         if (value == null || value.trim().isEmpty) {
@@ -162,7 +188,7 @@ class _TicketEntryScreenState extends State<TicketEntryScreen> {
                       width: double.infinity,
                       height: 56,
                       child: ElevatedButton(
-                        onPressed: _isLoading ? null : _checkTicketStatus,
+                        onPressed: _checkTicketStatus,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.primary,
                           foregroundColor: Colors.white,
@@ -171,22 +197,13 @@ class _TicketEntryScreenState extends State<TicketEntryScreen> {
                           ),
                           elevation: 0,
                         ),
-                        child: _isLoading
-                            ? const SizedBox(
-                                width: 24,
-                                height: 24,
-                                child: CircularProgressIndicator(
-                                  color: Colors.white,
-                                  strokeWidth: 2,
-                                ),
-                              )
-                            : const Text(
-                                'Status prüfen',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
+                        child: const Text(
+                          'Status prüfen',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                       ),
                     ),
                   ],
@@ -226,6 +243,40 @@ class _TicketEntryScreenState extends State<TicketEntryScreen> {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _TicketNumberFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    final upper = newValue.text.toUpperCase();
+    final filtered = upper.replaceAll(RegExp(r'[^A-Z0-9]'), '');
+
+    String letter = '';
+    final digitsBuffer = StringBuffer();
+
+    for (final char in filtered.split('')) {
+      if (letter.isEmpty && RegExp(r'[A-Z]').hasMatch(char)) {
+        letter = char;
+      } else if (letter.isNotEmpty &&
+          RegExp(r'[0-9]').hasMatch(char) &&
+          digitsBuffer.length < 4) {
+        digitsBuffer.write(char);
+      }
+    }
+
+    final digits = digitsBuffer.toString();
+    final formatted = letter.isEmpty
+        ? filtered
+        : (digits.isEmpty ? letter : '$letter-$digits');
+
+    return TextEditingValue(
+      text: formatted,
+      selection: TextSelection.collapsed(offset: formatted.length),
     );
   }
 }

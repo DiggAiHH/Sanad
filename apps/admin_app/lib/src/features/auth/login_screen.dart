@@ -16,9 +16,38 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
+  bool _canSubmit = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _emailController.addListener(_updateCanSubmit);
+    _passwordController.addListener(_updateCanSubmit);
+    ref.listen<AuthState>(authStateProvider, (previous, next) {
+      next.maybeWhen(
+        authenticated: (user, _, __) {
+          if (!mounted) return;
+          context.go('/dashboard');
+        },
+        error: (message) {
+          if (!mounted) return;
+          ModernSnackBar.show(
+            context,
+            message: message,
+            type: SnackBarType.error,
+            actionLabel: 'Erneut',
+            onAction: _handleLogin,
+          );
+        },
+        orElse: () {},
+      );
+    });
+  }
 
   @override
   void dispose() {
+    _emailController.removeListener(_updateCanSubmit);
+    _passwordController.removeListener(_updateCanSubmit);
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
@@ -26,29 +55,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final authState = ref.watch(authProvider);
+    final authState = ref.watch(authStateProvider);
     final isLoading = authState.maybeWhen(
       loading: () => true,
       orElse: () => false,
     );
-
-    // Listen for auth state changes
-    ref.listen<AuthState>(authProvider, (previous, next) {
-      next.maybeWhen(
-        authenticated: (user, _, __) {
-          context.go('/dashboard');
-        },
-        error: (message) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(message),
-              backgroundColor: Colors.red,
-            ),
-          );
-        },
-        orElse: () {},
-      );
-    });
 
     return Scaffold(
       body: Center(
@@ -120,7 +131,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   label: 'Anmelden',
                   isLoading: isLoading,
                   isFullWidth: true,
-                  onPressed: isLoading ? null : _handleLogin,
+                  onPressed: isLoading || !_canSubmit ? null : _handleLogin,
                 ),
               ],
             ),
@@ -135,18 +146,26 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final password = _passwordController.text;
 
     if (email.isEmpty || password.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Bitte E-Mail und Passwort eingeben'),
-          backgroundColor: Colors.orange,
-        ),
+      ModernSnackBar.show(
+        context,
+        message: 'Bitte E-Mail und Passwort eingeben',
+        type: SnackBarType.warning,
       );
       return;
     }
 
-    ref.read(authProvider.notifier).login(
+    ref.read(authStateProvider.notifier).login(
       email: email,
       password: password,
     );
+  }
+
+  void _updateCanSubmit() {
+    final email = _emailController.text.trim();
+    final password = _passwordController.text;
+    final canSubmit = email.isNotEmpty && password.isNotEmpty;
+    if (canSubmit != _canSubmit) {
+      setState(() => _canSubmit = canSubmit);
+    }
   }
 }

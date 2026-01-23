@@ -1,11 +1,18 @@
 import 'dart:async';
+
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:sanad_core/sanad_core.dart';
 import 'package:sanad_ui/sanad_ui.dart';
 
+import '../providers/ticket_status_provider.dart';
+import '../../../providers/last_ticket_provider.dart';
+
 /// Screen displaying the status of a specific ticket.
-class TicketStatusScreen extends StatefulWidget {
+class TicketStatusScreen extends ConsumerStatefulWidget {
   final String ticketNumber;
 
   const TicketStatusScreen({
@@ -14,221 +21,462 @@ class TicketStatusScreen extends StatefulWidget {
   });
 
   @override
-  State<TicketStatusScreen> createState() => _TicketStatusScreenState();
+  ConsumerState<TicketStatusScreen> createState() => _TicketStatusScreenState();
 }
 
-class _TicketStatusScreenState extends State<TicketStatusScreen> {
-  late Timer _refreshTimer;
-  
-  // Demo data - would come from API
-  int _positionInQueue = 3;
-  int _estimatedWaitMinutes = 15;
-  String _status = 'waiting'; // waiting, called, in_progress, completed
-  int _currentlyServing = 39;
+class _TicketStatusScreenState extends ConsumerState<TicketStatusScreen>
+    with WidgetsBindingObserver {
+  Timer? _refreshTimer;
+  DateTime _lastUpdated = DateTime.now();
+  bool _isRefreshing = false;
 
   @override
   void initState() {
     super.initState();
-    // Auto-refresh every 30 seconds
+    WidgetsBinding.instance.addObserver(this);
+    _registerLastTicketListener();
+    _startRefreshTimer();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _stopRefreshTimer();
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _startRefreshTimer();
+    } else if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.inactive ||
+        state == AppLifecycleState.detached) {
+      _stopRefreshTimer();
+    }
+  }
+
+  void _startRefreshTimer() {
+    _refreshTimer?.cancel();
     _refreshTimer = Timer.periodic(const Duration(seconds: 30), (_) {
       _refreshStatus();
     });
   }
 
-  @override
-  void dispose() {
-    _refreshTimer.cancel();
-    super.dispose();
+  void _stopRefreshTimer() {
+    _refreshTimer?.cancel();
+    _refreshTimer = null;
   }
 
-  void _refreshStatus() {
-    // Simulate status update
-    setState(() {
-      if (_positionInQueue > 0) {
-        _positionInQueue--;
-        _estimatedWaitMinutes = _positionInQueue * 5;
-        _currentlyServing++;
-      }
-      if (_positionInQueue == 0) {
-        _status = 'called';
-      }
-    });
+  Future<void> _refreshStatus() async {
+    final ticketNumber = _normalizedTicketNumber();
+    if (ticketNumber.isEmpty) {
+      return;
+    }
+    if (ref.read(connectivityProvider) == ConnectivityStatus.offline) {
+      return;
+    }
+    await ref.refresh(publicTicketStatusProvider(ticketNumber).future);
+    if (mounted) {
+      setState(() => _lastUpdated = DateTime.now());
+    }
   }
 
-  Color _getStatusColor() {
-    switch (_status) {
-      case 'called':
+  Future<void> _handleRefresh() async {
+    setState(() => _isRefreshing = true);
+    try {
+      await _refreshStatus();
+    } finally {
+      if (mounted) {
+        setState(() => _isRefreshing = false);
+      }
+    }
+  }
+
+  String _normalizedTicketNumber() {
+    return widget.ticketNumber.trim().toUpperCase();
+  }
+
+  String _formatTime(BuildContext context, DateTime time) {
+    final localizations = MaterialLocalizations.of(context);
+    final timeOfDay = TimeOfDay.fromDateTime(time);
+    return localizations.formatTimeOfDay(
+      timeOfDay,
+      alwaysUse24HourFormat: MediaQuery.of(context).alwaysUse24HourFormat,
+    );
+  }
+
+  Color _getStatusColor(TicketStatus status) {
+    switch (status) {
+      case TicketStatus.called:
         return AppColors.success;
-      case 'in_progress':
+      case TicketStatus.inProgress:
         return AppColors.info;
-      case 'completed':
+      case TicketStatus.completed:
+      case TicketStatus.cancelled:
+      case TicketStatus.noShow:
         return AppColors.textSecondary;
       default:
         return AppColors.warning;
     }
   }
 
-  String _getStatusText() {
-    switch (_status) {
-      case 'called':
+  String _getStatusText(TicketStatus status) {
+    switch (status) {
+      case TicketStatus.called:
         return 'Sie werden aufgerufen!';
-      case 'in_progress':
+      case TicketStatus.inProgress:
         return 'In Behandlung';
-      case 'completed':
+      case TicketStatus.completed:
         return 'Abgeschlossen';
+      case TicketStatus.cancelled:
+        return 'Storniert';
+      case TicketStatus.noShow:
+        return 'Nicht erschienen';
       default:
         return 'In Warteschlange';
     }
   }
 
-  IconData _getStatusIcon() {
-    switch (_status) {
-      case 'called':
+  String _getStatusShortText(TicketStatus status) {
+    switch (status) {
+      case TicketStatus.called:
+        return 'Aufgerufen';
+      case TicketStatus.inProgress:
+        return 'Behandlung';
+      case TicketStatus.completed:
+        return 'Erledigt';
+      case TicketStatus.cancelled:
+        return 'Storniert';
+      case TicketStatus.noShow:
+        return 'Nicht da';
+      default:
+        return 'Wartend';
+    }
+  }
+
+  IconData _getStatusIcon(TicketStatus status) {
+    switch (status) {
+      case TicketStatus.called:
         return Icons.notifications_active;
-      case 'in_progress':
+      case TicketStatus.inProgress:
         return Icons.medical_services;
-      case 'completed':
+      case TicketStatus.completed:
+      case TicketStatus.cancelled:
+      case TicketStatus.noShow:
         return Icons.check_circle;
       default:
         return Icons.hourglass_empty;
     }
   }
 
+  String _mapError(Object error) {
+    if (error is DioException) {
+      final status = error.response?.statusCode;
+      if (error.type == DioExceptionType.connectionError ||
+          error.type == DioExceptionType.connectionTimeout ||
+          error.type == DioExceptionType.receiveTimeout ||
+          error.type == DioExceptionType.sendTimeout) {
+        return 'Keine Internetverbindung. Bitte pruefen Sie Ihr Netzwerk.';
+      }
+      if (status == 404) {
+        return 'Ticket nicht gefunden. Bitte pruefen Sie die Nummer.';
+      }
+      if (status == 400) {
+        return 'Ticketnummer ungueltig. Bitte erneut eingeben.';
+      }
+    }
+    return 'Ticket konnte nicht geladen werden. Bitte versuchen Sie es erneut.';
+  }
+
+  void _registerLastTicketListener() {
+    final ticketNumber = _normalizedTicketNumber();
+    if (ticketNumber.isEmpty) {
+      return;
+    }
+    ref.listen<AsyncValue<PublicTicket>>(
+      publicTicketStatusProvider(ticketNumber),
+      (previous, next) {
+        next.whenData((_) {
+          final storage = ref.read(storageServiceProvider);
+          storage.setString(AppConstants.keyLastTicketNumber, ticketNumber);
+          ref.invalidate(lastTicketNumberProvider);
+        });
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final isCalled = _status == 'called';
-    
+    final trimmedTicket = _normalizedTicketNumber();
+    if (trimmedTicket.isEmpty) {
+      return Scaffold(
+        backgroundColor: AppColors.background,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
+            onPressed: () => context.go('/'),
+          ),
+          title: Text(
+            'Ticket fehlt',
+            style: AppTextStyles.titleLarge.copyWith(
+              color: AppColors.textPrimary,
+            ),
+          ),
+          centerTitle: true,
+        ),
+        body: ScreenState(
+          isEmpty: true,
+          emptyTitle: 'Keine Ticketnummer gefunden',
+          emptySubtitle: 'Bitte geben Sie Ihre Ticketnummer erneut ein.',
+          emptyActionLabel: 'Ticket eingeben',
+          onAction: () => context.go('/ticket-entry'),
+          child: const SizedBox.shrink(),
+        ),
+      );
+    }
+
+    final ticketAsync = ref.watch(publicTicketStatusProvider(trimmedTicket));
+    final isOffline =
+        ref.watch(connectivityProvider) == ConnectivityStatus.offline;
+    final errorMessage =
+        ticketAsync.whenOrNull(error: (error, _) => _mapError(error));
+    final isInitialLoading = ticketAsync.isLoading && !ticketAsync.hasValue;
+
     return Scaffold(
-      backgroundColor: isCalled ? AppColors.success : AppColors.background,
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back,
-            color: isCalled ? Colors.white : AppColors.textPrimary,
-          ),
+          icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
           onPressed: () => context.go('/'),
         ),
         title: Text(
-          'Ticket ${widget.ticketNumber}',
+          'Ticket $trimmedTicket',
           style: AppTextStyles.titleLarge.copyWith(
-            color: isCalled ? Colors.white : AppColors.textPrimary,
+            color: AppColors.textPrimary,
           ),
         ),
         centerTitle: true,
         actions: [
           IconButton(
             icon: Icon(
-              Icons.refresh,
-              color: isCalled ? Colors.white : AppColors.primary,
+              _isRefreshing ? Icons.sync : Icons.refresh,
+              color: AppColors.primary,
             ),
-            onPressed: _refreshStatus,
+            onPressed: _isRefreshing ? null : _handleRefresh,
           ),
         ],
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            children: [
-              // Status Card
-              if (isCalled) ...[
-                _CalledStatusCard(ticketNumber: widget.ticketNumber),
-              ] else ...[
-                _WaitingStatusCard(
-                  ticketNumber: widget.ticketNumber,
-                  status: _status,
-                  statusColor: _getStatusColor(),
-                  statusText: _getStatusText(),
-                  statusIcon: _getStatusIcon(),
-                  positionInQueue: _positionInQueue,
-                  estimatedWaitMinutes: _estimatedWaitMinutes,
-                  currentlyServing: _currentlyServing,
-                ),
-              ],
-              
-              const SizedBox(height: 24),
-              
-              // QR Code
+        child: ScreenState(
+          isLoading: isInitialLoading,
+          errorMessage: errorMessage,
+          errorActionLabel: 'Erneut versuchen',
+          onAction: () => ref.refresh(
+            publicTicketStatusProvider(trimmedTicket).future,
+          ),
+          child: ticketAsync.maybeWhen(
+            data: (ticket) => _TicketStatusContent(
+              ticket: ticket,
+              ticketNumber: trimmedTicket,
+              lastUpdated: _lastUpdated,
+              isRefreshing: _isRefreshing,
+              onRefresh: _handleRefresh,
+              formatTime: _formatTime,
+              getStatusColor: _getStatusColor,
+              getStatusText: _getStatusText,
+              getStatusShortText: _getStatusShortText,
+              getStatusIcon: _getStatusIcon,
+              isOffline: isOffline,
+            ),
+            orElse: () => const SizedBox.shrink(),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _TicketStatusContent extends StatelessWidget {
+  final PublicTicket ticket;
+  final String ticketNumber;
+  final DateTime lastUpdated;
+  final bool isRefreshing;
+  final Future<void> Function() onRefresh;
+  final String Function(BuildContext, DateTime) formatTime;
+  final Color Function(TicketStatus) getStatusColor;
+  final String Function(TicketStatus) getStatusText;
+  final String Function(TicketStatus) getStatusShortText;
+  final IconData Function(TicketStatus) getStatusIcon;
+  final bool isOffline;
+
+  const _TicketStatusContent({
+    required this.ticket,
+    required this.ticketNumber,
+    required this.lastUpdated,
+    required this.isRefreshing,
+    required this.onRefresh,
+    required this.formatTime,
+    required this.getStatusColor,
+    required this.getStatusText,
+    required this.getStatusShortText,
+    required this.getStatusIcon,
+    required this.isOffline,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final isCalled = ticket.status == TicketStatus.called;
+    final statusColor = getStatusColor(ticket.status);
+    final estimatedCallTime = DateTime.now().add(
+      Duration(minutes: ticket.estimatedWaitMinutes),
+    );
+
+    return RefreshIndicator(
+      onRefresh: onRefresh,
+      child: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          children: [
+            if (isOffline) ...[
               Container(
-                padding: const EdgeInsets.all(24),
+                padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
+                  color: AppColors.warning.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: AppColors.warning.withOpacity(0.3),
+                  ),
                 ),
-                child: Column(
+                child: Row(
                   children: [
-                    Text(
-                      'Ihr Ticket-QR-Code',
-                      style: AppTextStyles.titleMedium.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    QrImageView(
-                      data: 'sanad://ticket/${widget.ticketNumber}',
-                      version: QrVersions.auto,
-                      size: 180,
-                      backgroundColor: Colors.white,
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      widget.ticketNumber,
-                      style: AppTextStyles.headlineMedium.copyWith(
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 2,
+                    const Icon(Icons.wifi_off, color: AppColors.warning),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        'Offline-Modus: Status kann veraltet sein.',
+                        style: AppTextStyles.bodyMedium.copyWith(
+                          color: AppColors.textSecondary,
+                        ),
                       ),
                     ),
                   ],
                 ),
               ),
-              
-              const SizedBox(height: 24),
-              
-              // Info Cards
-              _InfoCard(
-                icon: Icons.access_time,
-                title: 'Auto-Aktualisierung',
-                description: 'Diese Seite wird automatisch alle 30 Sekunden aktualisiert.',
-              ),
-              const SizedBox(height: 12),
-              _InfoCard(
-                icon: Icons.volume_up,
-                title: 'Aufruf',
-                description: 'Achten Sie auf die Anzeige im Wartebereich, wenn Ihre Nummer aufgerufen wird.',
-              ),
-              
-              const SizedBox(height: 32),
-              
-              // Back to Home Button
-              OutlinedButton.icon(
-                onPressed: () => context.go('/'),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: isCalled ? Colors.white : AppColors.primary,
-                  side: BorderSide(
-                    color: isCalled ? Colors.white : AppColors.primary,
-                  ),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 12,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                icon: const Icon(Icons.home),
-                label: const Text('Zur Startseite'),
+              const SizedBox(height: 16),
+            ],
+            if (isCalled) ...[
+              _CalledStatusCard(ticketNumber: ticketNumber),
+            ] else ...[
+              _WaitingStatusCard(
+                ticketNumber: ticketNumber,
+                statusColor: statusColor,
+                statusText: getStatusText(ticket.status),
+                statusShortText: getStatusShortText(ticket.status),
+                statusIcon: getStatusIcon(ticket.status),
+                estimatedWaitMinutes: ticket.estimatedWaitMinutes,
+                createdAtTime: formatTime(context, ticket.createdAt),
+                estimatedCallTime: formatTime(context, estimatedCallTime),
               ),
             ],
-          ),
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  isRefreshing ? Icons.sync : Icons.update,
+                  size: 16,
+                  color: AppColors.textSecondary,
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  'Letzte Aktualisierung: ${formatTime(context, lastUpdated)}',
+                  style: AppTextStyles.bodySmall.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 24),
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Column(
+                children: [
+                  Text(
+                    'Ihr Ticket-QR-Code',
+                    style: AppTextStyles.titleMedium.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  QrImageView(
+                    data: 'sanad://ticket/$ticketNumber',
+                    version: QrVersions.auto,
+                    size: 180,
+                    backgroundColor: Colors.white,
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    ticketNumber,
+                    style: AppTextStyles.headlineMedium.copyWith(
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 2,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 24),
+            const _InfoCard(
+              icon: Icons.access_time,
+              title: 'Auto-Aktualisierung',
+              description:
+                  'Diese Seite wird automatisch alle 30 Sekunden aktualisiert.',
+            ),
+            const SizedBox(height: 12),
+            const _InfoCard(
+              icon: Icons.volume_up,
+              title: 'Aufruf',
+              description:
+                  'Achten Sie auf die Anzeige im Wartebereich, wenn Ihre Nummer aufgerufen wird.',
+            ),
+            const SizedBox(height: 32),
+            OutlinedButton.icon(
+              onPressed: () => context.go('/'),
+              style: OutlinedButton.styleFrom(
+                foregroundColor:
+                    isCalled ? AppColors.success : AppColors.primary,
+                side: BorderSide(
+                  color: isCalled ? AppColors.success : AppColors.primary,
+                ),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 12,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              icon: const Icon(Icons.home),
+              label: const Text('Zur Startseite'),
+            ),
+          ],
         ),
       ),
     );
@@ -310,23 +558,23 @@ class _CalledStatusCard extends StatelessWidget {
 
 class _WaitingStatusCard extends StatelessWidget {
   final String ticketNumber;
-  final String status;
   final Color statusColor;
   final String statusText;
+  final String statusShortText;
   final IconData statusIcon;
-  final int positionInQueue;
   final int estimatedWaitMinutes;
-  final int currentlyServing;
+  final String createdAtTime;
+  final String estimatedCallTime;
 
   const _WaitingStatusCard({
     required this.ticketNumber,
-    required this.status,
     required this.statusColor,
     required this.statusText,
+    required this.statusShortText,
     required this.statusIcon,
-    required this.positionInQueue,
     required this.estimatedWaitMinutes,
-    required this.currentlyServing,
+    required this.createdAtTime,
+    required this.estimatedCallTime,
   });
 
   @override
@@ -346,7 +594,6 @@ class _WaitingStatusCard extends StatelessWidget {
       ),
       child: Column(
         children: [
-          // Status Badge
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             decoration: BoxDecoration(
@@ -369,8 +616,6 @@ class _WaitingStatusCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 24),
-          
-          // Ticket Number
           Text(
             ticketNumber,
             style: AppTextStyles.displayMedium.copyWith(
@@ -379,26 +624,12 @@ class _WaitingStatusCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 24),
-          
-          // Stats Row
           Row(
             children: [
               Expanded(
                 child: _StatItem(
-                  value: positionInQueue.toString(),
-                  label: 'Position',
-                  color: AppColors.primary,
-                ),
-              ),
-              Container(
-                width: 1,
-                height: 50,
-                color: AppColors.border,
-              ),
-              Expanded(
-                child: _StatItem(
                   value: '~$estimatedWaitMinutes',
-                  label: 'Min. Wartezeit',
+                  label: 'Wartezeit (Min.)',
                   color: AppColors.warning,
                 ),
               ),
@@ -409,12 +640,46 @@ class _WaitingStatusCard extends StatelessWidget {
               ),
               Expanded(
                 child: _StatItem(
-                  value: 'A-${currentlyServing.toString().padLeft(3, '0')}',
-                  label: 'Aktuell',
-                  color: AppColors.success,
+                  value: statusShortText,
+                  label: 'Status',
+                  color: statusColor,
+                ),
+              ),
+              Container(
+                width: 1,
+                height: 50,
+                color: AppColors.border,
+              ),
+              Expanded(
+                child: _StatItem(
+                  value: createdAtTime,
+                  label: 'Ausgabe',
+                  color: AppColors.primary,
                 ),
               ),
             ],
+          ),
+          const SizedBox(height: 20),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: BoxDecoration(
+              color: AppColors.primaryLight.withOpacity(0.3),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.event, size: 18, color: AppColors.primary),
+                const SizedBox(width: 8),
+                Text(
+                  'Voraussichtlich: $estimatedCallTime',
+                  style: AppTextStyles.bodyMedium.copyWith(
+                    color: AppColors.textPrimary,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),

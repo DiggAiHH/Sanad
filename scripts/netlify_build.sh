@@ -87,7 +87,6 @@ flutter build web \
     --dart-define=ENABLE_DEMO_MODE="$DEMO_MODE" \
     --dart-define=ENABLE_ANALYTICS="$ANALYTICS" \
     --dart-define=ENABLE_PUSH_NOTIFICATIONS="$PUSH" \
-    --web-renderer canvaskit \
     --base-href "/"
 
 # Copy to expected output location

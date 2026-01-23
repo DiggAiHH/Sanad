@@ -5,7 +5,7 @@ All models use UUID primary keys for security and scalability.
 """
 
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum as PyEnum
 from typing import Optional
 
@@ -17,6 +17,7 @@ from app.database import Base
 
 class UserRole(str, PyEnum):
     """User role enumeration."""
+
     ADMIN = "admin"
     DOCTOR = "doctor"
     MFA = "mfa"
@@ -26,6 +27,7 @@ class UserRole(str, PyEnum):
 
 class TicketStatus(str, PyEnum):
     """Ticket status enumeration."""
+
     WAITING = "waiting"
     CALLED = "called"
     IN_PROGRESS = "in_progress"
@@ -36,6 +38,7 @@ class TicketStatus(str, PyEnum):
 
 class TicketPriority(str, PyEnum):
     """Ticket priority enumeration."""
+
     NORMAL = "normal"
     HIGH = "high"
     EMERGENCY = "emergency"
@@ -43,6 +46,7 @@ class TicketPriority(str, PyEnum):
 
 class TaskStatus(str, PyEnum):
     """Task status enumeration."""
+
     TODO = "todo"
     IN_PROGRESS = "in_progress"
     COMPLETED = "completed"
@@ -51,6 +55,7 @@ class TaskStatus(str, PyEnum):
 
 class TaskPriority(str, PyEnum):
     """Task priority enumeration."""
+
     LOW = "low"
     MEDIUM = "medium"
     HIGH = "high"
@@ -60,13 +65,14 @@ class TaskPriority(str, PyEnum):
 class User(Base):
     """
     User model for all system users.
-    
+
     Security:
         - Passwords stored as bcrypt hashes only.
         - Email must be unique.
     """
+
     __tablename__ = "users"
-    
+
     id: Mapped[uuid.UUID] = mapped_column(
         Uuid(as_uuid=True), primary_key=True, default=uuid.uuid4
     )
@@ -79,12 +85,16 @@ class User(Base):
     avatar_url: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     is_verified: Mapped[bool] = mapped_column(Boolean, default=False)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, default=lambda: datetime.now(timezone.utc)
+    )
     updated_at: Mapped[datetime] = mapped_column(
-        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+        DateTime,
+        default=lambda: datetime.now(timezone.utc),
+        onupdate=lambda: datetime.now(timezone.utc),
     )
     last_login: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
-    
+
     # Relationships
     assigned_tickets: Mapped[list["Ticket"]] = relationship(
         "Ticket", back_populates="assigned_to", foreign_keys="Ticket.assigned_to_id"
@@ -95,13 +105,21 @@ class User(Base):
     assigned_tasks: Mapped[list["Task"]] = relationship(
         "Task", back_populates="assignee", foreign_keys="Task.assignee_id"
     )
-    messages: Mapped[list["ChatMessage"]] = relationship("ChatMessage", back_populates="sender")
+    messages: Mapped[list["ChatMessage"]] = relationship(
+        "ChatMessage", back_populates="sender"
+    )
+
+    @property
+    def full_name(self) -> str:
+        """Return the user's full name."""
+        return f"{self.first_name} {self.last_name}"
 
 
 class Practice(Base):
     """Practice/clinic configuration."""
+
     __tablename__ = "practices"
-    
+
     id: Mapped[uuid.UUID] = mapped_column(
         Uuid(as_uuid=True), primary_key=True, default=uuid.uuid4
     )
@@ -109,23 +127,29 @@ class Practice(Base):
     address: Mapped[str] = mapped_column(Text)
     phone: Mapped[str] = mapped_column(String(50))
     email: Mapped[str] = mapped_column(String(255))
+    website: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
     opening_hours: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     max_daily_tickets: Mapped[int] = mapped_column(Integer, default=100)
     average_wait_time_minutes: Mapped[int] = mapped_column(Integer, default=15)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
-    updated_at: Mapped[datetime] = mapped_column(
-        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, default=lambda: datetime.now(timezone.utc)
     )
-    
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        default=lambda: datetime.now(timezone.utc),
+        onupdate=lambda: datetime.now(timezone.utc),
+    )
+
     # Relationships
     queues: Mapped[list["Queue"]] = relationship("Queue", back_populates="practice")
 
 
 class Queue(Base):
     """Queue/category for tickets."""
+
     __tablename__ = "queues"
-    
+
     id: Mapped[uuid.UUID] = mapped_column(
         Uuid(as_uuid=True), primary_key=True, default=uuid.uuid4
     )
@@ -142,8 +166,10 @@ class Queue(Base):
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     current_number: Mapped[int] = mapped_column(Integer, default=0)
     average_wait_minutes: Mapped[int] = mapped_column(Integer, default=15)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
-    
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, default=lambda: datetime.now(timezone.utc)
+    )
+
     # Relationships
     practice: Mapped["Practice"] = relationship("Practice", back_populates="queues")
     zone: Mapped[Optional["Zone"]] = relationship("Zone")
@@ -152,8 +178,9 @@ class Queue(Base):
 
 class Ticket(Base):
     """Patient ticket in the queue."""
+
     __tablename__ = "tickets"
-    
+
     id: Mapped[uuid.UUID] = mapped_column(
         Uuid(as_uuid=True), primary_key=True, default=uuid.uuid4
     )
@@ -179,8 +206,10 @@ class Ticket(Base):
     )
     called_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
     completed_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
-    
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, default=lambda: datetime.now(timezone.utc)
+    )
+
     # Relationships
     queue: Mapped["Queue"] = relationship("Queue", back_populates="tickets")
     created_by: Mapped[Optional["User"]] = relationship(
@@ -193,14 +222,17 @@ class Ticket(Base):
 
 class Task(Base):
     """Staff task/todo item."""
+
     __tablename__ = "tasks"
-    
+
     id: Mapped[uuid.UUID] = mapped_column(
         Uuid(as_uuid=True), primary_key=True, default=uuid.uuid4
     )
     title: Mapped[str] = mapped_column(String(255))
     description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
-    status: Mapped[TaskStatus] = mapped_column(Enum(TaskStatus), default=TaskStatus.TODO)
+    status: Mapped[TaskStatus] = mapped_column(
+        Enum(TaskStatus), default=TaskStatus.TODO
+    )
     priority: Mapped[TaskPriority] = mapped_column(
         Enum(TaskPriority), default=TaskPriority.MEDIUM
     )
@@ -209,11 +241,15 @@ class Task(Base):
     )
     due_date: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
     completed_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
-    updated_at: Mapped[datetime] = mapped_column(
-        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, default=lambda: datetime.now(timezone.utc)
     )
-    
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        default=lambda: datetime.now(timezone.utc),
+        onupdate=lambda: datetime.now(timezone.utc),
+    )
+
     # Relationships
     assignee: Mapped[Optional["User"]] = relationship(
         "User", back_populates="assigned_tasks"
@@ -222,18 +258,23 @@ class Task(Base):
 
 class ChatRoom(Base):
     """Chat room for team communication."""
+
     __tablename__ = "chat_rooms"
-    
+
     id: Mapped[uuid.UUID] = mapped_column(
         Uuid(as_uuid=True), primary_key=True, default=uuid.uuid4
     )
     name: Mapped[str] = mapped_column(String(255))
     is_group: Mapped[bool] = mapped_column(Boolean, default=False)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
-    updated_at: Mapped[datetime] = mapped_column(
-        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, default=lambda: datetime.now(timezone.utc)
     )
-    
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        default=lambda: datetime.now(timezone.utc),
+        onupdate=lambda: datetime.now(timezone.utc),
+    )
+
     # Relationships
     messages: Mapped[list["ChatMessage"]] = relationship(
         "ChatMessage", back_populates="room"
@@ -245,8 +286,9 @@ class ChatRoom(Base):
 
 class ChatParticipant(Base):
     """Chat room participant."""
+
     __tablename__ = "chat_participants"
-    
+
     id: Mapped[uuid.UUID] = mapped_column(
         Uuid(as_uuid=True), primary_key=True, default=uuid.uuid4
     )
@@ -256,17 +298,20 @@ class ChatParticipant(Base):
     user_id: Mapped[uuid.UUID] = mapped_column(
         Uuid(as_uuid=True), ForeignKey("users.id")
     )
-    joined_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    joined_at: Mapped[datetime] = mapped_column(
+        DateTime, default=lambda: datetime.now(timezone.utc)
+    )
     last_read_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
-    
+
     # Relationships
     room: Mapped["ChatRoom"] = relationship("ChatRoom", back_populates="participants")
 
 
 class ChatMessage(Base):
     """Chat message."""
+
     __tablename__ = "chat_messages"
-    
+
     id: Mapped[uuid.UUID] = mapped_column(
         Uuid(as_uuid=True), primary_key=True, default=uuid.uuid4
     )
@@ -278,8 +323,10 @@ class ChatMessage(Base):
     )
     content: Mapped[str] = mapped_column(Text)
     is_read: Mapped[bool] = mapped_column(Boolean, default=False)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
-    
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, default=lambda: datetime.now(timezone.utc)
+    )
+
     # Relationships
     room: Mapped["ChatRoom"] = relationship("ChatRoom", back_populates="messages")
     sender: Mapped["User"] = relationship("User", back_populates="messages")
@@ -289,8 +336,10 @@ class ChatMessage(Base):
 # ZERO-TOUCH RECEPTION MODELS (NFC, LED, Wayfinding)
 # ============================================================================
 
+
 class CheckInMethod(str, PyEnum):
     """Method used for patient check-in."""
+
     NFC = "nfc"
     QR = "qr"
     MANUAL = "manual"
@@ -300,6 +349,7 @@ class CheckInMethod(str, PyEnum):
 
 class DeviceType(str, PyEnum):
     """IoT device type enumeration."""
+
     NFC_READER = "nfc_reader"
     LED_CONTROLLER = "led_controller"
     DISPLAY = "display"
@@ -308,6 +358,7 @@ class DeviceType(str, PyEnum):
 
 class DeviceStatus(str, PyEnum):
     """IoT device online status."""
+
     ONLINE = "online"
     OFFLINE = "offline"
     ERROR = "error"
@@ -316,6 +367,7 @@ class DeviceStatus(str, PyEnum):
 
 class LEDPattern(str, PyEnum):
     """LED animation patterns for wayfinding."""
+
     SOLID = "solid"
     PULSE = "pulse"
     CHASE = "chase"
@@ -326,22 +378,24 @@ class LEDPattern(str, PyEnum):
 
 class NFCCardType(str, PyEnum):
     """Type of NFC card/token."""
-    EGK = "egk"              # Elektronische Gesundheitskarte
-    CUSTOM = "custom"        # Praxis-eigene Karte
+
+    EGK = "egk"  # Elektronische Gesundheitskarte
+    CUSTOM = "custom"  # Praxis-eigene Karte
     TEMPORARY = "temporary"  # Temporär-Karte für Neupatienten
-    MOBILE = "mobile"        # Smartphone HCE
+    MOBILE = "mobile"  # Smartphone HCE
 
 
 class IoTDevice(Base):
     """
     IoT device registry for NFC readers, LED controllers, displays.
-    
+
     Security:
         - device_secret is hashed, used for MQTT authentication.
         - All devices must be registered before connecting.
     """
+
     __tablename__ = "iot_devices"
-    
+
     id: Mapped[uuid.UUID] = mapped_column(
         Uuid(as_uuid=True), primary_key=True, default=uuid.uuid4
     )
@@ -356,18 +410,24 @@ class IoTDevice(Base):
     zone_id: Mapped[Optional[uuid.UUID]] = mapped_column(
         Uuid(as_uuid=True), ForeignKey("zones.id"), nullable=True
     )
-    ip_address: Mapped[Optional[str]] = mapped_column(String(45), nullable=True)  # IPv4/IPv6
+    ip_address: Mapped[Optional[str]] = mapped_column(
+        String(45), nullable=True
+    )  # IPv4/IPv6
     firmware_version: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
     status: Mapped[DeviceStatus] = mapped_column(
         Enum(DeviceStatus), default=DeviceStatus.OFFLINE
     )
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     last_heartbeat: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
-    updated_at: Mapped[datetime] = mapped_column(
-        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, default=lambda: datetime.now(timezone.utc)
     )
-    
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        default=lambda: datetime.now(timezone.utc),
+        onupdate=lambda: datetime.now(timezone.utc),
+    )
+
     # Relationships
     practice: Mapped["Practice"] = relationship("Practice")
     zone: Mapped[Optional["Zone"]] = relationship("Zone", back_populates="devices")
@@ -379,11 +439,12 @@ class IoTDevice(Base):
 class Zone(Base):
     """
     Physical zone in the practice for wayfinding.
-    
+
     Examples: "Eingang", "Wartebereich", "Flur-A", "Zimmer-1"
     """
+
     __tablename__ = "zones"
-    
+
     id: Mapped[uuid.UUID] = mapped_column(
         Uuid(as_uuid=True), primary_key=True, default=uuid.uuid4
     )
@@ -391,35 +452,52 @@ class Zone(Base):
         Uuid(as_uuid=True), ForeignKey("practices.id")
     )
     name: Mapped[str] = mapped_column(String(100))  # z.B. "Wartebereich"
-    code: Mapped[str] = mapped_column(String(20))   # z.B. "WB-1", "ZIM-3"
-    zone_type: Mapped[str] = mapped_column(String(50))  # entrance, corridor, waiting, room
+    code: Mapped[str] = mapped_column(String(20))  # z.B. "WB-1", "ZIM-3"
+    zone_type: Mapped[str] = mapped_column(
+        String(50)
+    )  # entrance, corridor, waiting, room
     floor: Mapped[int] = mapped_column(Integer, default=0)
-    x_position: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)  # Grid position
+    x_position: Mapped[Optional[int]] = mapped_column(
+        Integer, nullable=True
+    )  # Grid position
     y_position: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
-    is_destination: Mapped[bool] = mapped_column(Boolean, default=False)  # Can be routed to
+    is_destination: Mapped[bool] = mapped_column(
+        Boolean, default=False
+    )  # Can be routed to
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
-    
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, default=lambda: datetime.now(timezone.utc)
+    )
+
     # Relationships
     practice: Mapped["Practice"] = relationship("Practice")
-    devices: Mapped[list["IoTDevice"]] = relationship("IoTDevice", back_populates="zone")
-    led_segments: Mapped[list["LEDSegment"]] = relationship("LEDSegment", back_populates="zone")
+    devices: Mapped[list["IoTDevice"]] = relationship(
+        "IoTDevice", back_populates="zone"
+    )
+    led_segments: Mapped[list["LEDSegment"]] = relationship(
+        "LEDSegment", back_populates="zone"
+    )
     routes_from: Mapped[list["WayfindingRoute"]] = relationship(
-        "WayfindingRoute", back_populates="from_zone", foreign_keys="WayfindingRoute.from_zone_id"
+        "WayfindingRoute",
+        back_populates="from_zone",
+        foreign_keys="WayfindingRoute.from_zone_id",
     )
     routes_to: Mapped[list["WayfindingRoute"]] = relationship(
-        "WayfindingRoute", back_populates="to_zone", foreign_keys="WayfindingRoute.to_zone_id"
+        "WayfindingRoute",
+        back_populates="to_zone",
+        foreign_keys="WayfindingRoute.to_zone_id",
     )
 
 
 class LEDSegment(Base):
     """
     LED strip segment configuration for a zone.
-    
+
     Maps to WLED segments for granular control.
     """
+
     __tablename__ = "led_segments"
-    
+
     id: Mapped[uuid.UUID] = mapped_column(
         Uuid(as_uuid=True), primary_key=True, default=uuid.uuid4
     )
@@ -430,13 +508,15 @@ class LEDSegment(Base):
         Uuid(as_uuid=True), ForeignKey("iot_devices.id")
     )
     segment_id: Mapped[int] = mapped_column(Integer)  # WLED segment ID (0-15)
-    start_led: Mapped[int] = mapped_column(Integer)   # First LED index
-    end_led: Mapped[int] = mapped_column(Integer)     # Last LED index
+    start_led: Mapped[int] = mapped_column(Integer)  # First LED index
+    end_led: Mapped[int] = mapped_column(Integer)  # Last LED index
     default_color: Mapped[str] = mapped_column(String(7), default="#0066CC")  # Hex
     default_brightness: Mapped[int] = mapped_column(Integer, default=128)  # 0-255
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
-    
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, default=lambda: datetime.now(timezone.utc)
+    )
+
     # Relationships
     zone: Mapped["Zone"] = relationship("Zone", back_populates="led_segments")
     controller: Mapped["IoTDevice"] = relationship("IoTDevice")
@@ -445,11 +525,12 @@ class LEDSegment(Base):
 class WayfindingRoute(Base):
     """
     Pre-defined route between two zones.
-    
+
     Used to calculate which LED segments to activate.
     """
+
     __tablename__ = "wayfinding_routes"
-    
+
     id: Mapped[uuid.UUID] = mapped_column(
         Uuid(as_uuid=True), primary_key=True, default=uuid.uuid4
     )
@@ -468,10 +549,14 @@ class WayfindingRoute(Base):
         Enum(LEDPattern), default=LEDPattern.CHASE
     )
     led_color: Mapped[str] = mapped_column(String(7), default="#00FF00")  # Green for go
-    duration_seconds: Mapped[int] = mapped_column(Integer, default=30)  # How long to show
+    duration_seconds: Mapped[int] = mapped_column(
+        Integer, default=30
+    )  # How long to show
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
-    
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, default=lambda: datetime.now(timezone.utc)
+    )
+
     # Relationships
     practice: Mapped["Practice"] = relationship("Practice")
     from_zone: Mapped["Zone"] = relationship(
@@ -481,17 +566,33 @@ class WayfindingRoute(Base):
         "Zone", back_populates="routes_to", foreign_keys=[to_zone_id]
     )
 
+    @property
+    def route_name(self) -> str:
+        """Compatibility alias for API schema."""
+        return self.name
+
+    @property
+    def route_color(self) -> str:
+        """Compatibility alias for API schema."""
+        return self.led_color
+
+    @property
+    def animation_speed(self) -> int:
+        """Compatibility alias for API schema."""
+        return min(255, max(1, self.duration_seconds))
+
 
 class PatientNFCCard(Base):
     """
     NFC card/token assigned to a patient.
-    
+
     Security:
         - nfc_uid is stored encrypted (AES-256).
         - One patient can have multiple cards (e.g., eGK + temporary).
     """
+
     __tablename__ = "patient_nfc_cards"
-    
+
     id: Mapped[uuid.UUID] = mapped_column(
         Uuid(as_uuid=True), primary_key=True, default=uuid.uuid4
     )
@@ -499,14 +600,20 @@ class PatientNFCCard(Base):
         Uuid(as_uuid=True), ForeignKey("users.id")
     )
     nfc_uid_encrypted: Mapped[str] = mapped_column(String(255))  # Encrypted UID
-    nfc_uid_hash: Mapped[str] = mapped_column(String(64), unique=True, index=True)  # SHA-256 for lookup
+    nfc_uid_hash: Mapped[str] = mapped_column(
+        String(64), unique=True, index=True
+    )  # SHA-256 for lookup
     card_type: Mapped[NFCCardType] = mapped_column(Enum(NFCCardType))
-    card_label: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)  # "Hauptkarte"
+    card_label: Mapped[Optional[str]] = mapped_column(
+        String(100), nullable=True
+    )  # "Hauptkarte"
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
-    issued_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    issued_at: Mapped[datetime] = mapped_column(
+        DateTime, default=lambda: datetime.now(timezone.utc)
+    )
     expires_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
     last_used_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
-    
+
     # Relationships
     patient: Mapped["User"] = relationship("User")
     check_in_events: Mapped[list["CheckInEvent"]] = relationship(
@@ -517,11 +624,12 @@ class PatientNFCCard(Base):
 class CheckInEvent(Base):
     """
     Automated check-in event log.
-    
+
     Records every check-in attempt for audit and analytics.
     """
+
     __tablename__ = "check_in_events"
-    
+
     id: Mapped[uuid.UUID] = mapped_column(
         Uuid(as_uuid=True), primary_key=True, default=uuid.uuid4
     )
@@ -541,15 +649,19 @@ class CheckInEvent(Base):
     patient_id: Mapped[Optional[uuid.UUID]] = mapped_column(
         Uuid(as_uuid=True), ForeignKey("users.id"), nullable=True
     )
-    raw_nfc_uid_hash: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)  # For unregistered cards
+    raw_nfc_uid_hash: Mapped[Optional[str]] = mapped_column(
+        String(64), nullable=True
+    )  # For unregistered cards
     success: Mapped[bool] = mapped_column(Boolean, default=True)
     failure_reason: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
     assigned_room: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
     wayfinding_route_id: Mapped[Optional[uuid.UUID]] = mapped_column(
         Uuid(as_uuid=True), ForeignKey("wayfinding_routes.id"), nullable=True
     )
-    checked_in_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
-    
+    checked_in_at: Mapped[datetime] = mapped_column(
+        DateTime, default=lambda: datetime.now(timezone.utc)
+    )
+
     # Relationships
     practice: Mapped["Practice"] = relationship("Practice")
     ticket: Mapped[Optional["Ticket"]] = relationship("Ticket")
@@ -560,17 +672,20 @@ class CheckInEvent(Base):
         "PatientNFCCard", back_populates="check_in_events"
     )
     patient: Mapped[Optional["User"]] = relationship("User")
-    wayfinding_route: Mapped[Optional["WayfindingRoute"]] = relationship("WayfindingRoute")
+    wayfinding_route: Mapped[Optional["WayfindingRoute"]] = relationship(
+        "WayfindingRoute"
+    )
 
 
 class WaitTimeLog(Base):
     """
     Waiting time analytics for LED color visualization.
-    
+
     Used to calculate average wait times and trigger LED color changes.
     """
+
     __tablename__ = "wait_time_logs"
-    
+
     id: Mapped[uuid.UUID] = mapped_column(
         Uuid(as_uuid=True), primary_key=True, default=uuid.uuid4
     )
@@ -586,9 +701,13 @@ class WaitTimeLog(Base):
     waiting_count: Mapped[int] = mapped_column(Integer, default=0)
     average_wait_minutes: Mapped[int] = mapped_column(Integer, default=0)
     max_wait_minutes: Mapped[int] = mapped_column(Integer, default=0)
-    led_color_state: Mapped[str] = mapped_column(String(7), default="#00FF00")  # Green/Yellow/Red
-    recorded_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
-    
+    led_color_state: Mapped[str] = mapped_column(
+        String(7), default="#00FF00"
+    )  # Green/Yellow/Red
+    recorded_at: Mapped[datetime] = mapped_column(
+        DateTime, default=lambda: datetime.now(timezone.utc)
+    )
+
     # Relationships
     practice: Mapped["Practice"] = relationship("Practice")
     queue: Mapped["Queue"] = relationship("Queue")
@@ -597,6 +716,7 @@ class WaitTimeLog(Base):
 
 class DevicePlatform(str, PyEnum):
     """Mobile device platform for push notifications."""
+
     IOS = "ios"
     ANDROID = "android"
     WEB = "web"
@@ -605,13 +725,14 @@ class DevicePlatform(str, PyEnum):
 class PushDeviceToken(Base):
     """
     FCM device tokens for push notifications.
-    
+
     Security:
         - Tokens are stored per user + device.
         - Old tokens are automatically invalidated.
     """
+
     __tablename__ = "push_device_tokens"
-    
+
     id: Mapped[uuid.UUID] = mapped_column(
         Uuid(as_uuid=True), primary_key=True, default=uuid.uuid4
     )
@@ -623,8 +744,12 @@ class PushDeviceToken(Base):
     device_name: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
     app_version: Mapped[Optional[str]] = mapped_column(String(20), nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
-    last_used_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
-    
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, default=lambda: datetime.now(timezone.utc)
+    )
+    last_used_at: Mapped[datetime] = mapped_column(
+        DateTime, default=lambda: datetime.now(timezone.utc)
+    )
+
     # Relationships
     user: Mapped["User"] = relationship("User")

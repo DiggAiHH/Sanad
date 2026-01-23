@@ -24,7 +24,6 @@ from app.schemas.schemas import (
 )
 from app.services.auth_service import (
     authenticate_user,
-    create_access_token,
     create_user,
     decode_token,
     generate_tokens,
@@ -41,48 +40,50 @@ async def login(
 ) -> TokenResponse:
     """
     Authenticate user and return JWT tokens.
-    
+
     Args:
         request: Login credentials.
         db: Database session.
-        
+
     Returns:
         TokenResponse: Access and refresh tokens.
-        
+
     Raises:
         HTTPException: If credentials are invalid.
     """
     user = await authenticate_user(db, request.email, request.password)
-    
+
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Ungültige E-Mail oder Passwort",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    
+
     # Update last login
     user.last_login = datetime.now(timezone.utc)
     await db.commit()
-    
+
     return generate_tokens(user)
 
 
-@router.post("/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED
+)
 async def register(
     request: UserCreate,
     db: Annotated[AsyncSession, Depends(get_db)],
 ) -> User:
     """
     Register a new user.
-    
+
     Args:
         request: User registration data.
         db: Database session.
-        
+
     Returns:
         UserResponse: Created user.
-        
+
     Raises:
         HTTPException: If email already exists.
     """
@@ -111,19 +112,19 @@ async def refresh_token(
 ) -> TokenResponse:
     """
     Refresh access token using refresh token.
-    
+
     Args:
         request: Refresh token.
         db: Database session.
-        
+
     Returns:
         TokenResponse: New access and refresh tokens.
-        
+
     Raises:
         HTTPException: If refresh token is invalid.
     """
     payload = decode_token(request.refresh_token)
-    
+
     if not payload:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -135,18 +136,19 @@ async def refresh_token(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Ungültiger Token-Typ",
         )
-    
+
     # Get user
     from uuid import UUID
+
     result = await db.execute(select(User).where(User.id == UUID(payload.sub)))
     user = result.scalar_one_or_none()
-    
+
     if not user or not user.is_active:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Benutzer nicht gefunden oder deaktiviert",
         )
-    
+
     return generate_tokens(user)
 
 
@@ -156,10 +158,10 @@ async def get_current_user_info(
 ) -> User:
     """
     Get current authenticated user information.
-    
+
     Args:
         current_user: Authenticated user from token.
-        
+
     Returns:
         UserResponse: Current user data.
     """
@@ -172,13 +174,13 @@ async def logout(
 ) -> MessageResponse:
     """
     Logout current user.
-    
+
     Note: JWT tokens are stateless, so logout is handled client-side.
     This endpoint is for audit logging purposes.
-    
+
     Args:
         current_user: Authenticated user.
-        
+
     Returns:
         MessageResponse: Logout confirmation.
     """

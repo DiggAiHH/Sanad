@@ -125,7 +125,13 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
     final code = barcodes.first.rawValue;
     if (code == null) return;
 
+    if (!_isValidSanadCode(code)) {
+      _showScanError('Ungültiger QR-Code. Bitte Sanad-Ticket scannen.');
+      return;
+    }
+
     setState(() => _isProcessing = true);
+    await _controller.stop();
 
     // Simulate processing
     await Future.delayed(const Duration(seconds: 1));
@@ -135,5 +141,29 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
       // In real app, parse QR code and pre-fill patient data
       context.go('/check-in');
     }
+
+    if (mounted) {
+      setState(() => _isProcessing = false);
+      await _controller.start();
+    }
+  }
+
+  bool _isValidSanadCode(String code) {
+    return code.startsWith('sanad://');
+  }
+
+  void _showScanError(String message) {
+    if (_isProcessing) return;
+    setState(() => _isProcessing = true);
+    ModernSnackBar.show(
+      context,
+      message: message,
+      type: SnackBarType.error,
+    );
+    Future.delayed(const Duration(milliseconds: 600), () {
+      if (mounted) {
+        setState(() => _isProcessing = false);
+      }
+    });
   }
 }

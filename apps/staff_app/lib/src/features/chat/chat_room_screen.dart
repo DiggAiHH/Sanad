@@ -14,6 +14,7 @@ class ChatRoomScreen extends StatefulWidget {
 class _ChatRoomScreenState extends State<ChatRoomScreen> {
   final _messageController = TextEditingController();
   final _scrollController = ScrollController();
+  bool _canSend = false;
 
   // Mock messages
   final _messages = [
@@ -22,6 +23,18 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
     {'id': '3', 'sender': 'MFA Müller', 'text': 'Alles fertig!', 'time': '10:33', 'isMe': false},
     {'id': '4', 'sender': 'Dr. Schmidt', 'text': 'Danke, komme jetzt', 'time': '10:34', 'isMe': true},
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _messageController.addListener(() {
+      final hasText = _messageController.text.trim().isNotEmpty;
+      if (hasText != _canSend) {
+        setState(() => _canSend = hasText);
+      }
+    });
+    WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
+  }
 
   @override
   void dispose() {
@@ -152,7 +165,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                 ),
                 const SizedBox(width: 8),
                 FloatingActionButton.small(
-                  onPressed: _sendMessage,
+                  onPressed: _canSend ? _sendMessage : null,
                   child: const Icon(Icons.send),
                 ),
               ],
@@ -252,15 +265,17 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
     _messageController.clear();
 
     // Scroll to bottom
-    Future.delayed(const Duration(milliseconds: 100), () {
-      if (_scrollController.hasClients) {
-        _scrollController.animateTo(
-          _scrollController.position.maxScrollExtent,
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeOut,
-        );
-      }
-    });
+    Future.delayed(const Duration(milliseconds: 100), _scrollToBottom);
+  }
+
+  void _scrollToBottom() {
+    if (_scrollController.hasClients) {
+      _scrollController.animateTo(
+        _scrollController.position.maxScrollExtent,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
+    }
   }
 
   void _showAttachmentOptions(BuildContext context) {

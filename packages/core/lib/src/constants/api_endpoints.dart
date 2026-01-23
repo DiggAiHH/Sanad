@@ -2,6 +2,12 @@
 class ApiEndpoints {
   ApiEndpoints._();
 
+  /// Base URL for the API - configured via environment
+  static String baseUrl = const String.fromEnvironment(
+    'API_BASE_URL',
+    defaultValue: 'http://localhost:8000/api/v1',
+  );
+
   // Auth
   static const String login = '/auth/login';
   static const String logout = '/auth/logout';
@@ -55,4 +61,27 @@ class ApiEndpoints {
   static String educationContentItem(String id) => '/content/education/$id';
   static const String videoContent = '/content/videos';
   static String videoContentItem(String id) => '/content/videos/$id';
+
+  // Document Requests (Rezept, AU, Überweisung)
+  static const String documentRequests = '/document-requests';
+  static String documentRequest(String id) => '/document-requests/$id';
+  static const String myDocumentRequests = '/document-requests/my';
+
+  // Consultations (Video, Voice, Chat mit Arzt)
+  static const String consultations = '/consultations';
+  static String consultation(String id) => '/consultations/$id';
+  static const String myConsultations = '/consultations/my-consultations';
+  static String consultationMessages(String id) => '/consultations/$id/messages';
+  static String consultationCallRoom(String id) => '/consultations/$id/room';
+  static String consultationJoin(String id) => '/consultations/$id/join';
+  static String consultationEnd(String id) => '/consultations/$id/end';
+  static String consultationCancel(String id) => '/consultations/my-consultations/$id/cancel';
+  static String consultationMessagesRead(String id) => '/consultations/$id/messages/read';
+  
+  // WebRTC Signaling
+  static String webrtcOffer(String consultationId) => '/consultations/$consultationId/signal/offer';
+  static String webrtcAnswer(String consultationId) => '/consultations/$consultationId/signal/answer';
+  static String webrtcIce(String consultationId) => '/consultations/$consultationId/signal/ice';
+  static String webrtcPoll(String consultationId) => '/consultations/$consultationId/signal/poll';
+  static String webrtcClear(String consultationId) => '/consultations/$consultationId/signal';
 }

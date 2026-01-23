@@ -2,8 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:sanad_ui/sanad_ui.dart';
 
 /// Settings screen for admin
-class SettingsScreen extends StatelessWidget {
+class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
+
+  @override
+  State<SettingsScreen> createState() => _SettingsScreenState();
+}
+
+class _SettingsScreenState extends State<SettingsScreen> {
+  bool _qrCheckIn = true;
+  bool _nfcCheckIn = true;
+  bool _autoWait = true;
+  double _defaultSlot = 15;
+  bool _eduVideos = true;
+  bool _pushNotifications = true;
+  bool _showWaitTime = true;
+  DateTime _lastUpdated = DateTime.now();
 
   @override
   Widget build(BuildContext context) {
@@ -16,6 +30,8 @@ class SettingsScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            _buildLastUpdated(context),
+            const SizedBox(height: 16),
             _buildSection(
               title: 'Praxis-Informationen',
               children: [
@@ -40,19 +56,48 @@ class SettingsScreen extends StatelessWidget {
             _buildSection(
               title: 'Warteschlangen-Einstellungen',
               children: [
-                _buildSwitchRow('QR-Code Check-In', true),
-                _buildSwitchRow('NFC Check-In', true),
-                _buildSwitchRow('Automatische Wartezeit-Berechnung', true),
-                _buildSliderRow('Standard-Terminlänge', 15, 'Minuten'),
+                _buildSwitchRow(
+                  'QR-Code Check-In',
+                  _qrCheckIn,
+                  (value) => _updateSetting(() => _qrCheckIn = value),
+                ),
+                _buildSwitchRow(
+                  'NFC Check-In',
+                  _nfcCheckIn,
+                  (value) => _updateSetting(() => _nfcCheckIn = value),
+                ),
+                _buildSwitchRow(
+                  'Automatische Wartezeit-Berechnung',
+                  _autoWait,
+                  (value) => _updateSetting(() => _autoWait = value),
+                ),
+                _buildSliderRow(
+                  'Standard-Terminlänge',
+                  _defaultSlot,
+                  'Minuten',
+                  (value) => _updateSetting(() => _defaultSlot = value),
+                ),
               ],
             ),
             const SizedBox(height: 24),
             _buildSection(
-              title: 'Patenten-App',
+              title: 'Patienten-App',
               children: [
-                _buildSwitchRow('Aufklärungsvideos aktiviert', true),
-                _buildSwitchRow('Push-Benachrichtigungen', true),
-                _buildSwitchRow('Wartezeit-Anzeige', true),
+                _buildSwitchRow(
+                  'Aufklärungsvideos aktiviert',
+                  _eduVideos,
+                  (value) => _updateSetting(() => _eduVideos = value),
+                ),
+                _buildSwitchRow(
+                  'Push-Benachrichtigungen',
+                  _pushNotifications,
+                  (value) => _updateSetting(() => _pushNotifications = value),
+                ),
+                _buildSwitchRow(
+                  'Wartezeit-Anzeige',
+                  _showWaitTime,
+                  (value) => _updateSetting(() => _showWaitTime = value),
+                ),
               ],
             ),
           ],
@@ -121,20 +166,25 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSwitchRow(String label, bool value) {
+  Widget _buildSwitchRow(String label, bool value, ValueChanged<bool> onChanged) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(label, style: AppTextStyles.bodyMedium),
-          Switch(value: value, onChanged: (v) {}),
+          Switch(value: value, onChanged: onChanged),
         ],
       ),
     );
   }
 
-  Widget _buildSliderRow(String label, double value, String unit) {
+  Widget _buildSliderRow(
+    String label,
+    double value,
+    String unit,
+    ValueChanged<double> onChanged,
+  ) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Column(
@@ -152,10 +202,40 @@ class SettingsScreen extends StatelessWidget {
             min: 5,
             max: 60,
             divisions: 11,
-            onChanged: (v) {},
+            onChanged: onChanged,
           ),
         ],
       ),
     );
+  }
+
+  Widget _buildLastUpdated(BuildContext context) {
+    final localizations = MaterialLocalizations.of(context);
+    final timeOfDay = TimeOfDay.fromDateTime(_lastUpdated);
+    final formatted = localizations.formatTimeOfDay(
+      timeOfDay,
+      alwaysUse24HourFormat: MediaQuery.of(context).alwaysUse24HourFormat,
+    );
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        const Icon(Icons.update, size: 16, color: AppColors.textSecondary),
+        const SizedBox(width: 6),
+        Text(
+          'Zuletzt geändert: $formatted',
+          style: AppTextStyles.bodySmall.copyWith(
+            color: AppColors.textSecondary,
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _updateSetting(VoidCallback update) {
+    setState(() {
+      update();
+      _lastUpdated = DateTime.now();
+    });
   }
 }

@@ -9,6 +9,10 @@ class AppTextStyles {
   static final _baseFont = GoogleFonts.inter();
 
   // Headlines
+  static TextStyle get headlineLarge => h1;
+  static TextStyle get headlineMedium => h2;
+  static TextStyle get headlineSmall => h3;
+
   static TextStyle get h1 => _baseFont.copyWith(
         fontSize: 32,
         fontWeight: FontWeight.bold,
@@ -50,6 +54,16 @@ class AppTextStyles {
         color: AppColors.textPrimary,
         height: 1.5,
       );
+
+  // Titles
+  static TextStyle get titleLarge => h4;
+  static TextStyle get titleMedium => h5;
+  static TextStyle get titleSmall => h6;
+
+  // Display
+  static TextStyle get displayLarge => h1;
+  static TextStyle get displayMedium => h2;
+  static TextStyle get displaySmall => h3;
 
   // Body text
   static TextStyle get bodyLarge => _baseFont.copyWith(

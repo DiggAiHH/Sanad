@@ -20,6 +20,8 @@ class _NfcCheckInScreenState extends ConsumerState<NfcCheckInScreen>
 
   late AnimationController _pulseController;
   late Animation<double> _pulseAnimation;
+  bool _isStartingScan = false;
+  bool _handledSuccess = false;
 
   @override
   void initState() {
@@ -49,6 +51,10 @@ class _NfcCheckInScreenState extends ConsumerState<NfcCheckInScreen>
   }
 
   Future<void> _startNfcScan() async {
+    if (_isStartingScan) {
+      return;
+    }
+    _isStartingScan = true;
     final nfcNotifier = ref.read(nfcStateNotifierProvider.notifier);
 
     final storage = ref.read(storageServiceProvider);
@@ -59,24 +65,29 @@ class _NfcCheckInScreenState extends ConsumerState<NfcCheckInScreen>
       nfcNotifier.markUnavailable(
         'Geräte-Credentials fehlen. Bitte in Secure Storage setzen: $_deviceIdKey / $_deviceSecretKey',
       );
+      _isStartingScan = false;
       return;
     }
 
     await nfcNotifier.startScanning(deviceId: deviceId, deviceSecret: deviceSecret);
+    _isStartingScan = false;
   }
 
   void _handleCheckInResult(NFCCheckInResponse response) {
+    if (_handledSuccess) {
+      return;
+    }
     final ticketNumber = response.ticketNumber;
     if (ticketNumber == null || ticketNumber.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Check-In erfolgreich, aber Ticketnummer fehlt.'),
-          backgroundColor: AppColors.error,
-        ),
+      ModernSnackBar.show(
+        context,
+        message: 'Check-In erfolgreich, aber Ticketnummer fehlt.',
+        type: SnackBarType.error,
       );
       return;
     }
 
+    _handledSuccess = true;
     // Erfolgreicher Check-in - zur Bestätigung navigieren
     context.push('/ticket/$ticketNumber', extra: {
       'patientName': response.patientName,
@@ -95,16 +106,12 @@ class _NfcCheckInScreenState extends ConsumerState<NfcCheckInScreen>
       next.maybeWhen(
         success: (response) => _handleCheckInResult(response),
         error: (message) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(message),
-              backgroundColor: AppColors.error,
-              action: SnackBarAction(
-                label: 'Erneut',
-                textColor: Colors.white,
-                onPressed: _startNfcScan,
-              ),
-            ),
+          ModernSnackBar.show(
+            context,
+            message: message,
+            type: SnackBarType.error,
+            actionLabel: 'Erneut',
+            onAction: _startNfcScan,
           );
         },
         orElse: () {},
@@ -131,7 +138,7 @@ class _NfcCheckInScreenState extends ConsumerState<NfcCheckInScreen>
               nfcState.when(
                 idle: () => _buildIdleState(),
                 scanning: () => _buildScanningState(),
-                processing: () => _buildProcessingState(),
+                processing: (_) => _buildProcessingState(),
                 success: (response) => _buildSuccessState(response),
                 error: (message) => _buildErrorState(message),
                 unavailable: (reason) => _buildUnavailableState(reason),
@@ -139,6 +146,21 @@ class _NfcCheckInScreenState extends ConsumerState<NfcCheckInScreen>
               const SizedBox(height: 48),
               // Anweisungen
               nfcState.maybeWhen(
+                idle: () => Column(
+                  children: [
+                    Text(
+                      'Bereit zum Scannen',
+                      style: AppTextStyles.h4,
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 12),
+                    PrimaryButton(
+                      label: 'Scan starten',
+                      icon: Icons.nfc,
+                      onPressed: _startNfcScan,
+                    ),
+                  ],
+                ),
                 scanning: () => Column(
                   children: [
                     Text(
@@ -149,14 +171,14 @@ class _NfcCheckInScreenState extends ConsumerState<NfcCheckInScreen>
                     const SizedBox(height: 8),
                     Text(
                       'Die NFC-Karte kurz an das Symbol halten',
-                      style: AppTextStyles.body.copyWith(
+                      style: AppTextStyles.bodyMedium.copyWith(
                         color: AppColors.textSecondary,
                       ),
                       textAlign: TextAlign.center,
                     ),
                   ],
                 ),
-                processing: () => Text(
+                processing: (_) => Text(
                   'Wird verarbeitet...',
                   style: AppTextStyles.h4,
                   textAlign: TextAlign.center,
@@ -171,7 +193,7 @@ class _NfcCheckInScreenState extends ConsumerState<NfcCheckInScreen>
                     const SizedBox(height: 8),
                     Text(
                       message,
-                      style: AppTextStyles.body.copyWith(
+                      style: AppTextStyles.bodyMedium.copyWith(
                         color: AppColors.textSecondary,
                       ),
                       textAlign: TextAlign.center,
@@ -194,7 +216,7 @@ class _NfcCheckInScreenState extends ConsumerState<NfcCheckInScreen>
                     const SizedBox(height: 8),
                     Text(
                       reason,
-                      style: AppTextStyles.body.copyWith(
+                      style: AppTextStyles.bodyMedium.copyWith(
                         color: AppColors.textSecondary,
                       ),
                       textAlign: TextAlign.center,
@@ -385,7 +407,7 @@ class _NfcCheckInScreenState extends ConsumerState<NfcCheckInScreen>
         border: Border.all(color: AppColors.error, width: 3),
       ),
       child: const Icon(
-        Icons.nfc_off,
+        Icons.nfc,
         size: 80,
         color: AppColors.error,
       ),

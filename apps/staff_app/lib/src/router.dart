@@ -26,6 +26,10 @@ final routerProvider = Provider<GoRouter>((ref) {
             routes: [
               GoRoute(
                 path: ':roomId',
+                redirect: (context, state) {
+                  final roomId = state.pathParameters['roomId'] ?? '';
+                  return roomId.trim().isEmpty ? '/chat' : null;
+                },
                 builder: (context, state) {
                   final roomId = state.pathParameters['roomId']!;
                   return ChatRoomScreen(roomId: roomId);
@@ -39,6 +43,10 @@ final routerProvider = Provider<GoRouter>((ref) {
             routes: [
               GoRoute(
                 path: ':taskId',
+                redirect: (context, state) {
+                  final taskId = state.pathParameters['taskId'] ?? '';
+                  return taskId.trim().isEmpty ? '/tasks' : null;
+                },
                 builder: (context, state) {
                   final taskId = state.pathParameters['taskId']!;
                   return TaskDetailScreen(taskId: taskId);

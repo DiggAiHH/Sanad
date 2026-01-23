@@ -45,6 +45,7 @@ class AppColors {
   static const Color surface = Color(0xFFFFFFFF);
   static const Color surfaceVariant = Color(0xFFF0F4F8);
   static const Color divider = Color(0xFFE0E0E0);
+  static const Color border = divider;
 
   // Text colors
   static const Color textPrimary = Color(0xFF212121);

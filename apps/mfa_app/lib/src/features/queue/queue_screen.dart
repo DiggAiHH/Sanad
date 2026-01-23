@@ -2,60 +2,89 @@ import 'package:flutter/material.dart';
 import 'package:sanad_ui/sanad_ui.dart';
 
 /// Queue management screen for MFA
-class QueueScreen extends StatelessWidget {
+class QueueScreen extends StatefulWidget {
   const QueueScreen({super.key});
 
   @override
+  State<QueueScreen> createState() => _QueueScreenState();
+}
+
+class _QueueScreenState extends State<QueueScreen> {
+  String _selectedFilter = 'Alle';
+  String _query = '';
+  DateTime _lastUpdated = DateTime.now();
+
+  @override
   Widget build(BuildContext context) {
+    final tickets = _filteredTickets();
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Warteschlange'),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
-            onPressed: () {},
+            onPressed: _refresh,
             tooltip: 'Aktualisieren',
           ),
         ],
       ),
-      body: Column(
-        children: [
-          // Queue status
-          const Padding(
-            padding: EdgeInsets.all(16),
-            child: QueueStatus(
+      body: RefreshIndicator(
+        onRefresh: _refreshAsync,
+        child: ListView(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          children: [
+            const QueueStatus(
               waitingCount: 8,
               inProgressCount: 2,
               averageWaitMinutes: 12,
             ),
-          ),
-          // Filter tabs
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Row(
+            const SizedBox(height: 8),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                _buildFilterChip('Alle', true),
-                const SizedBox(width: 8),
-                _buildFilterChip('A', false, color: AppColors.primary),
-                const SizedBox(width: 8),
-                _buildFilterChip('B', false, color: AppColors.error),
-                const SizedBox(width: 8),
-                _buildFilterChip('C', false, color: AppColors.success),
-                const SizedBox(width: 8),
-                _buildFilterChip('D', false, color: AppColors.warning),
+                Icon(Icons.update, size: 16, color: AppColors.textSecondary),
+                const SizedBox(width: 6),
+                Text(
+                  'Aktualisiert: ${_formatTime(context, _lastUpdated)}',
+                  style: AppTextStyles.bodySmall.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
+                ),
               ],
             ),
-          ),
-          const SizedBox(height: 16),
-          // Ticket list
-          Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              itemCount: 10,
-              itemBuilder: (context, index) => _buildTicketItem(context, index),
+            const SizedBox(height: 16),
+            SearchInput(
+              hint: 'Ticket oder Patient suchen...',
+              onChanged: (value) => setState(() => _query = value.trim()),
+              onClear: () => setState(() => _query = ''),
             ),
-          ),
-        ],
+            const SizedBox(height: 12),
+            _buildFilterRow(tickets.length),
+            const SizedBox(height: 16),
+            ScreenState(
+              isEmpty: tickets.isEmpty,
+              emptyTitle: 'Keine Tickets',
+              emptySubtitle: 'Für diese Kategorie sind aktuell keine Tickets vorhanden.',
+              emptyActionLabel: 'Filter zurücksetzen',
+              onAction: () => setState(() => _selectedFilter = 'Alle'),
+              child: Column(
+                children: [
+                  ...tickets.map(
+                    (ticket) => _buildTicketItem(
+                      context,
+                      ticket.number,
+                      ticket.color,
+                      ticket.status,
+                      ticket.waitMinutes,
+                      ticket.patientName,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _callNext(context),
@@ -65,26 +94,48 @@ class QueueScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildFilterChip(String label, bool selected, {Color? color}) {
-    return FilterChip(
-      label: Text(label),
-      selected: selected,
-      selectedColor: color?.withOpacity(0.2),
-      checkmarkColor: color,
-      onSelected: (value) {},
+  Widget _buildFilterRow(int resultCount) {
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(right: 8, top: 4),
+          child: Text(
+            'Ergebnisse: $resultCount',
+            style: AppTextStyles.bodySmall.copyWith(
+              color: AppColors.textSecondary,
+            ),
+          ),
+        ),
+        _buildFilterChip('Alle', color: AppColors.primary),
+        _buildFilterChip('A', color: AppColors.primary),
+        _buildFilterChip('B', color: AppColors.error),
+        _buildFilterChip('C', color: AppColors.success),
+        _buildFilterChip('D', color: AppColors.warning),
+      ],
     );
   }
 
-  Widget _buildTicketItem(BuildContext context, int index) {
-    final prefixes = ['A', 'B', 'C', 'D'];
-    final prefix = prefixes[index % prefixes.length];
-    final number = 30 + index;
-    final ticketNumber = '$prefix$number';
-    final colors = [AppColors.primary, AppColors.error, AppColors.success, AppColors.warning];
-    final color = colors[index % colors.length];
-    final statuses = ['waiting', 'waiting', 'called', 'waiting'];
-    final status = statuses[index % statuses.length];
+  Widget _buildFilterChip(String label, {Color? color}) {
+    final isSelected = _selectedFilter == label;
+    return FilterChip(
+      label: Text(label),
+      selected: isSelected,
+      selectedColor: color?.withOpacity(0.2),
+      checkmarkColor: color,
+      onSelected: (_) => setState(() => _selectedFilter = label),
+    );
+  }
 
+  Widget _buildTicketItem(
+    BuildContext context,
+    String ticketNumber,
+    Color color,
+    String status,
+    int waitMinutes,
+    String patientName,
+  ) {
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
       child: ListTile(
@@ -103,12 +154,12 @@ class QueueScreen extends StatelessWidget {
             ),
           ),
         ),
-        title: Text('Patient ${index + 1}'),
+        title: Text(patientName),
         subtitle: Row(
           children: [
             const Icon(Icons.schedule, size: 14, color: AppColors.textSecondary),
             const SizedBox(width: 4),
-            Text('Wartet seit ${5 + index * 2} Min.'),
+            Text('Wartet seit $waitMinutes Min.'),
           ],
         ),
         trailing: Row(
@@ -117,7 +168,7 @@ class QueueScreen extends StatelessWidget {
             if (status == 'called')
               StatusBadge.info('Aufgerufen', icon: Icons.campaign)
             else
-              StatusBadge(
+              const StatusBadge(
                 text: 'Wartend',
                 color: AppColors.waiting,
               ),
@@ -136,6 +187,58 @@ class QueueScreen extends StatelessWidget {
         onTap: () => _showTicketDetails(context, ticketNumber),
       ),
     );
+  }
+
+  void _refresh() {
+    setState(() => _lastUpdated = DateTime.now());
+  }
+
+  Future<void> _refreshAsync() async {
+    await Future.delayed(const Duration(milliseconds: 300));
+    if (mounted) {
+      _refresh();
+    }
+  }
+
+  String _formatTime(BuildContext context, DateTime time) {
+    final localizations = MaterialLocalizations.of(context);
+    final timeOfDay = TimeOfDay.fromDateTime(time);
+    return localizations.formatTimeOfDay(
+      timeOfDay,
+      alwaysUse24HourFormat: MediaQuery.of(context).alwaysUse24HourFormat,
+    );
+  }
+
+  List<_QueueTicket> _filteredTickets() {
+    final tickets = _demoTickets();
+    if (_selectedFilter == 'Alle') {
+      return _filterByQuery(tickets);
+    }
+    return _filterByQuery(
+      tickets.where((ticket) => ticket.number.startsWith(_selectedFilter)).toList(),
+    );
+  }
+
+  List<_QueueTicket> _filterByQuery(List<_QueueTicket> tickets) {
+    if (_query.isEmpty) return tickets;
+    final q = _query.toLowerCase();
+    return tickets.where((ticket) {
+      return ticket.number.toLowerCase().contains(q) ||
+          ticket.patientName.toLowerCase().contains(q);
+    }).toList();
+  }
+
+  List<_QueueTicket> _demoTickets() {
+    return [
+      _QueueTicket('A33', AppColors.primary, 'waiting', 8, 'Max Mustermann'),
+      _QueueTicket('B12', AppColors.error, 'waiting', 12, 'Lea Hoffmann'),
+      _QueueTicket('C07', AppColors.success, 'called', 4, 'Ahmet Yilmaz'),
+      _QueueTicket('D21', AppColors.warning, 'waiting', 16, 'Maria Keller'),
+      _QueueTicket('A34', AppColors.primary, 'waiting', 6, 'Jonas Weber'),
+      _QueueTicket('B13', AppColors.error, 'waiting', 10, 'Lina Becker'),
+      _QueueTicket('C08', AppColors.success, 'waiting', 14, 'David Roth'),
+      _QueueTicket('D22', AppColors.warning, 'called', 3, 'Sara Klein'),
+    ];
   }
 
   void _callNext(BuildContext context) {
@@ -226,4 +329,20 @@ class QueueScreen extends StatelessWidget {
       ),
     );
   }
+}
+
+class _QueueTicket {
+  final String number;
+  final Color color;
+  final String status;
+  final int waitMinutes;
+  final String patientName;
+
+  const _QueueTicket(
+    this.number,
+    this.color,
+    this.status,
+    this.waitMinutes,
+    this.patientName,
+  );
 }

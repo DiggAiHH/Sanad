@@ -11,13 +11,13 @@ All endpoints require authenticated admin access.
 """
 
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Optional
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import BaseModel, Field
-from sqlalchemy import func, select, and_, case
+from sqlalchemy import func, select, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
@@ -30,7 +30,6 @@ from app.models.models import (
     TicketStatus,
     User,
     UserRole,
-    Zone,
 )
 
 logger = logging.getLogger(__name__)
@@ -58,7 +57,9 @@ class DailyStats(BaseModel):
     completed_tickets: int = Field(..., description="Tickets marked complete")
     no_show_tickets: int = Field(..., description="Tickets marked no-show")
     average_wait_minutes: float = Field(..., description="Average wait time in minutes")
-    peak_hour: Optional[int] = Field(None, description="Hour with most check-ins (0-23)")
+    peak_hour: Optional[int] = Field(
+        None, description="Hour with most check-ins (0-23)"
+    )
     nfc_checkins: int = Field(0, description="Check-ins via NFC")
     manual_checkins: int = Field(0, description="Manual check-ins")
 
@@ -134,7 +135,7 @@ async def get_analytics_summary(
     """
     _require_admin(current_user)
 
-    end_date = datetime.utcnow()
+    end_date = datetime.now(timezone.utc)
     start_date = end_date - timedelta(days=days)
 
     # Pre-aggregate check-in events to avoid per-day DB scans
@@ -169,7 +170,9 @@ async def get_analytics_summary(
         method = row.check_in_method
 
         method_bucket = "nfc" if method == CheckInMethod.NFC else "other"
-        daily_method_counts.setdefault(day_key, {"nfc": 0, "other": 0})[method_bucket] += count
+        daily_method_counts.setdefault(day_key, {"nfc": 0, "other": 0})[
+            method_bucket
+        ] += count
         daily_hour_counts.setdefault(day_key, {}).setdefault(hour_key, 0)
         daily_hour_counts[day_key][hour_key] += count
         overall_hour_counts[hour_key] += count
@@ -200,9 +203,7 @@ async def get_analytics_summary(
     # Get average wait time (for completed tickets)
     avg_wait_result = await db.execute(
         select(
-            func.avg(
-                func.extract("epoch", Ticket.called_at - Ticket.created_at) / 60
-            )
+            func.avg(func.extract("epoch", Ticket.called_at - Ticket.created_at) / 60)
         ).where(
             and_(
                 Ticket.created_at >= start_date,
@@ -277,7 +278,9 @@ async def get_analytics_summary(
         peak_hour = None
 
         if day_key in daily_hour_counts and daily_hour_counts[day_key]:
-            peak_hour = max(daily_hour_counts[day_key], key=daily_hour_counts[day_key].get)
+            peak_hour = max(
+                daily_hour_counts[day_key], key=daily_hour_counts[day_key].get
+            )
 
         # If no check-in events recorded, assume manual check-ins equal total tickets
         if day_nfc == 0 and day_manual == 0:
@@ -298,7 +301,7 @@ async def get_analytics_summary(
 
     # Queue performance
     queue_performance: list[QueuePerformance] = []
-    queues_result = await db.execute(select(Queue).where(Queue.is_active == True))
+    queues_result = await db.execute(select(Queue).where(Queue.is_active.is_(True)))
     queues = list(queues_result.scalars().all())
 
     for queue in queues:
@@ -414,14 +417,12 @@ async def get_wait_time_distribution(
     """
     _require_admin(current_user)
 
-    end_date = datetime.utcnow()
+    end_date = datetime.now(timezone.utc)
     start_date = end_date - timedelta(days=days)
 
     # Get all completed tickets with wait times
     result = await db.execute(
-        select(
-            func.extract("epoch", Ticket.called_at - Ticket.created_at) / 60
-        ).where(
+        select(func.extract("epoch", Ticket.called_at - Ticket.created_at) / 60).where(
             and_(
                 Ticket.created_at >= start_date,
                 Ticket.created_at <= end_date,
@@ -459,8 +460,7 @@ async def get_wait_time_distribution(
         "total_completed": total,
         "distribution": buckets,
         "percentages": {
-            k: round(v / total * 100, 1) if total > 0 else 0
-            for k, v in buckets.items()
+            k: round(v / total * 100, 1) if total > 0 else 0 for k, v in buckets.items()
         },
     }
 
@@ -482,7 +482,7 @@ async def get_hourly_pattern(
     """
     _require_admin(current_user)
 
-    end_date = datetime.utcnow()
+    end_date = datetime.now(timezone.utc)
     start_date = end_date - timedelta(days=days)
 
     # Initialize all hours to 0

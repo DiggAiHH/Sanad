@@ -7,6 +7,8 @@ class AppTheme {
   AppTheme._();
 
   /// Light theme
+  static ThemeData get lightTheme => light;
+
   static ThemeData get light {
     return ThemeData(
       useMaterial3: true,
@@ -32,7 +34,7 @@ class AppTheme {
         foregroundColor: AppColors.textPrimary,
         surfaceTintColor: Colors.transparent,
       ),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         elevation: 2,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
@@ -114,6 +116,8 @@ class AppTheme {
   }
 
   /// Dark theme
+  static ThemeData get darkTheme => dark;
+
   static ThemeData get dark {
     return ThemeData(
       useMaterial3: true,
@@ -139,7 +143,7 @@ class AppTheme {
         foregroundColor: AppColors.darkTextPrimary,
         surfaceTintColor: Colors.transparent,
       ),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         elevation: 2,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),

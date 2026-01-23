@@ -35,6 +35,7 @@ class AppConstants {
   static const String keyPracticeId = 'practice_id';
   static const String keyThemeMode = 'theme_mode';
   static const String keyLocale = 'locale';
+  static const String keyLastTicketNumber = 'last_ticket_number';
 
   // Animation durations
   static const Duration animationFast = Duration(milliseconds: 150);

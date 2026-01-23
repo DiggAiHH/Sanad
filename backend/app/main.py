@@ -6,17 +6,47 @@ A medical practice management system API built with FastAPI.
 
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator
+import logging
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import get_settings
 from app.database import engine, Base
-from app.routers import auth, users, queue, tickets, chat, practice, nfc, led, websocket, push, analytics
+from app.routers import (
+    auth,
+    users,
+    queue,
+    tickets,
+    chat,
+    practice,
+    nfc,
+    led,
+    websocket,
+    push,
+    analytics,
+    document_requests,
+    consultations,
+)
+# Online-Rezeption Module
+from app.routers import (
+    privacy,
+    appointments,
+    anamnesis,
+    symptom_checker,
+    lab_results,
+    medications,
+    vaccinations,
+    forms,
+    workflows,
+)
 from app.middleware import (
     CorrelationIdMiddleware,
     RequestLoggingMiddleware,
     PrometheusMiddleware,
+    RateLimitMiddleware,
+    SecurityHeadersMiddleware,
+    RequestSizeLimitMiddleware,
     PROMETHEUS_AVAILABLE,
     configure_logging,
     metrics_endpoint,
@@ -24,6 +54,7 @@ from app.middleware import (
 
 
 settings = get_settings()
+logger = logging.getLogger(__name__)
 
 
 async def init_db() -> None:
@@ -36,9 +67,10 @@ async def seed_demo_data() -> None:
     """Seed demo data for testing if enabled."""
     if not settings.SEED_ON_STARTUP:
         return
-    
+
     try:
         from app.seed_data import seed_database
+
         await seed_database()
         logger.info("Demo-Daten geladen")
     except Exception as e:
@@ -49,20 +81,21 @@ async def seed_demo_data() -> None:
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     """
     Application lifespan handler for startup/shutdown events.
-    
+
     Args:
         app: FastAPI application instance.
-        
+
     Yields:
         None: Application is running.
     """
     # Configure structured logging
     configure_logging(json_format=not settings.DEBUG)
-    
+
     # Startup
     logger.info(f"Starting {settings.APP_NAME} v{settings.APP_VERSION}")
-    await init_db()
-    await seed_demo_data()
+    if not settings.TESTING:
+        await init_db()
+        await seed_demo_data()
     yield
     # Shutdown
     logger.info(f"Shutting down {settings.APP_NAME}")
@@ -88,6 +121,13 @@ app.add_middleware(
 )
 
 # Observability Middleware (order matters: first added = outermost)
+app.add_middleware(SecurityHeadersMiddleware, enable_hsts=settings.ENABLE_HSTS)
+app.add_middleware(
+    RequestSizeLimitMiddleware, max_request_size_mb=settings.MAX_REQUEST_SIZE_MB
+)
+app.add_middleware(
+    RateLimitMiddleware, requests_per_minute=settings.RATE_LIMIT_PER_MINUTE
+)
 app.add_middleware(RequestLoggingMiddleware)
 app.add_middleware(CorrelationIdMiddleware)
 if PROMETHEUS_AVAILABLE:
@@ -101,6 +141,18 @@ app.include_router(tickets.router, prefix="/api/v1/tickets", tags=["Tickets"])
 app.include_router(chat.router, prefix="/api/v1/chat", tags=["Chat"])
 app.include_router(practice.router, prefix="/api/v1/practice", tags=["Practice"])
 
+# Patient Features
+app.include_router(
+    document_requests.router,
+    prefix="/api/v1/document-requests",
+    tags=["Document Requests"]
+)
+app.include_router(
+    consultations.router,
+    prefix="/api/v1/consultations",
+    tags=["Consultations (Video/Voice/Chat)"]
+)
+
 # Zero-Touch Reception Routers
 app.include_router(nfc.router, prefix="/api/v1", tags=["NFC"])
 app.include_router(led.router, prefix="/api/v1", tags=["LED & Wayfinding"])
@@ -112,12 +164,79 @@ app.include_router(push.router, prefix="/api/v1", tags=["Push Notifications"])
 # Analytics
 app.include_router(analytics.router, prefix="/api/v1", tags=["Analytics"])
 
+# =====================================================================
+# Online-Rezeption / Hausarzt-Automatisierung
+# =====================================================================
+
+# DSGVO / Privacy
+app.include_router(
+    privacy.router,
+    prefix="/api/v1",
+    tags=["Privacy & DSGVO"]
+)
+
+# Online-Terminbuchung
+app.include_router(
+    appointments.router,
+    prefix="/api/v1",
+    tags=["Online Appointments"]
+)
+
+# Digitale Anamnese
+app.include_router(
+    anamnesis.router,
+    prefix="/api/v1",
+    tags=["Digital Anamnesis"]
+)
+
+# Symptom-Checker & Triage
+app.include_router(
+    symptom_checker.router,
+    prefix="/api/v1",
+    tags=["Symptom Checker"]
+)
+
+# Laborbefunde
+app.include_router(
+    lab_results.router,
+    prefix="/api/v1",
+    tags=["Lab Results"]
+)
+
+# Medikationsplan
+app.include_router(
+    medications.router,
+    prefix="/api/v1",
+    tags=["Medications"]
+)
+
+# Impfpass & Recall
+app.include_router(
+    vaccinations.router,
+    prefix="/api/v1",
+    tags=["Vaccinations & Recall"]
+)
+
+# Praxis-Formulare
+app.include_router(
+    forms.router,
+    prefix="/api/v1",
+    tags=["Practice Forms"]
+)
+
+# Workflow-Automatisierung
+app.include_router(
+    workflows.router,
+    prefix="/api/v1",
+    tags=["Workflow Automation"]
+)
+
 
 @app.get("/health", tags=["Health"])
 async def health_check() -> dict[str, str]:
     """
     Health check endpoint for container orchestration.
-    
+
     Returns:
         dict: Health status.
     """
@@ -133,7 +252,7 @@ if PROMETHEUS_AVAILABLE and metrics_endpoint:
 async def root() -> dict[str, str]:
     """
     Root endpoint with API information.
-    
+
     Returns:
         dict: API welcome message.
     """

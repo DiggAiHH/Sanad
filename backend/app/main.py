@@ -8,8 +8,10 @@ from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 import logging
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 
 from app.config import get_settings
 from app.database import engine, Base
@@ -49,6 +51,7 @@ from app.middleware import (
     RequestSizeLimitMiddleware,
     PROMETHEUS_AVAILABLE,
     configure_logging,
+    get_correlation_id,
     metrics_endpoint,
 )
 
@@ -110,6 +113,56 @@ app = FastAPI(
     docs_url="/docs",
     redoc_url="/redoc",
 )
+
+
+@app.exception_handler(HTTPException)
+async def http_exception_handler(request: Request, exc: HTTPException) -> JSONResponse:
+    """
+    Return JSON error responses for HTTP exceptions.
+
+    Args:
+        request: Incoming request.
+        exc: Raised HTTPException.
+
+    Returns:
+        JSONResponse: Structured error payload.
+    """
+    correlation_id = get_correlation_id()
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={
+            "detail": exc.detail,
+            "error_code": "http_exception",
+            "correlation_id": correlation_id,
+        },
+        headers={"X-Correlation-ID": correlation_id} if correlation_id else None,
+    )
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(
+    request: Request, exc: RequestValidationError
+) -> JSONResponse:
+    """
+    Return JSON error responses for validation errors.
+
+    Args:
+        request: Incoming request.
+        exc: Validation error details.
+
+    Returns:
+        JSONResponse: Structured error payload.
+    """
+    correlation_id = get_correlation_id()
+    return JSONResponse(
+        status_code=422,
+        content={
+            "detail": exc.errors(),
+            "error_code": "validation_error",
+            "correlation_id": correlation_id,
+        },
+        headers={"X-Correlation-ID": correlation_id} if correlation_id else None,
+    )
 
 # CORS Middleware - includes Netlify domains
 app.add_middleware(

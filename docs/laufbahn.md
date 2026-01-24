@@ -150,6 +150,15 @@ packages/
 | require_roles Alias | ✅ | Router-Import Bugfix |
 | Backend Tests | ✅ | 3 neue Tests (Headers/Size/Rate) |
 
+### Phase 12: Backend Reliability ✅
+
+| Aktion | Status | Notizen |
+|--------|--------|---------|
+| RateLimit Skip-Paths | ✅ | /health und /metrics ausgenommen |
+| Error Handler HTTPException | ✅ | JSON Fehlerformat mit correlation_id |
+| Error Handler Validation | ✅ | JSON Fehlerformat mit detail[] |
+| Backend Tests | ✅ | 2 neue Handler-Tests |
+
 ---
 
 ## 4. Dateiregister

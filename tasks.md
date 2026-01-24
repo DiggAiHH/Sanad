@@ -45,10 +45,10 @@
 22. [x] Widgets Package: Alle Widgets auf Tokens umstellen (Tokens exportiert)
 
 ### E. Dark Mode Coverage (23-26)
-23. [ ] Patient App: Dark Mode in home_screen.dart testen/fixen
-24. [ ] Patient App: Dark Mode in info_screen.dart testen/fixen
-25. [ ] Admin App: Dashboard Dark Mode prüfen
-26. [ ] Staff App: Dark Mode in Tasks prüfen
+23. [x] Patient App: Dark Mode in home_screen.dart testen/fixen (AppColors.surface statt Colors.white)
+24. [x] Patient App: Dark Mode in info_screen.dart testen/fixen (AppColors.surface verwendet)
+25. [x] Admin App: Dashboard Dark Mode prüfen (AppTheme.darkTheme eingebunden)
+26. [x] Staff App: Dark Mode in Tasks prüfen (ThemeModeProvider aktiv)
 
 ### F. Finalisierung & Deployment (27-30)
 27. [ ] Build: bash scripts/build_web.sh
@@ -92,3 +92,25 @@
 14. [x] Doku: laufbahn.md Offene Aufgaben/Status aktualisieren
 15. [x] Tasklist: Backend Punkte abhaken
 16. [x] Verify: Backend Tests laufen
+
+---
+
+# Backend Reliability Sprint (Phase 12)
+
+> Status: In Progress
+> Fokus: Fehler-Responses, RateLimit-Ausnahmen, Doku, Tests
+> Start: 2026-01-24
+
+## Tasklist (Backend Phase 12)
+1. [x] Initiation: memory_log.md gelesen und Regeln beachtet
+2. [x] Initiation: copilot-instructions.md + laufbahn.md gelesen
+3. [x] Tasklist fuer Phase 12 erstellt (dieser Eintrag)
+4. [x] RateLimit: Skip-Paths fuer /health und /metrics ergaenzen
+5. [x] Error Handling: globale JSON-Handler fuer HTTPException
+6. [x] Error Handling: globale JSON-Handler fuer ValidationError
+7. [x] Tests: HTTPException Handler (401) verifizieren
+8. [x] Tests: ValidationError Handler (422) verifizieren
+9. [x] Doku: memory_log.md aktualisieren (Phase 12)
+10. [x] Doku: laufbahn.md aktualisieren (Phase 12)
+11. [x] Tasklist: Phase 12 Punkte abhaken
+12. [x] Verify: Backend Tests laufen

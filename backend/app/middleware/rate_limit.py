@@ -44,6 +44,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         self._window_seconds = 60.0
         self._requests: DefaultDict[str, Deque[float]] = defaultdict(deque)
         self._lock = asyncio.Lock()
+        self._skip_paths = {"/health", "/metrics"}
 
     async def dispatch(
         self,
@@ -68,6 +69,9 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
             - Does not protect against distributed attacks.
         """
         if self.requests_per_minute <= 0:
+            return await call_next(request)
+
+        if request.url.path in self._skip_paths:
             return await call_next(request)
 
         now = time.monotonic()

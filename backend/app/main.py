@@ -12,6 +12,7 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app.config import get_settings
 from app.database import engine, Base
@@ -124,6 +125,32 @@ async def http_exception_handler(request: Request, exc: HTTPException) -> JSONRe
     Args:
         request: Incoming request.
         exc: Raised HTTPException.
+
+    Returns:
+        JSONResponse: Structured error payload.
+    """
+    correlation_id = get_correlation_id()
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={
+            "detail": exc.detail,
+            "error_code": "http_exception",
+            "correlation_id": correlation_id,
+        },
+        headers={"X-Correlation-ID": correlation_id} if correlation_id else None,
+    )
+
+
+@app.exception_handler(StarletteHTTPException)
+async def starlette_http_exception_handler(
+    request: Request, exc: StarletteHTTPException
+) -> JSONResponse:
+    """
+    Return JSON error responses for Starlette HTTP exceptions (e.g. 404).
+
+    Args:
+        request: Incoming request.
+        exc: Raised Starlette HTTPException.
 
     Returns:
         JSONResponse: Structured error payload.

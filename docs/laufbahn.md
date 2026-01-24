@@ -2,7 +2,7 @@
 
 > **Letzte Aktualisierung:** 2026-01-24
 > **Agent-Version:** Senior Architect Agent v2025.2
-> **Status:** 🟡 Phase 9: Design System Refactoring
+> **Status:** 🟡 Phase 14: UI Polish Sprint (Build ausstehend)
 
 ---
 
@@ -167,6 +167,35 @@ packages/
 | Error Metrics | ✅ | record_error bei 500 |
 | Backend Tests | ✅ | 1 neuer 500-Handler Test |
 
+### Phase 14: Backend Reliability ✅
+
+| Aktion | Status | Notizen |
+|--------|--------|---------|
+| Starlette HTTP Handler | ✅ | 404/405 JSON Error Payloads |
+| RateLimit Skip-Pfade | ✅ | /docs, /redoc, /openapi.json ausgenommen |
+| Backend Tests | ✅ | 1 neuer 404-Handler Test |
+
+### Phase 14: UI Polish Sprint ⏳ (In Progress)
+
+| Aktion | Status | Notizen |
+|--------|--------|---------|
+| Design Tokens Audit | ✅ | Existierende Tokens in theme_extensions.dart identifiziert |
+| Farb-Migration Patient App | ✅ | Colors.white/grey → AppColors.surface/textSecondary |
+| BorderRadius Migration | ✅ | BorderRadius.circular → AppRadius.small/medium/large |
+| Spacing Migration | ✅ | EdgeInsets.all → AppSpacing.cardPadding |
+| Shadows Migration | ✅ | Inline BoxShadow → AppShadows.small |
+| tokens.dart Konflikt | ✅ | DEPRECATED gesetzt, Export entfernt |
+| Build | ⏳ | Ausstehend |
+| Deploy | ⏳ | Ausstehend |
+
+**Geänderte Dateien in Phase 14:**
+- `apps/patient_app/lib/features/home/screens/home_screen.dart`
+- `apps/patient_app/lib/features/info/screens/info_screen.dart`
+- `apps/patient_app/lib/features/anamnesis/screens/fill_anamnesis_screen.dart`
+- `apps/patient_app/lib/features/appointments/screens/my_appointments_screen.dart`
+- `packages/ui/lib/src/theme/tokens.dart` (DEPRECATED)
+- `packages/ui/lib/src/theme/theme.dart` (Export entfernt)
+
 ---
 
 ## 4. Dateiregister
@@ -196,8 +225,28 @@ packages/ui/lib/src/
 | P2 | **Refactor MFA App** | Prüfen auf inkonsistente Inputs | ✅ Abgeschlossen |
 | P3 | **Icon Consistency** | Sicherstellen, dass alle Icons Material Symbols verwenden | ✅ Geprüft |
 
+### 5.2 UI Polish Phase 14 (Aktuell)
+
+| Priorität | Aufgabe | Beschreibung | Status |
+|-----------|---------|--------------|--------|
+| P1 | **Build ausführen** | `bash scripts/build_web.sh` | ⏳ Ausstehend |
+| P2 | **Netlify Deploy** | `netlify deploy --prod --dir=build/web_deploy` | ⏳ Ausstehend |
+| P3 | **Git Commit** | Änderungen committen und pushen | ⏳ Ausstehend |
+
 ---
 
 ## 6. Annahmen & Risiken
 
-Keine neuen Risiken identifiziert.
+- tokens.dart wurde auf DEPRECATED gesetzt da Namenskonflikte mit existierenden Klassen (AppSpacing, AppRadius, AppShadows, AppTextStyles) in theme_extensions.dart und app_text_styles.dart bestanden.
+
+---
+
+## 7. Fortsetzungsanleitung
+
+**Für neuen Agent:**
+
+1. Diese Datei lesen (laufbahn.md)
+2. tasks.md lesen (aktuelle Phase 14 Tasks)
+3. Build ausführen: `bash scripts/build_web.sh`
+4. Falls Build erfolgreich: `netlify deploy --prod --dir=build/web_deploy`
+5. Git commit und push

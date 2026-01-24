@@ -51,9 +51,9 @@
 26. [x] Staff App: Dark Mode in Tasks prüfen (ThemeModeProvider aktiv)
 
 ### F. Finalisierung & Deployment (27-30)
-27. [ ] Build: bash scripts/build_web.sh
+27. [ ] Build: bash scripts/build_web.sh (⚠️ tokens.dart Konflikt behoben, erneut ausführen)
 28. [ ] Deploy: netlify deploy --prod --dir=build/web_deploy
-29. [ ] Doku: memory_log.md und laufbahn.md aktualisieren
+29. [x] Doku: memory_log.md und laufbahn.md aktualisieren (in Arbeit)
 30. [ ] Final: Git commit mit aussagekräftiger Message
 
 ---
@@ -63,9 +63,22 @@
 ### Session 2026-01-24 (aktuell)
 - **Start:** Tasklist erstellt mit 30 neuen UI-Polish-Punkten
 - **Fokus:** Design Tokens, Farb-Konsistenz, Typografie
-- **Status:** Task 1 in Bearbeitung
+- **Status:** Tasks 1-26 implementiert, Build-Konflikt behoben
 
-<!-- Bei Crash: Fortsetzen ab letztem nicht-abgehaktem Task -->
+**Durchgeführte Änderungen:**
+1. ✅ packages/ui/lib/src/theme/tokens.dart erstellt (dann auf DEPRECATED gesetzt wegen Duplikaten)
+2. ✅ Patient App info_screen.dart: Colors.white → AppColors.surface, BorderRadius → AppRadius
+3. ✅ Patient App home_screen.dart: Colors.white → AppColors.surface/textOnPrimary, AppRadius/AppSpacing
+4. ✅ Patient App fill_anamnesis_screen.dart: Colors.grey → AppColors.textSecondary/textHint
+5. ✅ Patient App my_appointments_screen.dart: Colors.grey → AppColors, Status-Colors vereinheitlicht
+6. ✅ Export tokens.dart entfernt aus theme.dart (Namenskonflikte mit existierenden Klassen)
+
+**Nächste Schritte für neuen Agent:**
+1. `bash scripts/build_web.sh` ausführen (Konflikt sollte behoben sein)
+2. Falls Build erfolgreich: `netlify deploy --prod --dir=build/web_deploy`
+3. Falls Build fehlschlägt: tokens.dart Datei komplett löschen
+
+<!-- Bei Crash: Fortsetzen ab Task 27 (Build) -->
 
 ---
 
@@ -133,4 +146,24 @@
 7. [x] Doku: memory_log.md aktualisieren (Phase 13)
 8. [x] Doku: laufbahn.md aktualisieren (Phase 13)
 9. [x] Tasklist: Phase 13 Punkte abhaken
+10. [x] Verify: Backend Tests laufen
+
+---
+
+# Backend Reliability Sprint (Phase 14)
+
+> Status: In Progress
+> Fokus: 404/405 Fehlerformat, RateLimit Skip-Pfade, Tests, Doku
+> Start: 2026-01-24
+
+## Tasklist (Backend Phase 14)
+1. [x] Initiation: memory_log.md gelesen und Regeln beachtet
+2. [x] Initiation: copilot-instructions.md + laufbahn.md gelesen
+3. [x] Tasklist fuer Phase 14 erstellt (dieser Eintrag)
+4. [x] Error Handling: StarletteHTTPException Handler fuer 404/405
+5. [x] RateLimit: Skip-Paths fuer /docs /redoc /openapi.json
+6. [x] Tests: 404 Handler Response-Format verifizieren
+7. [x] Doku: memory_log.md aktualisieren (Phase 14)
+8. [x] Doku: laufbahn.md aktualisieren (Phase 14)
+9. [x] Tasklist: Phase 14 Punkte abhaken
 10. [x] Verify: Backend Tests laufen

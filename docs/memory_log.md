@@ -178,6 +178,14 @@ packages/
 | Error Metrics | ✅ | record_error bei 500 |
 | Backend Tests | ✅ | 1 neuer 500-Handler Test |
 
+### Phase 14: Backend Reliability ✅
+
+| Aktion | Status | Notizen |
+|--------|--------|---------|
+| Starlette HTTP Handler | ✅ | 404/405 JSON Error Payloads |
+| RateLimit Skip-Pfade | ✅ | /docs, /redoc, /openapi.json ausgenommen |
+| Backend Tests | ✅ | 1 neuer 404-Handler Test |
+
 ---
 
 ## 4. Dateiregister
@@ -195,6 +203,27 @@ packages/ui/lib/src/
         └── sanad_dropdown.dart   # NEU
 ```
 
+### Phase 14: UI Polish Sprint ⏳ (In Progress)
+
+| Aktion | Status | Notizen |
+|--------|--------|---------|
+| Design Tokens Audit | ✅ | Existierende AppSpacing/AppRadius/AppShadows in theme_extensions.dart |
+| Patient App Farb-Migration | ✅ | Colors.white → AppColors.surface, Colors.grey → AppColors.textSecondary |
+| Patient App BorderRadius | ✅ | BorderRadius.circular → AppRadius.small/medium/large |
+| Patient App Spacing | ✅ | EdgeInsets.all → AppSpacing.cardPadding/cardPaddingLarge |
+| Patient App Shadows | ✅ | BoxShadow inline → AppShadows.small |
+| tokens.dart Konflikt | ✅ | Datei auf DEPRECATED gesetzt, Export entfernt |
+| Build | ⏳ | Ausstehend (Token-Konflikt behoben) |
+| Deploy | ⏳ | Ausstehend |
+
+**Geänderte Dateien:**
+- apps/patient_app/lib/features/home/screens/home_screen.dart
+- apps/patient_app/lib/features/info/screens/info_screen.dart
+- apps/patient_app/lib/features/anamnesis/screens/fill_anamnesis_screen.dart
+- apps/patient_app/lib/features/appointments/screens/my_appointments_screen.dart
+- packages/ui/lib/src/theme/tokens.dart (DEPRECATED)
+- packages/ui/lib/src/theme/theme.dart (Export entfernt)
+
 ---
 
 ## 5. Offene Aufgaben
@@ -206,6 +235,14 @@ packages/ui/lib/src/
 | P1 | **Refactor Patient App** | `DropdownButtonFormField` ersetzen | ✅ Abgeschlossen |
 | P2 | **Refactor MFA App** | Prüfen auf inkonsistente Inputs | ✅ Abgeschlossen |
 | P3 | **Icon Consistency** | Sicherstellen, dass alle Icons Material Symbols verwenden | ✅ Geprüft |
+
+### 5.2 UI Polish (Phase 14)
+
+| Priorität | Aufgabe | Beschreibung | Status |
+|-----------|---------|--------------|--------|
+| P1 | **Build ausführen** | bash scripts/build_web.sh | ⏳ |
+| P2 | **Deploy** | netlify deploy --prod | ⏳ |
+| P3 | **Git Commit** | Änderungen committen | ⏳ |
 
 ---
 

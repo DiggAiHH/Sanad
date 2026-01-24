@@ -44,7 +44,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         self._window_seconds = 60.0
         self._requests: DefaultDict[str, Deque[float]] = defaultdict(deque)
         self._lock = asyncio.Lock()
-        self._skip_paths = {"/health", "/metrics"}
+        self._skip_paths = {"/health", "/metrics", "/docs", "/redoc", "/openapi.json"}
 
     async def dispatch(
         self,

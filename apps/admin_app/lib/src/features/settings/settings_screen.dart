@@ -56,20 +56,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
             _buildSection(
               title: 'Warteschlangen-Einstellungen',
               children: [
-                _buildSwitchRow(
-                  'QR-Code Check-In',
-                  _qrCheckIn,
-                  (value) => _updateSetting(() => _qrCheckIn = value),
+                SanadToggle(
+                  label: 'QR-Code Check-In',
+                  value: _qrCheckIn,
+                  onChanged: (value) => _updateSetting(() => _qrCheckIn = value),
                 ),
-                _buildSwitchRow(
-                  'NFC Check-In',
-                  _nfcCheckIn,
-                  (value) => _updateSetting(() => _nfcCheckIn = value),
+                SanadToggle(
+                  label: 'NFC Check-In',
+                  value: _nfcCheckIn,
+                  onChanged: (value) => _updateSetting(() => _nfcCheckIn = value),
                 ),
-                _buildSwitchRow(
-                  'Automatische Wartezeit-Berechnung',
-                  _autoWait,
-                  (value) => _updateSetting(() => _autoWait = value),
+                SanadToggle(
+                  label: 'Automatische Wartezeit-Berechnung',
+                  value: _autoWait,
+                  onChanged: (value) => _updateSetting(() => _autoWait = value),
                 ),
                 _buildSliderRow(
                   'Standard-Terminlänge',
@@ -83,20 +83,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
             _buildSection(
               title: 'Patienten-App',
               children: [
-                _buildSwitchRow(
-                  'Aufklärungsvideos aktiviert',
-                  _eduVideos,
-                  (value) => _updateSetting(() => _eduVideos = value),
+                SanadToggle(
+                  label: 'Aufklärungsvideos aktiviert',
+                  value: _eduVideos,
+                  onChanged: (value) => _updateSetting(() => _eduVideos = value),
                 ),
-                _buildSwitchRow(
-                  'Push-Benachrichtigungen',
-                  _pushNotifications,
-                  (value) => _updateSetting(() => _pushNotifications = value),
+                SanadToggle(
+                  label: 'Push-Benachrichtigungen',
+                  value: _pushNotifications,
+                  onChanged: (value) => _updateSetting(() => _pushNotifications = value),
                 ),
-                _buildSwitchRow(
-                  'Wartezeit-Anzeige',
-                  _showWaitTime,
-                  (value) => _updateSetting(() => _showWaitTime = value),
+                SanadToggle(
+                  label: 'Wartezeit-Anzeige',
+                  value: _showWaitTime,
+                  onChanged: (value) => _updateSetting(() => _showWaitTime = value),
                 ),
               ],
             ),
@@ -161,19 +161,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
             child: Text(day, style: AppTextStyles.bodyMedium),
           ),
           Text(time, style: AppTextStyles.bodyMedium),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSwitchRow(String label, bool value, ValueChanged<bool> onChanged) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(label, style: AppTextStyles.bodyMedium),
-          Switch(value: value, onChanged: onChanged),
         ],
       ),
     );

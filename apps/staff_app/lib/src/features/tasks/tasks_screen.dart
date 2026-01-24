@@ -292,8 +292,9 @@ class _TasksScreenState extends State<TasksScreen> with SingleTickerProviderStat
             const SizedBox(height: 16),
             const TextInput(label: 'Beschreibung', hint: 'Details...', maxLines: 3),
             const SizedBox(height: 16),
-            DropdownButtonFormField<String>(
-              decoration: const InputDecoration(labelText: 'Zuweisen an'),
+            SanadDropdown<String>(
+              value: null,
+              label: 'Zuweisen an',
               items: const [
                 DropdownMenuItem(value: 'mfa1', child: Text('MFA Müller')),
                 DropdownMenuItem(value: 'mfa2', child: Text('MFA Schmidt')),
@@ -302,8 +303,9 @@ class _TasksScreenState extends State<TasksScreen> with SingleTickerProviderStat
               onChanged: (value) {},
             ),
             const SizedBox(height: 16),
-            DropdownButtonFormField<String>(
-              decoration: const InputDecoration(labelText: 'Priorität'),
+            SanadDropdown<String>(
+              value: null,
+              label: 'Priorität',
               items: const [
                 DropdownMenuItem(value: 'normal', child: Text('Normal')),
                 DropdownMenuItem(value: 'high', child: Text('Hoch')),

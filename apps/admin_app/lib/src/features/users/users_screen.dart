@@ -130,19 +130,22 @@ class _UsersScreenState extends State<UsersScreen> {
   }
 
   Widget _buildRoleFilter() {
-    return DropdownButton<String>(
-      value: _roleFilter,
-      items: const [
-        DropdownMenuItem(value: 'Alle', child: Text('Alle Rollen')),
-        DropdownMenuItem(value: 'Admin', child: Text('Admin')),
-        DropdownMenuItem(value: 'Arzt', child: Text('Arzt')),
-        DropdownMenuItem(value: 'MFA', child: Text('MFA')),
-        DropdownMenuItem(value: 'Patient', child: Text('Patient')),
-      ],
-      onChanged: (value) {
-        if (value == null) return;
-        setState(() => _roleFilter = value);
-      },
+    return SizedBox(
+      width: 200,
+      child: SanadDropdown<String>(
+        value: _roleFilter,
+        items: const [
+          DropdownMenuItem(value: 'Alle', child: Text('Alle Rollen')),
+          DropdownMenuItem(value: 'Admin', child: Text('Admin')),
+          DropdownMenuItem(value: 'Arzt', child: Text('Arzt')),
+          DropdownMenuItem(value: 'MFA', child: Text('MFA')),
+          DropdownMenuItem(value: 'Patient', child: Text('Patient')),
+        ],
+        onChanged: (value) {
+          if (value == null) return;
+          setState(() => _roleFilter = value);
+        },
+      ),
     );
   }
 

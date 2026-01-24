@@ -211,4 +211,21 @@ Read tasks.md.
 Acknowledge context (e.g., "Senior Architect Sanad loaded. Layer 1-3 Active. Memory synced.").
 
 Await input."
-                                                                                         
+
+---
+
+## RULE 10: MANDATORY DEPLOYMENT & TESTING
+
+**Trigger:** After EVERY code change session.
+
+**Action:**
+1. **Build:** Run `bash scripts/build_web.sh` to compile all Flutter apps.
+2. **Deploy:** Run `netlify deploy --prod --dir=build/web_deploy` to push to Netlify.
+3. **OR Localhost:** If Netlify is unavailable, start a local server: `cd build/web_deploy && python3 -m http.server 8080` and provide the link.
+4. **Provide Links:** Always give the user the deployed URLs for testing:
+   - Admin: https://sanad-admin-diggaihh.netlify.app
+   - MFA: https://sanad-mfa-diggaihh.netlify.app
+   - Staff: https://sanad-staff-diggaihh.netlify.app
+   - Patient: https://sanad-patient-diggaihh.netlify.app
+
+**Rationale:** The user tests on Netlify. No deployment = No verification.

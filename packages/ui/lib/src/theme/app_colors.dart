@@ -49,8 +49,8 @@ class AppColors {
 
   // Text colors
   static const Color textPrimary = Color(0xFF212121);
-  static const Color textSecondary = Color(0xFF757575);
-  static const Color textHint = Color(0xFFBDBDBD);
+  static const Color textSecondary = Color(0xFF424242); // Darker for better contrast (was 0xFF757575)
+  static const Color textHint = Color(0xFF616161); // Darker for accessibility (was 0xFFBDBDBD)
   static const Color textOnPrimary = Color(0xFFFFFFFF);
   static const Color textOnSecondary = Color(0xFFFFFFFF);
 

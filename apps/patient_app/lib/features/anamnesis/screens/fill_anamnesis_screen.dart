@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:core/core.dart';
+import 'package:sanad_ui/sanad_ui.dart';
 
 /// Anamnese-Bogen ausfüllen Screen
 /// 
@@ -64,7 +65,7 @@ class _FillAnamnesisScreenState extends ConsumerState<FillAnamnesisScreen> {
           // Fortschrittsanzeige
           LinearProgressIndicator(
             value: progress,
-            backgroundColor: Colors.grey[200],
+            backgroundColor: AppColors.divider,
           ),
           Padding(
             padding: const EdgeInsets.all(16),
@@ -73,11 +74,11 @@ class _FillAnamnesisScreenState extends ConsumerState<FillAnamnesisScreen> {
               children: [
                 Text(
                   '${l10n.anamnesisSection} ${_currentSection + 1} ${l10n.of_} ${_template.sections.length}',
-                  style: TextStyle(color: Colors.grey[600]),
+                  style: const TextStyle(color: AppColors.textSecondary),
                 ),
                 Text(
                   '~${_template.estimatedMinutes} ${l10n.minutesAbbrev}',
-                  style: TextStyle(color: Colors.grey[600]),
+                  style: const TextStyle(color: AppColors.textSecondary),
                 ),
               ],
             ),
@@ -101,7 +102,7 @@ class _FillAnamnesisScreenState extends ConsumerState<FillAnamnesisScreen> {
                     const SizedBox(height: 8),
                     Text(
                       currentSectionData.description!,
-                      style: TextStyle(color: Colors.grey[600]),
+                      style: const TextStyle(color: AppColors.textSecondary),
                     ),
                   ],
                   const SizedBox(height: 24),
@@ -197,7 +198,7 @@ class _FillAnamnesisScreenState extends ConsumerState<FillAnamnesisScreen> {
             const SizedBox(height: 4),
             Text(
               question.description!,
-              style: TextStyle(color: Colors.grey[600], fontSize: 14),
+              style: const TextStyle(color: AppColors.textHint, fontSize: 14),
             ),
           ],
           const SizedBox(height: 12),
@@ -289,7 +290,7 @@ class _FillAnamnesisScreenState extends ConsumerState<FillAnamnesisScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('$min', style: TextStyle(color: Colors.grey[600])),
+                Text('$min', style: const TextStyle(color: AppColors.textSecondary)),
                 Text(
                   '$value',
                   style: const TextStyle(
@@ -297,7 +298,7 @@ class _FillAnamnesisScreenState extends ConsumerState<FillAnamnesisScreen> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                Text('$max', style: TextStyle(color: Colors.grey[600])),
+                Text('$max', style: const TextStyle(color: AppColors.textSecondary)),
               ],
             ),
             Slider(
@@ -556,7 +557,7 @@ class _SelectableButton extends StatelessWidget {
     return Material(
       color: isSelected 
           ? Theme.of(context).colorScheme.primaryContainer
-          : Colors.grey[100],
+          : AppColors.surfaceVariant,
       borderRadius: BorderRadius.circular(8),
       child: InkWell(
         onTap: onTap,

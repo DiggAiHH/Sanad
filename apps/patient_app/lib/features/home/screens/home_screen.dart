@@ -57,11 +57,11 @@ class HomeScreen extends ConsumerWidget {
                       height: 100,
                       decoration: BoxDecoration(
                         color: AppColors.primary,
-                        borderRadius: BorderRadius.circular(24),
+                        borderRadius: AppRadius.extraLarge,
                       ),
                       child: const Icon(
                         Icons.local_hospital,
-                        color: Colors.white,
+                        color: AppColors.textOnPrimary,
                         size: 48,
                       ),
                     ),
@@ -87,10 +87,10 @@ class HomeScreen extends ConsumerWidget {
               
               // Welcome Message
               Container(
-                padding: const EdgeInsets.all(20),
+                padding: AppSpacing.cardPaddingLarge,
                 decoration: BoxDecoration(
                   color: AppColors.primaryLight.withOpacity(0.3),
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: AppRadius.large,
                 ),
                 child: Column(
                   children: [
@@ -301,10 +301,10 @@ class _QuickStatCard extends StatelessWidget {
     return SizedBox(
       width: width,
       child: Container(
-        padding: const EdgeInsets.all(16),
+        padding: AppSpacing.cardPadding,
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(14),
+          color: AppColors.surface,
+          borderRadius: AppRadius.medium,
           border: Border.all(color: AppColors.border),
         ),
         child: Row(
@@ -314,7 +314,7 @@ class _QuickStatCard extends StatelessWidget {
               height: 36,
               decoration: BoxDecoration(
                 color: color.withOpacity(0.12),
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: AppRadius.small,
               ),
               child: Icon(icon, color: color, size: 18),
             ),
@@ -367,20 +367,14 @@ class _ActionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: AppSpacing.cardPaddingLarge,
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        color: AppColors.surface,
+        borderRadius: AppRadius.large,
         border: isPrimary 
             ? Border.all(color: AppColors.primary, width: 2)
             : Border.all(color: AppColors.border),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        boxShadow: AppShadows.small,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -394,11 +388,11 @@ class _ActionCard extends StatelessWidget {
                   color: isPrimary 
                       ? AppColors.primary 
                       : AppColors.primaryLight.withOpacity(0.5),
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: AppRadius.medium,
                 ),
                 child: Icon(
                   icon,
-                  color: isPrimary ? Colors.white : AppColors.primary,
+                  color: isPrimary ? AppColors.textOnPrimary : AppColors.primary,
                 ),
               ),
               const SizedBox(width: 16),
@@ -427,7 +421,7 @@ class _ActionCard extends StatelessWidget {
                     onPressed: onPressed,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primary,
-                      foregroundColor: Colors.white,
+                      foregroundColor: AppColors.textOnPrimary,
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -472,10 +466,10 @@ class _WaitTimeCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: AppSpacing.cardPadding,
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        color: AppColors.surface,
+        borderRadius: AppRadius.medium,
         border: Border.all(color: AppColors.border),
       ),
       child: Row(
@@ -485,7 +479,7 @@ class _WaitTimeCard extends StatelessWidget {
             height: 48,
             decoration: BoxDecoration(
               color: color.withOpacity(0.15),
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: AppRadius.small,
             ),
             child: Center(
               child: Text(

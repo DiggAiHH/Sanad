@@ -239,37 +239,37 @@ class WorkflowStatusUpdate {
   }
 }
 
-enum TaskPriority {
+enum WorkflowTaskPriority {
   low,
   medium,
   high,
   urgent,
 }
 
-TaskPriority taskPriorityFromJson(String value) {
+WorkflowTaskPriority workflowTaskPriorityFromJson(String value) {
   switch (value) {
     case 'low':
-      return TaskPriority.low;
+      return WorkflowTaskPriority.low;
     case 'medium':
-      return TaskPriority.medium;
+      return WorkflowTaskPriority.medium;
     case 'high':
-      return TaskPriority.high;
+      return WorkflowTaskPriority.high;
     case 'urgent':
-      return TaskPriority.urgent;
+      return WorkflowTaskPriority.urgent;
     default:
-      throw ArgumentError('Unknown TaskPriority: $value');
+      throw ArgumentError('Unknown WorkflowTaskPriority: $value');
   }
 }
 
-String taskPriorityToJson(TaskPriority priority) {
+String workflowTaskPriorityToJson(WorkflowTaskPriority priority) {
   switch (priority) {
-    case TaskPriority.low:
+    case WorkflowTaskPriority.low:
       return 'low';
-    case TaskPriority.medium:
+    case WorkflowTaskPriority.medium:
       return 'medium';
-    case TaskPriority.high:
+    case WorkflowTaskPriority.high:
       return 'high';
-    case TaskPriority.urgent:
+    case WorkflowTaskPriority.urgent:
       return 'urgent';
   }
 }
@@ -280,7 +280,7 @@ class PracticeTask {
   final String? description;
   final String? patientId;
   final String? assignedTo;
-  final TaskPriority priority;
+  final WorkflowTaskPriority priority;
   final DateTime? dueDate;
   final bool completed;
   final DateTime? completedAt;
@@ -315,7 +315,7 @@ class PracticeTask {
       description: json['description'] as String?,
       patientId: json['patient_id'] as String?,
       assignedTo: json['assigned_to'] as String?,
-      priority: taskPriorityFromJson(json['priority'] as String),
+      priority: workflowTaskPriorityFromJson(json['priority'] as String),
       dueDate: parseDate(json['due_date']),
       completed: json['completed'] as bool? ?? false,
       completedAt: parseDate(json['completed_at']),
@@ -331,7 +331,7 @@ class TaskCreateRequest {
   final String? description;
   final String? patientId;
   final String? assignedTo;
-  final TaskPriority priority;
+  final WorkflowTaskPriority priority;
   final DateTime? dueDate;
 
   const TaskCreateRequest({
@@ -339,7 +339,7 @@ class TaskCreateRequest {
     this.description,
     this.patientId,
     this.assignedTo,
-    this.priority = TaskPriority.medium,
+    this.priority = WorkflowTaskPriority.medium,
     this.dueDate,
   });
 
@@ -348,7 +348,7 @@ class TaskCreateRequest {
         if (description != null) 'description': description,
         if (patientId != null) 'patient_id': patientId,
         if (assignedTo != null) 'assigned_to': assignedTo,
-        'priority': taskPriorityToJson(priority),
+        'priority': workflowTaskPriorityToJson(priority),
         if (dueDate != null) 'due_date': dueDate!.toIso8601String(),
       };
 }

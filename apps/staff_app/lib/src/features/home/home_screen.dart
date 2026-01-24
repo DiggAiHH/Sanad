@@ -324,8 +324,9 @@ class _HomeScreenState extends State<HomeScreen> {
               maxLines: 3,
             ),
             const SizedBox(height: 16),
-            DropdownButtonFormField<String>(
-              decoration: const InputDecoration(labelText: 'Zuweisen an'),
+            SanadDropdown<String>(
+              value: null,
+              label: 'Zuweisen an',
               items: const [
                 DropdownMenuItem(value: 'mfa1', child: Text('MFA Müller')),
                 DropdownMenuItem(value: 'mfa2', child: Text('MFA Schmidt')),

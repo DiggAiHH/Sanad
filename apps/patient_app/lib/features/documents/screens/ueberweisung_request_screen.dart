@@ -74,9 +74,10 @@ class _UeberweisungRequestScreenState
               // Specialty Selection
               _buildSectionTitle('Fachrichtung *'),
               const SizedBox(height: 8),
-              DropdownButtonFormField<String>(
+              SanadDropdown<String>(
                 value: _selectedSpecialty,
-                decoration: _inputDecoration('Fachrichtung auswählen', Icons.local_hospital),
+                hint: 'Fachrichtung auswählen',
+                prefixIcon: const Icon(Icons.local_hospital),
                 items: _specialties
                     .map((s) => DropdownMenuItem(value: s, child: Text(s)))
                     .toList(),

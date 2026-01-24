@@ -289,13 +289,9 @@ class _BescheinigungRequestScreenState
                 ),
               ),
               const SizedBox(height: 8),
-              DropdownButtonFormField<String>(
+              SanadDropdown<String>(
                 value: _deliveryMethod,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
+                hint: 'Abholung/Zustellung auswählen',
                 items: const [
                   DropdownMenuItem(
                     value: 'pickup',

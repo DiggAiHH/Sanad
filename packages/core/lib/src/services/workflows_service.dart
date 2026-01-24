@@ -63,14 +63,14 @@ class WorkflowsService {
   Future<List<PracticeTask>> listTasks({
     String? assignedTo,
     bool? completed,
-    TaskPriority? priority,
+    WorkflowTaskPriority? priority,
   }) async {
     final response = await _dio.get(
       ApiEndpoints.workflowTasks,
       queryParameters: {
         if (assignedTo != null) 'assigned_to': assignedTo,
         if (completed != null) 'completed': completed,
-        if (priority != null) 'priority': taskPriorityToJson(priority),
+        if (priority != null) 'priority': workflowTaskPriorityToJson(priority),
       },
     );
     final items = response.data as List<dynamic>? ?? [];

@@ -70,17 +70,11 @@ class InfoScreen extends ConsumerWidget {
                 children: [
                   // Practice Header
                   Container(
-                    padding: const EdgeInsets.all(24),
+                    padding: AppSpacing.cardPaddingLarge,
                     decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
-                          blurRadius: 10,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
+                      color: AppColors.surface,
+                      borderRadius: AppRadius.large,
+                      boxShadow: AppShadows.small,
                     ),
                     child: Row(
                       children: [
@@ -89,11 +83,11 @@ class InfoScreen extends ConsumerWidget {
                           height: 72,
                           decoration: BoxDecoration(
                             color: AppColors.primary,
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: AppRadius.large,
                           ),
                           child: const Icon(
                             Icons.local_hospital,
-                            color: Colors.white,
+                            color: AppColors.textOnPrimary,
                             size: 36,
                           ),
                         ),
@@ -344,10 +338,10 @@ class _InfoCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(20),
+      padding: AppSpacing.cardPaddingLarge,
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        color: AppColors.surface,
+        borderRadius: AppRadius.large,
         border: Border.all(color: AppColors.border),
       ),
       child: child,
@@ -405,15 +399,15 @@ class _ContactCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(12),
+      color: AppColors.surface,
+      borderRadius: AppRadius.medium,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: AppRadius.medium,
         child: Container(
-          padding: const EdgeInsets.all(16),
+          padding: AppSpacing.cardPadding,
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: AppRadius.medium,
             border: Border.all(color: AppColors.border),
           ),
           child: Row(
@@ -423,7 +417,7 @@ class _ContactCard extends StatelessWidget {
                 height: 44,
                 decoration: BoxDecoration(
                   color: AppColors.primaryLight.withOpacity(0.3),
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: AppRadius.small,
                 ),
                 child: Icon(icon, color: AppColors.primary, size: 22),
               ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:core/core.dart';
+import 'package:sanad_ui/sanad_ui.dart';
 
 /// Meine Termine - Übersicht aller gebuchten Termine
 class MyAppointmentsScreen extends ConsumerStatefulWidget {
@@ -125,13 +126,13 @@ class _MyAppointmentsScreenState extends ConsumerState<MyAppointmentsScreen>
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, size: 64, color: Colors.grey[400]),
+          Icon(icon, size: 64, color: AppColors.textHint),
           const SizedBox(height: 16),
           Text(
             message,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 16,
-              color: Colors.grey[600],
+              color: AppColors.textSecondary,
             ),
           ),
         ],
@@ -296,22 +297,22 @@ class _AppointmentCard extends StatelessWidget {
               // Datum & Zeit
               Row(
                 children: [
-                  Icon(Icons.calendar_today, size: 16, color: Colors.grey[600]),
+                  const Icon(Icons.calendar_today, size: 16, color: AppColors.textSecondary),
                   const SizedBox(width: 8),
                   Text(
                     DateFormat('EEEE, dd. MMMM yyyy', 'de').format(appointment.date),
-                    style: TextStyle(color: Colors.grey[700]),
+                    style: const TextStyle(color: AppColors.textSecondary),
                   ),
                 ],
               ),
               const SizedBox(height: 4),
               Row(
                 children: [
-                  Icon(Icons.access_time, size: 16, color: Colors.grey[600]),
+                  const Icon(Icons.access_time, size: 16, color: AppColors.textSecondary),
                   const SizedBox(width: 8),
                   Text(
                     '${appointment.time} Uhr (${appointment.duration} ${l10n.minutesAbbrev})',
-                    style: TextStyle(color: Colors.grey[700]),
+                    style: const TextStyle(color: AppColors.textSecondary),
                   ),
                 ],
               ),
@@ -321,11 +322,11 @@ class _AppointmentCard extends StatelessWidget {
                 const SizedBox(height: 4),
                 Row(
                   children: [
-                    Icon(Icons.person, size: 16, color: Colors.grey[600]),
+                    const Icon(Icons.person, size: 16, color: AppColors.textSecondary),
                     const SizedBox(width: 8),
                     Text(
                       appointment.doctorName!,
-                      style: TextStyle(color: Colors.grey[700]),
+                      style: const TextStyle(color: AppColors.textSecondary),
                     ),
                   ],
                 ),
@@ -334,11 +335,11 @@ class _AppointmentCard extends StatelessWidget {
                 const SizedBox(height: 4),
                 Row(
                   children: [
-                    Icon(Icons.room, size: 16, color: Colors.grey[600]),
+                    const Icon(Icons.room, size: 16, color: AppColors.textSecondary),
                     const SizedBox(width: 8),
                     Text(
                       appointment.location!,
-                      style: TextStyle(color: Colors.grey[700]),
+                      style: const TextStyle(color: AppColors.textSecondary),
                     ),
                   ],
                 ),
@@ -350,17 +351,17 @@ class _AppointmentCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.blue[50],
+                    color: AppColors.info.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Row(
                     children: [
-                      Icon(Icons.assignment, size: 20, color: Colors.blue[700]),
+                      const Icon(Icons.assignment, size: 20, color: AppColors.info),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
                           l10n.appointmentFillAnamnesisReminder,
-                          style: TextStyle(color: Colors.blue[700], fontSize: 13),
+                          style: const TextStyle(color: AppColors.info, fontSize: 13),
                         ),
                       ),
                       TextButton(
@@ -383,15 +384,15 @@ class _AppointmentCard extends StatelessWidget {
   Color _getStatusColor(AppointmentStatus status) {
     switch (status) {
       case AppointmentStatus.pending:
-        return Colors.orange;
+        return AppColors.warning;
       case AppointmentStatus.confirmed:
-        return Colors.green;
+        return AppColors.success;
       case AppointmentStatus.cancelled:
-        return Colors.red;
+        return AppColors.error;
       case AppointmentStatus.completed:
-        return Colors.blue;
+        return AppColors.info;
       case AppointmentStatus.noShow:
-        return Colors.grey;
+        return AppColors.textSecondary;
     }
   }
 

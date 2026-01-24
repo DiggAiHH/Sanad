@@ -114,3 +114,23 @@
 10. [x] Doku: laufbahn.md aktualisieren (Phase 12)
 11. [x] Tasklist: Phase 12 Punkte abhaken
 12. [x] Verify: Backend Tests laufen
+
+---
+
+# Backend Reliability Sprint (Phase 13)
+
+> Status: In Progress
+> Fokus: Fehler-Handling 500, RateLimit Ausnahmen, Tests, Doku
+> Start: 2026-01-24
+
+## Tasklist (Backend Phase 13)
+1. [x] Initiation: memory_log.md gelesen und Regeln beachtet
+2. [x] Initiation: copilot-instructions.md + laufbahn.md gelesen
+3. [x] Tasklist fuer Phase 13 erstellt (dieser Eintrag)
+4. [x] Error Handling: Globaler 500-Handler mit sanitisiertem Output
+5. [x] Error Handling: Fehler-Metrik record_error fuer 500
+6. [x] Tests: 500-Handler Response-Format verifizieren
+7. [x] Doku: memory_log.md aktualisieren (Phase 13)
+8. [x] Doku: laufbahn.md aktualisieren (Phase 13)
+9. [x] Tasklist: Phase 13 Punkte abhaken
+10. [x] Verify: Backend Tests laufen

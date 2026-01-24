@@ -159,6 +159,14 @@ packages/
 | Error Handler Validation | ✅ | JSON Fehlerformat mit detail[] |
 | Backend Tests | ✅ | 2 neue Handler-Tests |
 
+### Phase 13: Backend Reliability ✅
+
+| Aktion | Status | Notizen |
+|--------|--------|---------|
+| Error Handler 500 | ✅ | Sanitized 500 Payload + correlation_id |
+| Error Metrics | ✅ | record_error bei 500 |
+| Backend Tests | ✅ | 1 neuer 500-Handler Test |
+
 ---
 
 ## 4. Dateiregister

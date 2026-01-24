@@ -52,6 +52,7 @@ from app.middleware import (
     PROMETHEUS_AVAILABLE,
     configure_logging,
     get_correlation_id,
+    record_error,
     metrics_endpoint,
 )
 
@@ -159,6 +160,33 @@ async def validation_exception_handler(
         content={
             "detail": exc.errors(),
             "error_code": "validation_error",
+            "correlation_id": correlation_id,
+        },
+        headers={"X-Correlation-ID": correlation_id} if correlation_id else None,
+    )
+
+
+@app.exception_handler(Exception)
+async def internal_exception_handler(
+    request: Request, exc: Exception
+) -> JSONResponse:
+    """
+    Return sanitized JSON error responses for unhandled exceptions.
+
+    Args:
+        request: Incoming request.
+        exc: Unhandled exception.
+
+    Returns:
+        JSONResponse: Structured error payload.
+    """
+    record_error("internal_error", request.url.path)
+    correlation_id = get_correlation_id()
+    return JSONResponse(
+        status_code=500,
+        content={
+            "detail": "Internal server error",
+            "error_code": "internal_error",
             "correlation_id": correlation_id,
         },
         headers={"X-Correlation-ID": correlation_id} if correlation_id else None,

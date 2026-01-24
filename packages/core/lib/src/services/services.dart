@@ -9,6 +9,13 @@ export 'public_ticket_service.dart';
 export 'public_practice_service.dart';
 export 'public_queue_summary_service.dart';
 export 'medication_service.dart';
+export 'appointment_service.dart';
+export 'anamnesis_service.dart';
+export 'symptom_checker_service.dart';
+export 'lab_results_service.dart';
+export 'vaccinations_service.dart';
+export 'forms_service.dart';
+export 'workflows_service.dart';
 
 // Document Requests & Consultations
 export 'document_request_service.dart';

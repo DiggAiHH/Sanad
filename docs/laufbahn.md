@@ -2400,3 +2400,21 @@ dependencies:
 4. **E2E-Tests:** Playwright für vollständige Patientenreisen
 5. **Performance:** Lazy-Loading für große Listen
 6. **Analytics:** Anonymisierte Nutzungsstatistiken
+
+---
+
+## 37. Session Log 2026-02-XX: Appointment API Integration (Phase 17)
+
+### 37.1 Umsetzung
+
+- Appointment-Core-Modelle + API-Mapping ergänzt (`Appointment`, `TimeSlot`, `ReminderSettings`)
+- AppointmentService inkl. Booking/Reschedule/Cancel/Reminder-Settings integriert
+- Provider-Integration über `core_providers.dart`
+- Unit-Tests für AppointmentService (Happy Paths + Abuse Cases)
+- `http_mock_adapter` als Dev-Dependency ergänzt (Test-Infrastruktur)
+
+### 37.2 Offene Punkte
+
+1. **Flutter-Integration:** Anamnesis, Symptom-Checker, Lab Results, Vaccinations, Forms, Workflows (Services + Models)
+2. **UI-Screens:** Symptom-Checker, Laborbefunde, Medikationsplan, Impfpass
+3. **PDF-Export:** Medikationsplan und Impfpass als PDF

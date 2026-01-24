@@ -13,6 +13,13 @@ import '../services/consultation_service.dart';
 import '../services/document_request_service.dart';
 import '../services/encryption_service.dart';
 import '../services/medication_service.dart';
+import '../services/appointment_service.dart';
+import '../services/anamnesis_service.dart';
+import '../services/symptom_checker_service.dart';
+import '../services/lab_results_service.dart';
+import '../services/vaccinations_service.dart';
+import '../services/forms_service.dart';
+import '../services/workflows_service.dart';
 import '../constants/app_constants.dart';
 
 /// Storage service provider - singleton
@@ -101,6 +108,48 @@ final documentRequestServiceProvider = Provider<DocumentRequestService>((ref) {
 final medicationServiceProvider = Provider<MedicationService>((ref) {
   final dio = ref.watch(dioProvider);
   return MedicationService(dio);
+});
+
+/// Appointment service provider - uses shared Dio instance.
+final appointmentServiceProvider = Provider<AppointmentService>((ref) {
+  final dio = ref.watch(dioProvider);
+  return AppointmentService(dio);
+});
+
+/// Anamnesis service provider - uses shared Dio instance.
+final anamnesisServiceProvider = Provider<AnamnesisService>((ref) {
+  final dio = ref.watch(dioProvider);
+  return AnamnesisService(dio);
+});
+
+/// Symptom checker service provider - uses shared Dio instance.
+final symptomCheckerServiceProvider = Provider<SymptomCheckerService>((ref) {
+  final dio = ref.watch(dioProvider);
+  return SymptomCheckerService(dio);
+});
+
+/// Lab results service provider - uses shared Dio instance.
+final labResultsServiceProvider = Provider<LabResultsService>((ref) {
+  final dio = ref.watch(dioProvider);
+  return LabResultsService(dio);
+});
+
+/// Vaccinations service provider - uses shared Dio instance.
+final vaccinationsServiceProvider = Provider<VaccinationsService>((ref) {
+  final dio = ref.watch(dioProvider);
+  return VaccinationsService(dio);
+});
+
+/// Forms service provider - uses shared Dio instance.
+final formsServiceProvider = Provider<FormsService>((ref) {
+  final dio = ref.watch(dioProvider);
+  return FormsService(dio);
+});
+
+/// Workflows service provider - uses shared Dio instance.
+final workflowsServiceProvider = Provider<WorkflowsService>((ref) {
+  final dio = ref.watch(dioProvider);
+  return WorkflowsService(dio);
 });
 
 /// Encryption service provider - singleton for E2E encryption.

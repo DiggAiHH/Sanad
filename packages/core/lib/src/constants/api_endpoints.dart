@@ -83,6 +83,18 @@ class ApiEndpoints {
   static String consultationEnd(String id) => '/consultations/$id/end';
   static String consultationCancel(String id) => '/consultations/my-consultations/$id/cancel';
   static String consultationMessagesRead(String id) => '/consultations/$id/messages/read';
+
+  // Appointments (Online-Terminbuchung)
+  static const String appointments = '/appointments';
+  static const String appointmentTypes = '/appointments/types';
+  static const String appointmentAvailability = '/appointments/availability';
+  static const String appointmentNextAvailable = '/appointments/next-available';
+  static const String appointmentBook = '/appointments/book';
+  static const String myAppointments = '/appointments/my';
+  static String appointment(String id) => '/appointments/$id';
+  static String appointmentReschedule(String id) => '/appointments/$id/reschedule';
+  static String appointmentReminderSettings(String id) =>
+      '/appointments/$id/reminder-settings';
   
   // WebRTC Signaling
   static String webrtcOffer(String consultationId) => '/consultations/$consultationId/signal/offer';
@@ -90,4 +102,58 @@ class ApiEndpoints {
   static String webrtcIce(String consultationId) => '/consultations/$consultationId/signal/ice';
   static String webrtcPoll(String consultationId) => '/consultations/$consultationId/signal/poll';
   static String webrtcClear(String consultationId) => '/consultations/$consultationId/signal';
+
+  // Anamnesis
+  static const String anamnesisTemplates = '/anamnesis/templates';
+  static String anamnesisTemplate(String id) => '/anamnesis/templates/$id';
+  static const String anamnesisSubmit = '/anamnesis/submit';
+  static const String anamnesisMySubmissions = '/anamnesis/my-submissions';
+  static String anamnesisSubmission(String id) => '/anamnesis/submission/$id';
+  static String anamnesisForAppointment(String appointmentId) =>
+      '/anamnesis/for-appointment/$appointmentId';
+
+  // Symptom checker
+  static const String symptomCatalog = '/symptom-checker/symptoms';
+  static const String symptomRedFlags = '/symptom-checker/red-flags';
+  static const String symptomCheck = '/symptom-checker/check';
+  static const String symptomSaveSession = '/symptom-checker/save-session';
+
+  // Lab results
+  static const String myLabResults = '/lab-results/my';
+  static String myLabResult(String id) => '/lab-results/my/$id';
+  static const String myLabResultsPendingCount = '/lab-results/my/pending-count';
+  static const String labResultsReferenceValues = '/lab-results/reference-values';
+  static const String labResultsRelease = '/lab-results/release';
+  static String labResultsMarkDiscussed(String id) =>
+      '/lab-results/$id/mark-discussed';
+
+  // Vaccinations
+  static const String myVaccinations = '/vaccinations/my';
+  static const String myVaccinationPass = '/vaccinations/my/pass';
+  static const String myVaccinationRecommendations = '/vaccinations/my/recommendations';
+  static const String myUpcomingVaccinations = '/vaccinations/my/upcoming';
+  static String myVaccination(String id) => '/vaccinations/my/$id';
+  static const String myVaccinationRecalls = '/vaccinations/recalls/my';
+  static String acknowledgeVaccinationRecall(String recallId) =>
+      '/vaccinations/recalls/$recallId/acknowledge';
+  static String scheduleVaccinationRecall(String recallId) =>
+      '/vaccinations/recalls/$recallId/schedule';
+  static const String vaccinationExportWhoCard = '/vaccinations/my/export/who-card';
+  static const String vaccinationExportEuDcc = '/vaccinations/my/export/eu-dcc';
+
+  // Forms
+  static const String forms = '/forms';
+  static const String formCategories = '/forms/categories';
+  static String form(String id) => '/forms/$id';
+  static String formDownload(String id) => '/forms/$id/download';
+  static String formSubmit(String id) => '/forms/$id/submit';
+
+  // Workflows
+  static const String workflows = '/workflows';
+  static String workflow(String id) => '/workflows/$id';
+  static String workflowStatus(String id) => '/workflows/$id/status';
+  static String workflowTrigger(String id) => '/workflows/$id/trigger';
+  static const String workflowTasks = '/workflows/tasks/';
+  static String workflowCompleteTask(String id) => '/workflows/tasks/$id/complete';
+  static const String workflowRunDue = '/workflows/scheduler/run-due';
 }

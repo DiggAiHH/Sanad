@@ -32,5 +32,26 @@ export 'consultation.dart';
 // Medication Models
 export 'medication.dart';
 
+// Appointment Models
+export 'appointment.dart';
+
+// Anamnesis Models
+export 'anamnesis.dart';
+
+// Symptom Checker Models
+export 'symptom_checker.dart';
+
+// Lab Results Models
+export 'lab_results.dart';
+
+// Vaccination Models
+export 'vaccinations.dart';
+
+// Forms Models
+export 'forms.dart';
+
+// Workflow Models
+export 'workflows.dart';
+
 // Encryption Models (E2E)
 export 'encryption.dart';

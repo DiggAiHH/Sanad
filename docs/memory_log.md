@@ -194,6 +194,14 @@ packages/
 | HSTS Default | ✅ | ENABLE_HSTS standardmaessig aktiv |
 | Backend Tests | ✅ | 1 neuer CORS-Preflight Test |
 
+### Phase 16: Backend Reliability ✅
+
+| Aktion | Status | Notizen |
+|--------|--------|---------|
+| Health Details | ✅ | /health mit DB-Status |
+| Readiness Endpoint | ✅ | /ready fuer DB readiness |
+| Backend Tests | ✅ | 2 neue Health/Ready Tests |
+
 ---
 
 ## 4. Dateiregister
@@ -257,3 +265,39 @@ packages/ui/lib/src/
 ## 6. Annahmen & Risiken
 
 - Pytest zeigt DeprecationWarning fuer `crypt` (passlib/utils) unter Python 3.12; kein Laufzeitfehler, aber mittelfristig Upstream-Fix einplanen.
+
+---
+
+## 7. Fortsetzungsanleitung (WICHTIG)
+
+> ⚠️ **Agent-Handoff-Situation:** Terminal-Provider vorübergehend nicht verfügbar.
+> Die Code-Änderungen sind vollständig, aber Build/Deploy konnte nicht automatisiert erfolgen.
+
+### Nächste Schritte (manuell):
+
+```bash
+# 1. Build ausführen (Token-Konflikt wurde behoben)
+cd /workspaces/Sanad
+bash scripts/build_web.sh
+
+# 2. Bei erfolgreichem Build: Deploy
+netlify deploy --prod --dir=build/web_deploy
+
+# 3. Git Commit
+git add -A
+git commit -m "Phase 14: UI Polish - AppColors/AppRadius/AppSpacing Migration in Patient App"
+```
+
+### Falls Build fehlschlägt:
+
+```bash
+# tokens.dart komplett löschen falls noch Konflikte
+rm packages/ui/lib/src/theme/tokens.dart
+```
+
+### Zusammenfassung der Änderungen:
+1. **Patient App Home Screen:** Colors.white → AppColors.surface/textOnPrimary, BorderRadius → AppRadius, EdgeInsets → AppSpacing
+2. **Patient App Info Screen:** Gleiche Migration
+3. **Patient App Anamnesis Screen:** Colors.grey[200]/[600] → AppColors.divider/textSecondary/textHint
+4. **Patient App Appointments Screen:** Status-Farben → AppColors.warning/success/error/info
+5. **tokens.dart:** Auf DEPRECATED gesetzt wegen Namenskonflikten mit existierenden Klassen in theme_extensions.dart

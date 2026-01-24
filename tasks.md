@@ -186,14 +186,35 @@
 > Start: 2026-01-24
 
 ## Tasklist (Backend Phase 15)
-1. [ ] Initiation: memory_log.md gelesen und Regeln beachtet
-2. [ ] Initiation: copilot-instructions.md + laufbahn.md gelesen
-3. [ ] Tasklist fuer Phase 15 erstellt (dieser Eintrag)
-4. [ ] CORS: allow_headers auf minimalen Satz reduzieren
-5. [ ] CORS: allow_methods auf GET/POST/PUT/PATCH/DELETE/OPTIONS ergaenzen
-6. [ ] HSTS: Enable via settings + doc update
-7. [ ] Tests: CORS preflight headers verifizieren
-8. [ ] Doku: memory_log.md aktualisieren (Phase 15)
-9. [ ] Doku: laufbahn.md aktualisieren (Phase 15)
-10. [ ] Tasklist: Phase 15 Punkte abhaken
-11. [ ] Verify: Backend Tests laufen
+1. [x] Initiation: memory_log.md gelesen und Regeln beachtet
+2. [x] Initiation: copilot-instructions.md + laufbahn.md gelesen
+3. [x] Tasklist fuer Phase 15 erstellt (dieser Eintrag)
+4. [x] CORS: allow_headers auf minimalen Satz reduzieren
+5. [x] CORS: allow_methods auf GET/POST/PUT/PATCH/DELETE/OPTIONS ergaenzen
+6. [x] HSTS: Enable via settings + doc update
+7. [x] Tests: CORS preflight headers verifizieren
+8. [x] Doku: memory_log.md aktualisieren (Phase 15)
+9. [x] Doku: laufbahn.md aktualisieren (Phase 15)
+10. [x] Tasklist: Phase 15 Punkte abhaken
+11. [x] Verify: Backend Tests laufen
+
+---
+
+# Backend Reliability Sprint (Phase 16)
+
+> Status: In Progress
+> Fokus: API Health Details, Readiness, Tests, Doku
+> Start: 2026-01-24
+
+## Tasklist (Backend Phase 16)
+1. [x] Initiation: memory_log.md gelesen und Regeln beachtet
+2. [x] Initiation: copilot-instructions.md + laufbahn.md gelesen
+3. [x] Tasklist fuer Phase 16 erstellt (dieser Eintrag)
+4. [x] Health: /health erweitert mit DB-Status
+5. [x] Readiness: /ready Endpoint fuer DB readiness
+6. [x] Tests: /health Status-Response verifizieren
+7. [x] Tests: /ready Status-Response verifizieren
+8. [x] Doku: memory_log.md aktualisieren (Phase 16)
+9. [x] Doku: laufbahn.md aktualisieren (Phase 16)
+10. [x] Tasklist: Phase 16 Punkte abhaken
+11. [x] Verify: Backend Tests laufen

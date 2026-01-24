@@ -15,6 +15,8 @@ from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app.config import get_settings
+from sqlalchemy import text
+
 from app.database import engine, Base
 from app.routers import (
     auth,
@@ -350,14 +352,41 @@ app.include_router(
 
 
 @app.get("/health", tags=["Health"])
-async def health_check() -> dict[str, str]:
+async def health_check() -> dict[str, str | bool]:
     """
     Health check endpoint for container orchestration.
 
     Returns:
         dict: Health status.
     """
-    return {"status": "healthy", "version": settings.APP_VERSION}
+    db_ok = True
+    if not settings.TESTING:
+        try:
+            async with engine.begin() as conn:
+                await conn.execute(text("SELECT 1"))
+        except Exception:
+            db_ok = False
+    return {
+        "status": "healthy" if db_ok else "degraded",
+        "version": settings.APP_VERSION,
+        "database": db_ok,
+    }
+
+
+@app.get("/ready", tags=["Health"])
+async def readiness_check() -> dict[str, str | bool]:
+    """
+    Readiness check endpoint for database availability.
+
+    Returns:
+        dict: Readiness status.
+    """
+    try:
+        async with engine.begin() as conn:
+            await conn.execute(text("SELECT 1"))
+        return {"status": "ready", "database": True}
+    except Exception:
+        return {"status": "not_ready", "database": False}
 
 
 # Prometheus metrics endpoint (if available)

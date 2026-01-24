@@ -183,6 +183,14 @@ packages/
 | HSTS Default | ✅ | ENABLE_HSTS standardmaessig aktiv |
 | Backend Tests | ✅ | 1 neuer CORS-Preflight Test |
 
+### Phase 16: Backend Reliability ✅
+
+| Aktion | Status | Notizen |
+|--------|--------|---------|
+| Health Details | ✅ | /health mit DB-Status |
+| Readiness Endpoint | ✅ | /ready fuer DB readiness |
+| Backend Tests | ✅ | 2 neue Health/Ready Tests |
+
 ### Phase 14: UI Polish Sprint ⏳ (In Progress)
 
 | Aktion | Status | Notizen |

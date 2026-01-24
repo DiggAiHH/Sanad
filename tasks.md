@@ -51,10 +51,19 @@
 26. [x] Staff App: Dark Mode in Tasks prüfen (ThemeModeProvider aktiv)
 
 ### F. Finalisierung & Deployment (27-30)
-27. [ ] Build: bash scripts/build_web.sh (⚠️ tokens.dart Konflikt behoben, erneut ausführen)
+27. [ ] Build: bash scripts/build_web.sh ⚠️ MANUELL AUSFÜHREN (Terminal-Provider nicht verfügbar)
 28. [ ] Deploy: netlify deploy --prod --dir=build/web_deploy
-29. [x] Doku: memory_log.md und laufbahn.md aktualisieren (in Arbeit)
+29. [x] Doku: memory_log.md und laufbahn.md aktualisiert ✅
 30. [ ] Final: Git commit mit aussagekräftiger Message
+
+> ⚠️ **AGENT-HANDOFF:** Terminal-Provider vorübergehend nicht verfügbar.
+> **Manuell auszuführen:**
+> ```bash
+> cd /workspaces/Sanad
+> bash scripts/build_web.sh
+> netlify deploy --prod --dir=build/web_deploy
+> git add -A && git commit -m "Phase 14: UI Polish - AppColors/AppRadius/AppSpacing Migration"
+> ```
 
 ---
 
@@ -167,3 +176,24 @@
 8. [x] Doku: laufbahn.md aktualisieren (Phase 14)
 9. [x] Tasklist: Phase 14 Punkte abhaken
 10. [x] Verify: Backend Tests laufen
+
+---
+
+# Backend Reliability Sprint (Phase 15)
+
+> Status: In Progress
+> Fokus: CORS tighten, HSTS toggle, Tests, Doku
+> Start: 2026-01-24
+
+## Tasklist (Backend Phase 15)
+1. [ ] Initiation: memory_log.md gelesen und Regeln beachtet
+2. [ ] Initiation: copilot-instructions.md + laufbahn.md gelesen
+3. [ ] Tasklist fuer Phase 15 erstellt (dieser Eintrag)
+4. [ ] CORS: allow_headers auf minimalen Satz reduzieren
+5. [ ] CORS: allow_methods auf GET/POST/PUT/PATCH/DELETE/OPTIONS ergaenzen
+6. [ ] HSTS: Enable via settings + doc update
+7. [ ] Tests: CORS preflight headers verifizieren
+8. [ ] Doku: memory_log.md aktualisieren (Phase 15)
+9. [ ] Doku: laufbahn.md aktualisieren (Phase 15)
+10. [ ] Tasklist: Phase 15 Punkte abhaken
+11. [ ] Verify: Backend Tests laufen

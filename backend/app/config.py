@@ -65,7 +65,7 @@ class Settings(BaseSettings):
     MAX_REQUEST_SIZE_MB: int = 5
 
     # Security headers
-    ENABLE_HSTS: bool = False
+    ENABLE_HSTS: bool = True
 
     # WebRTC / TURN Server Configuration (Option B: Managed EU Provider)
     # Examples: Twilio TURN (EU), Cloudflare Calls, Xirsys (EU region)

@@ -224,8 +224,17 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.all_cors_origins,
     allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE", "PATCH"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allow_headers=[
+        "authorization",
+        "content-type",
+        "accept",
+        "origin",
+        "x-correlation-id",
+        "x-request-id",
+        "x-device-id",
+        "x-device-secret",
+    ],
 )
 
 # Observability Middleware (order matters: first added = outermost)

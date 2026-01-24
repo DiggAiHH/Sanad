@@ -175,6 +175,14 @@ packages/
 | RateLimit Skip-Pfade | ✅ | /docs, /redoc, /openapi.json ausgenommen |
 | Backend Tests | ✅ | 1 neuer 404-Handler Test |
 
+### Phase 15: Backend Reliability ✅
+
+| Aktion | Status | Notizen |
+|--------|--------|---------|
+| CORS Tightening | ✅ | allow_headers reduziert, allow_methods erweitert |
+| HSTS Default | ✅ | ENABLE_HSTS standardmaessig aktiv |
+| Backend Tests | ✅ | 1 neuer CORS-Preflight Test |
+
 ### Phase 14: UI Polish Sprint ⏳ (In Progress)
 
 | Aktion | Status | Notizen |

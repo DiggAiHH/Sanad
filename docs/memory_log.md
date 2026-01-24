@@ -140,6 +140,27 @@ packages/
 | Admin App Refactoring | ✅ | Settings & Users Screen migriert |
 | Staff App Refactoring | ✅ | Tasks Screen migriert |
 
+### Phase 10: UI Consistency Rollout ✅
+
+| Aktion | Status | Notizen |
+|--------|--------|---------|
+| Staff Home Dropdown | ✅ | SanadDropdown integriert |
+| Patient Bescheinigung Dropdown | ✅ | SanadDropdown integriert |
+| Patient Ueberweisung Dropdown | ✅ | SanadDropdown integriert |
+| MFA Input Audit | ✅ | Keine inkonsistenten Inputs gefunden |
+| Icon Audit | ✅ | Material Icons konsistent, keine Abweichungen |
+| Build + Netlify Deploy | ✅ | Web Build abgeschlossen, Deploys fuer alle 4 Apps |
+
+### Phase 11: Backend Hardening ✅
+
+| Aktion | Status | Notizen |
+|--------|--------|---------|
+| RateLimit Middleware | ✅ | In-memory Sliding Window, 429 Responses |
+| RequestSizeLimit Middleware | ✅ | 413 Responses mit JSON Fehler |
+| SecurityHeaders Middleware | ✅ | Default-Deny Header gesetzt |
+| require_roles Alias | ✅ | Router-Import Bugfix |
+| Backend Tests | ✅ | 3 neue Tests (Headers/Size/Rate) |
+
 ---
 
 ## 4. Dateiregister
@@ -165,12 +186,12 @@ packages/ui/lib/src/
 
 | Priorität | Aufgabe | Beschreibung | Status |
 |-----------|---------|--------------|--------|
-| P1 | **Refactor Patient App** | `DropdownButtonFormField` ersetzen | 🕒 Ausstehend |
-| P2 | **Refactor MFA App** | Prüfen auf inkonsistente Inputs | 🕒 Ausstehend |
-| P3 | **Icon Consistency** | Sicherstellen, dass alle Icons Material Symbols verwenden | 🕒 Ausstehend |
+| P1 | **Refactor Patient App** | `DropdownButtonFormField` ersetzen | ✅ Abgeschlossen |
+| P2 | **Refactor MFA App** | Prüfen auf inkonsistente Inputs | ✅ Abgeschlossen |
+| P3 | **Icon Consistency** | Sicherstellen, dass alle Icons Material Symbols verwenden | ✅ Geprüft |
 
 ---
 
 ## 6. Annahmen & Risiken
 
-Keine neuen Risiken identifiziert.
+- Pytest zeigt DeprecationWarning fuer `crypt` (passlib/utils) unter Python 3.12; kein Laufzeitfehler, aber mittelfristig Upstream-Fix einplanen.

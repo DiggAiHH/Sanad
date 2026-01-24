@@ -147,6 +147,22 @@ def require_role(*roles: UserRole):
     return role_checker
 
 
+def require_roles(*roles: UserRole):
+    """
+    Backwards-compatible alias for require_role.
+
+    Args:
+        *roles: Allowed roles.
+
+    Returns:
+        Dependency function.
+
+    Security Implications:
+        - Ensures role checks are consistently applied.
+    """
+    return require_role(*roles)
+
+
 # Pre-defined role dependencies
 RequireAdmin = Depends(require_role(UserRole.ADMIN))
 RequireDoctor = Depends(require_role(UserRole.ADMIN, UserRole.DOCTOR))

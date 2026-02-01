@@ -7,7 +7,7 @@
  * @module nfc-features
  */
 
-import { secureLog, sanitizeLogData } from './privacy-utils.js';
+import { secureLog } from './privacy-utils.js';
 import { PRIVACY_CONFIG } from './privacy-config.js';
 
 /**
@@ -387,7 +387,7 @@ export class StaffNFCLogin {
    */
   static async authenticate(nfcData) {
     try {
-      const { staffId, badgeId, timestamp } = nfcData;
+      const { staffId, timestamp } = nfcData;
       
       // Verify badge hasn't been cloned (check last use timestamp)
       const timeSinceLastUse = Date.now() - timestamp;

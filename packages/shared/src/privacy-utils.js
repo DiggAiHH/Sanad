@@ -218,41 +218,52 @@ const sendToAuditLog = async (message, data) => {
 
 /**
  * GDPR Rights Helper
+ * 
+ * NOTE: These functions are PLACEHOLDER STUBS that require backend implementation.
+ * They should throw errors until properly implemented to avoid false GDPR compliance claims.
  */
 export const GDPRRights = {
   /**
    * Request data export (Art. 15 GDPR)
+   * @throws {Error} Not implemented - requires backend API
    */
   requestDataExport: async (patientId) => {
     secureLog('Data export requested');
-    // Implementation: Call backend API
+    throw new Error('GDPR data export not implemented - requires backend API integration');
+    // TODO: Implement backend API call
     // return await fetch(`/api/gdpr/export/${patientId}`);
   },
   
   /**
    * Request data deletion (Art. 17 GDPR)
+   * @throws {Error} Not implemented - requires backend API
    */
   requestDataDeletion: async (patientId, reason) => {
     secureLog('Data deletion requested', { reason });
-    // Implementation: Call backend API
+    throw new Error('GDPR data deletion not implemented - requires backend API integration');
+    // TODO: Implement backend API call
     // return await fetch(`/api/gdpr/delete/${patientId}`, { method: 'DELETE' });
   },
   
   /**
    * Request data rectification (Art. 16 GDPR)
+   * @throws {Error} Not implemented - requires backend API
    */
-  requestDataRectification: async (patientId, corrections) => {
+  requestDataRectification: async (patientId, corrections) {
     secureLog('Data rectification requested');
-    // Implementation: Call backend API
+    throw new Error('GDPR data rectification not implemented - requires backend API integration');
+    // TODO: Implement backend API call
     // return await fetch(`/api/gdpr/rectify/${patientId}`, { method: 'PATCH', body: corrections });
   },
   
   /**
    * Request data portability (Art. 20 GDPR)
+   * @throws {Error} Not implemented - requires backend API
    */
-  requestDataPortability: async (patientId, format = 'json') => {
+  requestDataPortability: async (patientId, format = 'json') {
     secureLog('Data portability requested', { format });
-    // Implementation: Call backend API
+    throw new Error('GDPR data portability not implemented - requires backend API integration');
+    // TODO: Implement backend API call
     // return await fetch(`/api/gdpr/export/${patientId}?format=${format}`);
   },
 };

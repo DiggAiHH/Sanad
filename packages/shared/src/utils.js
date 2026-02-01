@@ -33,7 +33,8 @@ export const parseQRCodeData = (qrData) => {
   try {
     return JSON.parse(qrData);
   } catch (e) {
-    console.error('Invalid QR code data', e);
+    // Never log the actual QR data as it contains personal information (GDPR)
+    console.error('Invalid QR code data format');
     return null;
   }
 };

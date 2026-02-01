@@ -36,12 +36,12 @@ class ConsultationsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
-      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: const Text('Arzt kontaktieren'),
         backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
+        foregroundColor: colorScheme.onPrimary,
         actions: [
           ThemeModeMenuButton(
             mode: ref.watch(themeModeProvider),
@@ -182,6 +182,7 @@ class ConsultationsScreen extends ConsumerWidget {
   }
 
   Widget _buildActiveConsultations(BuildContext context, WidgetRef ref) {
+    final colorScheme = Theme.of(context).colorScheme;
     final consultationsAsync = ref.watch(activeConsultationsProvider);
     
     return consultationsAsync.when(
@@ -189,7 +190,7 @@ class ConsultationsScreen extends ConsumerWidget {
       loading: () => Container(
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          color: AppColors.surface,
+          color: colorScheme.surface,
           borderRadius: BorderRadius.circular(12),
         ),
         child: const Center(
@@ -226,7 +227,7 @@ class ConsultationsScreen extends ConsumerWidget {
           return Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: AppColors.surface,
+              color: colorScheme.surface,
               borderRadius: BorderRadius.circular(12),
             ),
             child: Column(
@@ -234,13 +235,13 @@ class ConsultationsScreen extends ConsumerWidget {
                 Icon(
                   Icons.chat_bubble_outline,
                   size: 48,
-                  color: AppColors.textSecondary,
+                  color: colorScheme.onSurfaceVariant,
                 ),
                 const SizedBox(height: 12),
                 Text(
                   'Keine aktiven Gespräche',
                   style: AppTextStyles.bodyLarge.copyWith(
-                    color: AppColors.textSecondary,
+                    color: colorScheme.onSurfaceVariant,
                   ),
                 ),
               ],
@@ -278,6 +279,7 @@ class _ContactOptionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -286,7 +288,7 @@ class _ContactOptionCard extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: AppColors.surface,
+            color: colorScheme.surface,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(color: color.withOpacity(0.3)),
           ),
@@ -315,7 +317,7 @@ class _ContactOptionCard extends StatelessWidget {
                     Text(
                       subtitle,
                       style: AppTextStyles.bodySmall.copyWith(
-                        color: AppColors.textSecondary,
+                        color: colorScheme.onSurfaceVariant,
                       ),
                     ),
                     const SizedBox(height: 4),
@@ -334,7 +336,7 @@ class _ContactOptionCard extends StatelessWidget {
                   ],
                 ),
               ),
-              Icon(Icons.arrow_forward_ios, color: AppColors.textSecondary),
+              Icon(Icons.arrow_forward_ios, color: colorScheme.onSurfaceVariant),
             ],
           ),
         ),
@@ -373,6 +375,7 @@ class _RealConsultationListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     IconData icon;
     Color color;
 
@@ -404,9 +407,9 @@ class _RealConsultationListItem extends StatelessWidget {
           margin: const EdgeInsets.only(bottom: 8),
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: AppColors.surface,
+            color: colorScheme.surface,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: AppColors.border),
+            border: Border.all(color: colorScheme.outlineVariant),
           ),
           child: Row(
             children: [
@@ -433,7 +436,7 @@ class _RealConsultationListItem extends StatelessWidget {
                     Text(
                       consultation.reason ?? 'Konsultation',
                       style: AppTextStyles.bodySmall.copyWith(
-                        color: AppColors.textSecondary,
+                        color: colorScheme.onSurfaceVariant,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -471,8 +474,8 @@ class _RealConsultationListItem extends StatelessWidget {
         text = 'Geplant';
         break;
       default:
-        bgColor = AppColors.textSecondary.withOpacity(0.1);
-        textColor = AppColors.textSecondary;
+        bgColor = AppColors.completed.withOpacity(0.15);
+        textColor = AppColors.completed;
         text = status.name;
     }
     
@@ -504,6 +507,7 @@ class _ConsultationListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     IconData icon;
     Color color;
 
@@ -534,9 +538,9 @@ class _ConsultationListItem extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: AppColors.surface,
+            color: colorScheme.surface,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: AppColors.border),
+            border: Border.all(color: colorScheme.outlineVariant),
           ),
           child: Row(
             children: [
@@ -563,7 +567,7 @@ class _ConsultationListItem extends StatelessWidget {
                     Text(
                       consultation.lastMessage,
                       style: AppTextStyles.bodySmall.copyWith(
-                        color: AppColors.textSecondary,
+                        color: colorScheme.onSurfaceVariant,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -575,13 +579,13 @@ class _ConsultationListItem extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: AppColors.primary,
+                    color: colorScheme.primary,
                     shape: BoxShape.circle,
                   ),
                   child: Text(
                     '${consultation.unreadCount}',
                     style: AppTextStyles.labelSmall.copyWith(
-                      color: Colors.white,
+                      color: colorScheme.onPrimary,
                       fontWeight: FontWeight.bold,
                     ),
                   ),

@@ -18,7 +18,6 @@ class MedicationPlanScreen extends ConsumerWidget {
     final planAsync = ref.watch(medicationPlanProvider);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: const Text('Medikationsplan'),
         backgroundColor: AppColors.primary,
@@ -60,6 +59,7 @@ class _MedicationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     final dosageText = medication.dosages.isEmpty
         ? 'Dosierung folgt'
         : medication.dosages
@@ -69,9 +69,9 @@ class _MedicationCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: colorScheme.surface,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: colorScheme.outlineVariant),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -95,7 +95,7 @@ class _MedicationCard extends StatelessWidget {
           Text(
             '${medication.activeIngredient} • ${medication.strength}',
             style: AppTextStyles.bodySmall.copyWith(
-              color: AppColors.textSecondary,
+              color: colorScheme.onSurfaceVariant,
             ),
           ),
           const SizedBox(height: 8),
@@ -109,7 +109,7 @@ class _MedicationCard extends StatelessWidget {
             Text(
               medication.instructions!,
               style: AppTextStyles.bodySmall.copyWith(
-                color: AppColors.textSecondary,
+                color: colorScheme.onSurfaceVariant,
               ),
             ),
           ],
@@ -160,7 +160,7 @@ class _StatusBadge extends StatelessWidget {
         label = 'Abgesetzt';
         break;
       case MedicationStatus.completed:
-        color = AppColors.textSecondary;
+        color = AppColors.completed;
         label = 'Beendet';
         break;
     }
@@ -185,16 +185,17 @@ class _StatusBadge extends StatelessWidget {
 class _EmptyState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.inbox_outlined, size: 48, color: AppColors.textSecondary),
+          Icon(Icons.inbox_outlined, size: 48, color: colorScheme.onSurfaceVariant),
           const SizedBox(height: 12),
           Text(
             'Kein Medikationsplan vorhanden',
             style: AppTextStyles.bodyLarge.copyWith(
-              color: AppColors.textSecondary,
+              color: colorScheme.onSurfaceVariant,
             ),
           ),
         ],
@@ -210,6 +211,7 @@ class _ErrorState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(24),
@@ -226,7 +228,7 @@ class _ErrorState extends StatelessWidget {
             Text(
               error.toString(),
               style: AppTextStyles.bodySmall.copyWith(
-                color: AppColors.textSecondary,
+                color: colorScheme.onSurfaceVariant,
               ),
               textAlign: TextAlign.center,
             ),

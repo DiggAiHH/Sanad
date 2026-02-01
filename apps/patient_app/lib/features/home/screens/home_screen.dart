@@ -20,6 +20,7 @@ class HomeScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colorScheme = Theme.of(context).colorScheme;
     final summaryAsync = ref.watch(publicQueueSummaryProvider);
     final lastTicketNumber = ref.watch(lastTicketNumberProvider);
     final summary = summaryAsync.asData?.value;
@@ -30,7 +31,6 @@ class HomeScreen extends ConsumerWidget {
     final nowServing = summary?.nowServingTicket ?? '—';
 
     return Scaffold(
-      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: const Text('Sanad'),
         actions: [
@@ -77,7 +77,7 @@ class HomeScreen extends ConsumerWidget {
                     Text(
                       'Praxismanagement',
                       style: AppTextStyles.bodyLarge.copyWith(
-                        color: AppColors.textSecondary,
+                        color: colorScheme.onSurfaceVariant,
                       ),
                     ),
                   ],
@@ -89,28 +89,28 @@ class HomeScreen extends ConsumerWidget {
               Container(
                 padding: AppSpacing.cardPaddingLarge,
                 decoration: BoxDecoration(
-                  color: AppColors.primaryLight.withOpacity(0.3),
+                  color: colorScheme.primaryContainer.withOpacity(0.35),
                   borderRadius: AppRadius.large,
                 ),
                 child: Column(
                   children: [
-                    const Icon(
+                    Icon(
                       Icons.waving_hand,
-                      color: AppColors.primary,
+                      color: colorScheme.primary,
                       size: 32,
                     ),
                     const SizedBox(height: 12),
                     Text(
                       'Willkommen!',
                       style: AppTextStyles.headlineSmall.copyWith(
-                        color: AppColors.textPrimary,
+                        color: colorScheme.onSurface,
                       ),
                     ),
                     const SizedBox(height: 8),
                     Text(
                       'Hier können Sie Ihren Wartestatus einsehen und Informationen zur Praxis abrufen.',
                       style: AppTextStyles.bodyMedium.copyWith(
-                        color: AppColors.textSecondary,
+                        color: colorScheme.onSurfaceVariant,
                       ),
                       textAlign: TextAlign.center,
                     ),
@@ -231,7 +231,7 @@ class HomeScreen extends ConsumerWidget {
                     return Text(
                       'Derzeit sind keine Warteschlangen aktiv.',
                       style: AppTextStyles.bodyMedium.copyWith(
-                        color: AppColors.textSecondary,
+                        color: colorScheme.onSurfaceVariant,
                       ),
                     );
                   }
@@ -298,14 +298,15 @@ class _QuickStatCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return SizedBox(
       width: width,
       child: Container(
         padding: AppSpacing.cardPadding,
         decoration: BoxDecoration(
-          color: AppColors.surface,
+          color: colorScheme.surface,
           borderRadius: AppRadius.medium,
-          border: Border.all(color: AppColors.border),
+          border: Border.all(color: colorScheme.outlineVariant),
         ),
         child: Row(
           children: [
@@ -326,7 +327,7 @@ class _QuickStatCard extends StatelessWidget {
                   Text(
                     title,
                     style: AppTextStyles.bodySmall.copyWith(
-                      color: AppColors.textSecondary,
+                      color: colorScheme.onSurfaceVariant,
                     ),
                   ),
                   const SizedBox(height: 2),
@@ -366,14 +367,15 @@ class _ActionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Container(
       padding: AppSpacing.cardPaddingLarge,
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: colorScheme.surface,
         borderRadius: AppRadius.large,
         border: isPrimary 
             ? Border.all(color: AppColors.primary, width: 2)
-            : Border.all(color: AppColors.border),
+            : Border.all(color: colorScheme.outlineVariant),
         boxShadow: AppShadows.small,
       ),
       child: Column(
@@ -410,7 +412,7 @@ class _ActionCard extends StatelessWidget {
           Text(
             description,
             style: AppTextStyles.bodyMedium.copyWith(
-              color: AppColors.textSecondary,
+              color: colorScheme.onSurfaceVariant,
             ),
           ),
           const SizedBox(height: 16),
@@ -465,12 +467,13 @@ class _WaitTimeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Container(
       padding: AppSpacing.cardPadding,
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: colorScheme.surface,
         borderRadius: AppRadius.medium,
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: colorScheme.outlineVariant),
       ),
       child: Row(
         children: [
@@ -505,7 +508,7 @@ class _WaitTimeCard extends StatelessWidget {
                 Text(
                   '$waitingCount Wartende',
                   style: AppTextStyles.bodySmall.copyWith(
-                    color: AppColors.textSecondary,
+                    color: colorScheme.onSurfaceVariant,
                   ),
                 ),
               ],
@@ -524,7 +527,7 @@ class _WaitTimeCard extends StatelessWidget {
               Text(
                 'Wartezeit',
                 style: AppTextStyles.bodySmall.copyWith(
-                  color: AppColors.textSecondary,
+                  color: colorScheme.onSurfaceVariant,
                 ),
               ),
             ],

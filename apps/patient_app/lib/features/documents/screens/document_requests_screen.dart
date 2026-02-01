@@ -19,13 +19,13 @@ class _DocumentRequestsScreenState
     extends ConsumerState<DocumentRequestsScreen> {
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     final requestsAsync = ref.watch(myDocumentRequestsProvider);
     return Scaffold(
-      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: const Text('Dokumente anfordern'),
         backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
+        foregroundColor: colorScheme.onPrimary,
         actions: [
           ThemeModeMenuButton(
             mode: ref.watch(themeModeProvider),
@@ -146,10 +146,11 @@ class _DocumentRequestsScreenState
 
   Widget _buildRecentRequests(List<DocumentRequest> requests) {
     if (requests.isEmpty) {
+      final colorScheme = Theme.of(context).colorScheme;
       return Container(
         padding: const EdgeInsets.all(32),
         decoration: BoxDecoration(
-          color: AppColors.surface,
+          color: colorScheme.surface,
           borderRadius: BorderRadius.circular(12),
         ),
         child: Column(
@@ -157,13 +158,13 @@ class _DocumentRequestsScreenState
             Icon(
               Icons.inbox_outlined,
               size: 48,
-              color: AppColors.textSecondary,
+              color: colorScheme.onSurfaceVariant,
             ),
             const SizedBox(height: 12),
             Text(
               'Noch keine Anfragen',
               style: AppTextStyles.bodyLarge.copyWith(
-                color: AppColors.textSecondary,
+                color: colorScheme.onSurfaceVariant,
               ),
             ),
           ],
@@ -198,7 +199,7 @@ class _DocumentRequestsScreenState
           Text(
             error.toString(),
             style: AppTextStyles.bodySmall.copyWith(
-              color: AppColors.textSecondary,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
             textAlign: TextAlign.center,
           ),
@@ -225,6 +226,7 @@ class _DocumentTypeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -233,7 +235,7 @@ class _DocumentTypeCard extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: AppColors.surface,
+            color: colorScheme.surface,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(color: color.withOpacity(0.3)),
             boxShadow: [
@@ -267,7 +269,7 @@ class _DocumentTypeCard extends StatelessWidget {
               Text(
                 subtitle,
                 style: AppTextStyles.bodySmall.copyWith(
-                  color: AppColors.textSecondary,
+                  color: colorScheme.onSurfaceVariant,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -286,13 +288,14 @@ class _RequestListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: colorScheme.surface,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: colorScheme.outlineVariant),
       ),
       child: Row(
         children: [
@@ -312,7 +315,7 @@ class _RequestListItem extends StatelessWidget {
                 Text(
                   '${_typeLabel(request.documentType)} • ${_formatDate(request.createdAt)}',
                   style: AppTextStyles.bodySmall.copyWith(
-                    color: AppColors.textSecondary,
+                    color: colorScheme.onSurfaceVariant,
                   ),
                 ),
               ],
@@ -377,7 +380,7 @@ class _StatusIndicator extends StatelessWidget {
         icon = Icons.check_circle;
         break;
       case DocumentRequestStatus.delivered:
-        color = AppColors.textSecondary;
+        color = AppColors.completed;
         icon = Icons.done_all;
         break;
       case DocumentRequestStatus.rejected:
@@ -427,7 +430,7 @@ class _StatusBadge extends StatelessWidget {
         break;
       case DocumentRequestStatus.delivered:
         text = 'Abgeholt';
-        color = AppColors.textSecondary;
+        color = AppColors.completed;
         break;
       case DocumentRequestStatus.rejected:
         text = 'Abgelehnt';

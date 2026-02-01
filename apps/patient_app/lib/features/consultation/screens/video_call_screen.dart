@@ -12,7 +12,6 @@ enum WebRTCConnectionState {
   failed,
 }
 
-/// Screen für Videosprechstunde mit dem Arzt.
 /// DSGVO-konform: WebRTC mit Ende-zu-Ende-Verschlüsselung.
 class VideoCallScreen extends ConsumerStatefulWidget {
   final String? consultationId;
@@ -21,6 +20,7 @@ class VideoCallScreen extends ConsumerStatefulWidget {
 
   @override
   ConsumerState<VideoCallScreen> createState() => _VideoCallScreenState();
+
 }
 
 class _VideoCallScreenState extends ConsumerState<VideoCallScreen> {
@@ -32,8 +32,8 @@ class _VideoCallScreenState extends ConsumerState<VideoCallScreen> {
   bool _showControls = true;
   
   // Schritt 11: Reconnect tracking
+  static const int _maxReconnectAttempts = 3;
   int _reconnectAttempts = 0;
-  static const int _maxReconnectAttempts = 5;
   bool _signalingActive = false;
   
   WebRTCRoom? _roomInfo;
@@ -396,6 +396,7 @@ class _VideoCallScreenState extends ConsumerState<VideoCallScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
       backgroundColor: Colors.black,
       body: GestureDetector(
@@ -480,7 +481,7 @@ class _VideoCallScreenState extends ConsumerState<VideoCallScreen> {
                   label: const Text('Erneut verbinden'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
-                    foregroundColor: Colors.white,
+                    foregroundColor: colorScheme.onPrimary,
                   ),
                 ),
               ),
@@ -494,9 +495,9 @@ class _VideoCallScreenState extends ConsumerState<VideoCallScreen> {
                   width: 120,
                   height: 160,
                   decoration: BoxDecoration(
-                    color: AppColors.surface,
+                    color: colorScheme.surface,
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.white, width: 2),
+                    border: Border.all(color: colorScheme.outlineVariant, width: 2),
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withOpacity(0.3),
@@ -513,13 +514,13 @@ class _VideoCallScreenState extends ConsumerState<VideoCallScreen> {
                           Icon(
                             Icons.videocam,
                             size: 32,
-                            color: AppColors.textSecondary,
+                            color: colorScheme.onSurfaceVariant,
                           ),
                           const SizedBox(height: 8),
                           Text(
                             'Ihr Video',
                             style: AppTextStyles.labelSmall.copyWith(
-                              color: AppColors.textSecondary,
+                              color: colorScheme.onSurfaceVariant,
                             ),
                           ),
                         ],
@@ -907,12 +908,12 @@ class _RequestVideoCallScreenState extends ConsumerState<RequestVideoCallScreen>
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
-      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: const Text('Videosprechstunde anfragen'),
         backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
+        foregroundColor: colorScheme.onPrimary,
       ),
       body: Form(
         key: _formKey,
@@ -1054,9 +1055,9 @@ class _RequestVideoCallScreenState extends ConsumerState<RequestVideoCallScreen>
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: AppColors.surface,
+                  color: colorScheme.surface,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AppColors.border),
+                  border: Border.all(color: colorScheme.outlineVariant),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -1079,7 +1080,7 @@ class _RequestVideoCallScreenState extends ConsumerState<RequestVideoCallScreen>
                       '• Es erfolgt keine Aufzeichnung ohne Ihre Zustimmung.\n'
                       '• Ihre Angaben werden in Ihrer Patientenakte gespeichert.',
                       style: AppTextStyles.bodySmall.copyWith(
-                        color: AppColors.textSecondary,
+                        color: colorScheme.onSurfaceVariant,
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -1116,7 +1117,7 @@ class _RequestVideoCallScreenState extends ConsumerState<RequestVideoCallScreen>
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.all(16),
                   backgroundColor: AppColors.primary,
-                  foregroundColor: Colors.white,
+                  foregroundColor: colorScheme.onPrimary,
                 ),
               ),
             ],

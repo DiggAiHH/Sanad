@@ -51,19 +51,28 @@
 26. [x] Staff App: Dark Mode in Tasks prüfen (ThemeModeProvider aktiv)
 
 ### F. Finalisierung & Deployment (27-30)
-27. [ ] Build: bash scripts/build_web.sh ⚠️ MANUELL AUSFÜHREN (Terminal-Provider nicht verfügbar)
-28. [ ] Deploy: netlify deploy --prod --dir=build/web_deploy
+27. [x] Build: bash scripts/build_web.sh
+28. [x] Deploy: Netlify Deploy (prebuilt, --no-build, per Site-ID)
 29. [x] Doku: memory_log.md und laufbahn.md aktualisiert ✅
 30. [ ] Final: Git commit mit aussagekräftiger Message
 
-> ⚠️ **AGENT-HANDOFF:** Terminal-Provider vorübergehend nicht verfügbar.
-> **Manuell auszuführen:**
-> ```bash
-> cd /workspaces/Sanad
-> bash scripts/build_web.sh
-> netlify deploy --prod --dir=build/web_deploy
-> git add -A && git commit -m "Phase 14: UI Polish - AppColors/AppRadius/AppSpacing Migration"
-> ```
+**Deploy-Kommandos (bypasst APP_NAME Build-Pipeline):**
+```bash
+cd /workspaces/Sanad
+bash scripts/build_web.sh
+
+# Admin
+netlify deploy --no-build --prod --dir=build/web_deploy/admin --site=89479734-3c20-4300-8e26-f12dab3197f9
+
+# MFA
+netlify deploy --no-build --prod --dir=build/web_deploy/mfa --site=d1fe9a5f-240e-44ab-9208-95c6e9f14c3d
+
+# Staff
+netlify deploy --no-build --prod --dir=build/web_deploy/staff --site=bfb8b97e-be84-4f6f-adb6-296a056a8f96
+
+# Patient
+netlify deploy --no-build --prod --dir=build/web_deploy/patient --site=4783a06c-0b35-4e08-8e8d-a592295967f4
+```
 
 ---
 
@@ -83,11 +92,25 @@
 6. ✅ Export tokens.dart entfernt aus theme.dart (Namenskonflikte mit existierenden Klassen)
 
 **Nächste Schritte für neuen Agent:**
-1. `bash scripts/build_web.sh` ausführen (Konflikt sollte behoben sein)
-2. Falls Build erfolgreich: `netlify deploy --prod --dir=build/web_deploy`
-3. Falls Build fehlschlägt: tokens.dart Datei komplett löschen
+1. Git Commit + Push (Task 30)
+2. PenTest-Plan (Scope: Backend + Flutter Web + Infra) erstellen
+3. Video/Voice: Architektur + Netlify/DB Entscheidung (DSGVO, internal-first)
 
 <!-- Bei Crash: Fortsetzen ab Task 27 (Build) -->
+
+---
+
+# Security & Realtime Sprint (Neu)
+
+> Status: Not Started
+> Fokus: PenTest-Plan, Bug-Hunt, Video/Voice Calls (internal-first, DSGVO)
+
+## Tasklist (Security/Realtime)
+1. [ ] PenTest-Plan erstellen (OWASP ASVS + API + Web + Infra)
+2. [ ] Bug-Hunt: Patient App UI/UX Smoke-Test Matrix (Dark Mode, Accessibility, Mobile/Web)
+3. [ ] Realtime Architektur: Video/Voice Signaling (SFU vs P2P), TURN/STUN, DSGVO Datenfluss
+4. [ ] Netlify Backend PoC: Minimal Signaling/API (Auth, RateLimit, Logging ohne PII)
+5. [ ] Datenbank: Auswahl + Schema (Session/Call/Consent), migrations + secrets via env
 
 ---
 

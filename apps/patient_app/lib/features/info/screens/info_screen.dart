@@ -18,20 +18,20 @@ class InfoScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final practiceAsync = ref.watch(publicPracticeProvider);
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () => context.pop(),
         ),
         title: Text(
           'Praxis-Information',
           style: AppTextStyles.titleLarge.copyWith(
-            color: AppColors.textPrimary,
+            color: colorScheme.onSurface,
           ),
         ),
         centerTitle: true,
@@ -72,7 +72,7 @@ class InfoScreen extends ConsumerWidget {
                   Container(
                     padding: AppSpacing.cardPaddingLarge,
                     decoration: BoxDecoration(
-                      color: AppColors.surface,
+                      color: colorScheme.surface,
                       borderRadius: AppRadius.large,
                       boxShadow: AppShadows.small,
                     ),
@@ -107,7 +107,7 @@ class InfoScreen extends ConsumerWidget {
                                 'Durchschnittliche Wartezeit: '
                                 '${practice.averageWaitTimeMinutes} Min.',
                                 style: AppTextStyles.bodyMedium.copyWith(
-                                  color: AppColors.textSecondary,
+                                  color: colorScheme.onSurfaceVariant,
                                 ),
                               ),
                             ],
@@ -128,7 +128,7 @@ class InfoScreen extends ConsumerWidget {
                               Text(
                                 'Bitte telefonisch erfragen.',
                                 style: AppTextStyles.bodyMedium.copyWith(
-                                  color: AppColors.textSecondary,
+                                  color: colorScheme.onSurfaceVariant,
                                 ),
                               ),
                             ]
@@ -226,7 +226,7 @@ class InfoScreen extends ConsumerWidget {
                           ),
                         ),
                         IconButton(
-                          icon: const Icon(Icons.directions, color: AppColors.primary),
+                          icon: const Icon(Icons.directions),
                           onPressed: () async {
                             final encoded = Uri.encodeComponent(practice.address);
                             final uri = Uri.parse('geo:0,0?q=$encoded');
@@ -289,7 +289,7 @@ class InfoScreen extends ConsumerWidget {
                         Text(
                           'Bei lebensbedrohlichen Notfällen rufen Sie bitte sofort den Notruf 112 an.',
                           style: AppTextStyles.bodyMedium.copyWith(
-                            color: AppColors.textSecondary,
+                            color: colorScheme.onSurfaceVariant,
                           ),
                         ),
                         const SizedBox(height: 12),
@@ -336,13 +336,14 @@ class _InfoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Container(
       width: double.infinity,
       padding: AppSpacing.cardPaddingLarge,
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: colorScheme.surface,
         borderRadius: AppRadius.large,
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: colorScheme.outlineVariant),
       ),
       child: child,
     );
@@ -398,8 +399,9 @@ class _ContactCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Material(
-      color: AppColors.surface,
+      color: colorScheme.surface,
       borderRadius: AppRadius.medium,
       child: InkWell(
         onTap: onTap,
@@ -408,7 +410,7 @@ class _ContactCard extends StatelessWidget {
           padding: AppSpacing.cardPadding,
           decoration: BoxDecoration(
             borderRadius: AppRadius.medium,
-            border: Border.all(color: AppColors.border),
+            border: Border.all(color: colorScheme.outlineVariant),
           ),
           child: Row(
             children: [
@@ -429,7 +431,7 @@ class _ContactCard extends StatelessWidget {
                     Text(
                       title,
                       style: AppTextStyles.bodySmall.copyWith(
-                        color: AppColors.textSecondary,
+                        color: colorScheme.onSurfaceVariant,
                       ),
                     ),
                     Text(
@@ -442,10 +444,7 @@ class _ContactCard extends StatelessWidget {
                   ],
                 ),
               ),
-              const Icon(
-                Icons.chevron_right,
-                color: AppColors.textSecondary,
-              ),
+              const Icon(Icons.chevron_right),
             ],
           ),
         ),

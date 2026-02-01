@@ -9,14 +9,14 @@ class DocumentHistoryScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colorScheme = Theme.of(context).colorScheme;
     final requestsAsync = ref.watch(myDocumentRequestsProvider);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: const Text('Dokumentenverlauf'),
         backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
+        foregroundColor: colorScheme.onPrimary,
         actions: [
           ThemeModeMenuButton(
             mode: ref.watch(themeModeProvider),
@@ -55,12 +55,13 @@ class _HistoryItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: colorScheme.surface,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: colorScheme.outlineVariant),
       ),
       child: Row(
         children: [
@@ -80,7 +81,7 @@ class _HistoryItem extends StatelessWidget {
                 Text(
                   '${_typeLabel(request.documentType)} • ${_formatDate(request.createdAt)}',
                   style: AppTextStyles.bodySmall.copyWith(
-                    color: AppColors.textSecondary,
+                    color: colorScheme.onSurfaceVariant,
                   ),
                 ),
               ],
@@ -145,7 +146,7 @@ class _StatusIndicator extends StatelessWidget {
         icon = Icons.check_circle;
         break;
       case DocumentRequestStatus.delivered:
-        color = AppColors.textSecondary;
+        color = AppColors.completed;
         icon = Icons.done_all;
         break;
       case DocumentRequestStatus.rejected:
@@ -192,7 +193,7 @@ class _StatusBadge extends StatelessWidget {
         label = 'Bereit';
         break;
       case DocumentRequestStatus.delivered:
-        color = AppColors.textSecondary;
+        color = AppColors.completed;
         label = 'Abgeholt';
         break;
       case DocumentRequestStatus.rejected:
@@ -225,16 +226,17 @@ class _StatusBadge extends StatelessWidget {
 class _EmptyState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.inbox_outlined, size: 48, color: AppColors.textSecondary),
+          Icon(Icons.inbox_outlined, size: 48, color: colorScheme.onSurfaceVariant),
           const SizedBox(height: 12),
           Text(
             'Noch keine Anfragen',
             style: AppTextStyles.bodyLarge.copyWith(
-              color: AppColors.textSecondary,
+              color: colorScheme.onSurfaceVariant,
             ),
           ),
         ],
@@ -250,6 +252,7 @@ class _ErrorState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(24),
@@ -266,7 +269,7 @@ class _ErrorState extends StatelessWidget {
             Text(
               error.toString(),
               style: AppTextStyles.bodySmall.copyWith(
-                color: AppColors.textSecondary,
+                color: colorScheme.onSurfaceVariant,
               ),
               textAlign: TextAlign.center,
             ),

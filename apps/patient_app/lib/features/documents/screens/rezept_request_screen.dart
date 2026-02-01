@@ -35,12 +35,12 @@ class _RezeptRequestScreenState extends ConsumerState<RezeptRequestScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
-      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: const Text('Rezept anfordern'),
         backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
+        foregroundColor: colorScheme.onPrimary,
       ),
       body: Form(
         key: _formKey,
@@ -182,24 +182,25 @@ class _RezeptRequestScreenState extends ConsumerState<RezeptRequestScreen> {
       title,
       style: AppTextStyles.titleSmall.copyWith(
         fontWeight: FontWeight.w600,
-        color: AppColors.textPrimary,
+        color: Theme.of(context).colorScheme.onSurface,
       ),
     );
   }
 
   InputDecoration _inputDecoration(String hint, IconData icon) {
+    final colorScheme = Theme.of(context).colorScheme;
     return InputDecoration(
       hintText: hint,
       prefixIcon: Icon(icon, color: AppColors.primary),
       filled: true,
-      fillColor: AppColors.surface,
+      fillColor: colorScheme.surfaceContainerHighest,
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: AppColors.border),
+        borderSide: BorderSide(color: colorScheme.outlineVariant),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: AppColors.border),
+        borderSide: BorderSide(color: colorScheme.outlineVariant),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
@@ -331,16 +332,17 @@ class _PriorityChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     final chipColor = color ?? AppColors.primary;
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected ? chipColor.withOpacity(0.15) : AppColors.surface,
+          color: isSelected ? chipColor.withOpacity(0.15) : colorScheme.surface,
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
-            color: isSelected ? chipColor : AppColors.border,
+            color: isSelected ? chipColor : colorScheme.outlineVariant,
             width: isSelected ? 2 : 1,
           ),
         ),
@@ -350,13 +352,13 @@ class _PriorityChip extends StatelessWidget {
             Icon(
               icon,
               size: 16,
-              color: isSelected ? chipColor : AppColors.textSecondary,
+              color: isSelected ? chipColor : colorScheme.onSurfaceVariant,
             ),
             const SizedBox(width: 4),
             Text(
               label,
               style: AppTextStyles.labelMedium.copyWith(
-                color: isSelected ? chipColor : AppColors.textSecondary,
+                color: isSelected ? chipColor : colorScheme.onSurfaceVariant,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
               ),
             ),
@@ -382,17 +384,18 @@ class _DeliveryChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
           color: isSelected
-              ? AppColors.primary.withOpacity(0.15)
-              : AppColors.surface,
+              ? colorScheme.primary.withOpacity(0.15)
+              : colorScheme.surface,
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
-            color: isSelected ? AppColors.primary : AppColors.border,
+            color: isSelected ? colorScheme.primary : colorScheme.outlineVariant,
             width: isSelected ? 2 : 1,
           ),
         ),
@@ -402,14 +405,13 @@ class _DeliveryChip extends StatelessWidget {
             Icon(
               icon,
               size: 16,
-              color: isSelected ? AppColors.primary : AppColors.textSecondary,
+              color: isSelected ? colorScheme.primary : colorScheme.onSurfaceVariant,
             ),
             const SizedBox(width: 4),
             Text(
               label,
               style: AppTextStyles.labelMedium.copyWith(
-                color:
-                    isSelected ? AppColors.primary : AppColors.textSecondary,
+                color: isSelected ? colorScheme.primary : colorScheme.onSurfaceVariant,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
               ),
             ),

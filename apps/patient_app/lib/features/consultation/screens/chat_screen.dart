@@ -41,6 +41,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
   @override
   void initState() {
+    final colorScheme = Theme.of(context).colorScheme;
     super.initState();
     _encryptionService = ref.read(encryptionServiceProvider);
     _loadMessages();
@@ -301,10 +302,10 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     final doctorName = _consultation?.doctorName ?? 'Arzt';
     
     return Scaffold(
-      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: _isSearching
             // Schritt 15: Search Input in AppBar
@@ -312,15 +313,15 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                 controller: _searchController,
                 autofocus: true,
                 onChanged: _performSearch,
-                style: const TextStyle(color: Colors.white),
+                style: TextStyle(color: colorScheme.onPrimary),
                 decoration: InputDecoration(
                   hintText: 'Nachrichten durchsuchen...',
-                  hintStyle: TextStyle(color: Colors.white.withOpacity(0.7)),
+                  hintStyle: TextStyle(color: colorScheme.onPrimary.withOpacity(0.7)),
                   border: InputBorder.none,
                   suffixText: _searchResults.isEmpty 
                       ? '' 
                       : '${_currentSearchIndex + 1}/${_searchResults.length}',
-                  suffixStyle: const TextStyle(color: Colors.white70),
+                  suffixStyle: TextStyle(color: colorScheme.onPrimary.withOpacity(0.7)),
                 ),
               )
             : Column(
@@ -330,13 +331,13 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                   Text(
                     '$doctorName • ${_consultation?.status == ConsultationStatus.inProgress ? "Online" : "Wartend"}',
                     style: AppTextStyles.labelSmall.copyWith(
-                      color: Colors.white70,
+                      color: colorScheme.onPrimary.withOpacity(0.7),
                     ),
                   ),
                 ],
               ),
         backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
+        foregroundColor: colorScheme.onPrimary,
         actions: _isSearching
             // Schritt 15: Search Navigation
             ? [
@@ -440,20 +441,20 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                             Icon(
                               Icons.chat_bubble_outline,
                               size: 64,
-                              color: AppColors.textSecondary.withOpacity(0.5),
+                              color: colorScheme.onSurfaceVariant.withOpacity(0.6),
                             ),
                             const SizedBox(height: 16),
                             Text(
                               'Noch keine Nachrichten',
                               style: AppTextStyles.bodyLarge.copyWith(
-                                color: AppColors.textSecondary,
+                                color: colorScheme.onSurfaceVariant,
                               ),
                             ),
                             const SizedBox(height: 8),
                             Text(
                               'Schreiben Sie Ihre erste Nachricht',
                               style: AppTextStyles.bodySmall.copyWith(
-                                color: AppColors.textSecondary,
+                                color: colorScheme.onSurfaceVariant,
                               ),
                             ),
                           ],
@@ -479,7 +480,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                                   child: Text(
                                     _formatDate(message.createdAt),
                                     style: AppTextStyles.labelSmall.copyWith(
-                                      color: AppColors.textSecondary,
+                                      color: colorScheme.onSurfaceVariant,
                                     ),
                                   ),
                                 ),
@@ -494,7 +495,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: AppColors.surface,
+              color: colorScheme.surface,
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withOpacity(0.05),
@@ -521,7 +522,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                           borderSide: BorderSide.none,
                         ),
                         filled: true,
-                        fillColor: AppColors.background,
+                        fillColor: colorScheme.surfaceContainerHighest,
                         contentPadding: const EdgeInsets.symmetric(
                           horizontal: 16,
                           vertical: 12,
@@ -695,6 +696,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     required String title,
     required String description,
   }) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
       child: Row(
@@ -723,7 +725,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                 Text(
                   description,
                   style: AppTextStyles.bodySmall.copyWith(
-                    color: AppColors.textSecondary,
+                    color: colorScheme.onSurfaceVariant,
                   ),
                 ),
               ],
@@ -742,6 +744,7 @@ class _MessageBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     // Patient messages have senderRole == 'patient'
     final isPatient = message.senderRole.toLowerCase() == 'patient';
     final senderName = message.senderName ?? (isPatient ? 'Sie' : 'Arzt');
@@ -755,7 +758,7 @@ class _MessageBubble extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 8),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
-          color: isPatient ? AppColors.primary : AppColors.surface,
+          color: isPatient ? AppColors.primary : colorScheme.surface,
           borderRadius: BorderRadius.only(
             topLeft: const Radius.circular(16),
             topRight: const Radius.circular(16),
@@ -787,7 +790,7 @@ class _MessageBubble extends StatelessWidget {
             Text(
               message.content,
               style: AppTextStyles.bodyMedium.copyWith(
-                color: isPatient ? Colors.white : AppColors.textPrimary,
+                color: isPatient ? Colors.white : colorScheme.onSurface,
               ),
             ),
             const SizedBox(height: 4),
@@ -798,7 +801,7 @@ class _MessageBubble extends StatelessWidget {
                   '${message.createdAt.hour.toString().padLeft(2, '0')}:'
                   '${message.createdAt.minute.toString().padLeft(2, '0')}',
                   style: AppTextStyles.labelSmall.copyWith(
-                    color: isPatient ? Colors.white70 : AppColors.textSecondary,
+                    color: isPatient ? Colors.white70 : colorScheme.onSurfaceVariant,
                   ),
                 ),
                 if (isPatient) ...[

@@ -58,7 +58,6 @@ class _UeberweisungRequestScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: const Text('Überweisung'),
         backgroundColor: AppColors.success,
@@ -187,24 +186,25 @@ class _UeberweisungRequestScreenState
       title,
       style: AppTextStyles.titleSmall.copyWith(
         fontWeight: FontWeight.w600,
-        color: AppColors.textPrimary,
+        color: Theme.of(context).colorScheme.onSurface,
       ),
     );
   }
 
   InputDecoration _inputDecoration(String hint, IconData icon) {
+    final colorScheme = Theme.of(context).colorScheme;
     return InputDecoration(
       hintText: hint,
       prefixIcon: Icon(icon, color: AppColors.success),
       filled: true,
-      fillColor: AppColors.surface,
+      fillColor: colorScheme.surfaceContainerHighest,
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: AppColors.border),
+        borderSide: BorderSide(color: colorScheme.outlineVariant),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: AppColors.border),
+        borderSide: BorderSide(color: colorScheme.outlineVariant),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
@@ -324,16 +324,17 @@ class _PriorityOption extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     final optionColor = color ?? AppColors.success;
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: isSelected ? optionColor.withOpacity(0.15) : AppColors.surface,
+          color: isSelected ? optionColor.withOpacity(0.15) : colorScheme.surface,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isSelected ? optionColor : AppColors.border,
+            color: isSelected ? optionColor : colorScheme.outlineVariant,
             width: isSelected ? 2 : 1,
           ),
         ),
@@ -341,7 +342,7 @@ class _PriorityOption extends StatelessWidget {
           child: Text(
             label,
             style: AppTextStyles.titleMedium.copyWith(
-              color: isSelected ? optionColor : AppColors.textPrimary,
+              color: isSelected ? optionColor : colorScheme.onSurface,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -366,6 +367,7 @@ class _DeliveryChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -373,10 +375,10 @@ class _DeliveryChip extends StatelessWidget {
         decoration: BoxDecoration(
           color: isSelected
               ? AppColors.success.withOpacity(0.15)
-              : AppColors.surface,
+              : colorScheme.surface,
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
-            color: isSelected ? AppColors.success : AppColors.border,
+            color: isSelected ? AppColors.success : colorScheme.outlineVariant,
             width: isSelected ? 2 : 1,
           ),
         ),
@@ -386,14 +388,13 @@ class _DeliveryChip extends StatelessWidget {
             Icon(
               icon,
               size: 16,
-              color: isSelected ? AppColors.success : AppColors.textSecondary,
+              color: isSelected ? AppColors.success : colorScheme.onSurfaceVariant,
             ),
             const SizedBox(width: 4),
             Text(
               label,
               style: AppTextStyles.labelMedium.copyWith(
-                color:
-                    isSelected ? AppColors.success : AppColors.textSecondary,
+                color: isSelected ? AppColors.success : colorScheme.onSurfaceVariant,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
               ),
             ),

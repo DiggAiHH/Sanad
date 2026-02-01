@@ -131,12 +131,14 @@ class _BookAppointmentScreenState extends ConsumerState<BookAppointmentScreen> {
                         decoration: BoxDecoration(
                           color: isSelected
                               ? Theme.of(context).colorScheme.primary
-                              : Colors.grey[200],
+                              : Theme.of(context).colorScheme.surfaceContainerHighest,
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Icon(
                           type.icon,
-                          color: isSelected ? Colors.white : Colors.grey[600],
+                          color: isSelected
+                              ? Theme.of(context).colorScheme.onPrimary
+                              : Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
                       ),
                       const SizedBox(width: 16),
@@ -153,7 +155,7 @@ class _BookAppointmentScreenState extends ConsumerState<BookAppointmentScreen> {
                             Text(
                               '~${type.duration} ${l10n.minutesAbbrev}',
                               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                color: Colors.grey[600],
+                                color: Theme.of(context).colorScheme.onSurfaceVariant,
                               ),
                             ),
                           ],

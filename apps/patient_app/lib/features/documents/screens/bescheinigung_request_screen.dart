@@ -110,12 +110,12 @@ class _BescheinigungRequestScreenState
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
-      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: const Text('Bescheinigung anfragen'),
         backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
+        foregroundColor: colorScheme.onPrimary,
       ),
       body: Form(
         key: _formKey,
@@ -171,17 +171,17 @@ class _BescheinigungRequestScreenState
                       width: (MediaQuery.of(context).size.width - 48) / 2,
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: isSelected ? AppColors.primary : AppColors.surface,
+                        color: isSelected ? colorScheme.primary : colorScheme.surface,
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
-                          color: isSelected ? AppColors.primary : AppColors.border,
+                          color: isSelected ? colorScheme.primary : colorScheme.outlineVariant,
                         ),
                       ),
                       child: Row(
                         children: [
                           Icon(
                             type['icon'] as IconData,
-                            color: isSelected ? Colors.white : AppColors.textSecondary,
+                            color: isSelected ? colorScheme.onPrimary : colorScheme.onSurfaceVariant,
                             size: 20,
                           ),
                           const SizedBox(width: 8),
@@ -189,7 +189,7 @@ class _BescheinigungRequestScreenState
                             child: Text(
                               type['label'] as String,
                               style: AppTextStyles.bodySmall.copyWith(
-                                color: isSelected ? Colors.white : AppColors.textPrimary,
+                                color: isSelected ? colorScheme.onPrimary : colorScheme.onSurface,
                                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                               ),
                             ),
@@ -316,9 +316,9 @@ class _BescheinigungRequestScreenState
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: AppColors.surface,
+                  color: colorScheme.surface,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AppColors.border),
+                  border: Border.all(color: colorScheme.outlineVariant),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -341,7 +341,7 @@ class _BescheinigungRequestScreenState
                       'ausschließlich zur Bearbeitung Ihrer Anfrage verwendet. '
                       'Die Daten werden in Ihrer Patientenakte dokumentiert.',
                       style: AppTextStyles.bodySmall.copyWith(
-                        color: AppColors.textSecondary,
+                        color: colorScheme.onSurfaceVariant,
                       ),
                     ),
                     const SizedBox(height: 12),

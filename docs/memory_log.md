@@ -1,8 +1,8 @@
 # 🛤️ LAUFBAHN – Sanad Agent Handoff Log
 
-> **Letzte Aktualisierung:** 2026-01-24
+> **Letzte Aktualisierung:** 2026-02-01
 > **Agent-Version:** Senior Architect Agent v2025.2
-> **Status:** 🟡 Phase 9: Design System Refactoring
+> **Status:** 🟡 UI Polish Sprint: Build+Deploy ✅, Commit ⏳
 
 ---
 
@@ -151,6 +151,14 @@ packages/
 | Icon Audit | ✅ | Material Icons konsistent, keine Abweichungen |
 | Build + Netlify Deploy | ✅ | Web Build abgeschlossen, Deploys fuer alle 4 Apps |
 
+### Phase 11+: Patient Dark Mode Coverage + Web Build Fix ✅
+
+| Aktion | Status | Notizen |
+|--------|--------|---------|
+| Patient App Dark Mode | ✅ | Mehrere Screens auf `Theme.of(context).colorScheme` migriert (Kontrast/Lesbarkeit) |
+| Web Build Fix | ✅ | `video_call_screen.dart`: fehlendes lokales `colorScheme` in `build()` behoben |
+| Netlify Deploy | ✅ | Deploy per CLI mit `--no-build` + Site-IDs (umgeht `APP_NAME` in `netlify.toml`) |
+
 ### Phase 11: Backend Hardening ✅
 
 | Aktion | Status | Notizen |
@@ -229,8 +237,8 @@ packages/ui/lib/src/
 | Patient App Spacing | ✅ | EdgeInsets.all → AppSpacing.cardPadding/cardPaddingLarge |
 | Patient App Shadows | ✅ | BoxShadow inline → AppShadows.small |
 | tokens.dart Konflikt | ✅ | Datei auf DEPRECATED gesetzt, Export entfernt |
-| Build | ⏳ | Ausstehend (Token-Konflikt behoben) |
-| Deploy | ⏳ | Ausstehend |
+| Build | ✅ | build_web.sh erfolgreich ausgeführt |
+| Deploy | ✅ | Netlify Prod Deploy für alle 4 Apps |
 
 **Geänderte Dateien:**
 - apps/patient_app/lib/features/home/screens/home_screen.dart
@@ -256,8 +264,8 @@ packages/ui/lib/src/
 
 | Priorität | Aufgabe | Beschreibung | Status |
 |-----------|---------|--------------|--------|
-| P1 | **Build ausführen** | bash scripts/build_web.sh | ⏳ |
-| P2 | **Deploy** | netlify deploy --prod | ⏳ |
+| P1 | **Build ausführen** | bash scripts/build_web.sh | ✅ |
+| P2 | **Deploy** | netlify deploy --prod | ✅ |
 | P3 | **Git Commit** | Änderungen committen | ⏳ |
 
 ---

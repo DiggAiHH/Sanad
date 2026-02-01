@@ -122,6 +122,7 @@ class _MyAppointmentsScreenState extends ConsumerState<MyAppointmentsScreen>
   }
 
   Widget _buildEmptyState(String message, IconData icon) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -130,9 +131,9 @@ class _MyAppointmentsScreenState extends ConsumerState<MyAppointmentsScreen>
           const SizedBox(height: 16),
           Text(
             message,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 16,
-              color: AppColors.textSecondary,
+              color: colorScheme.onSurfaceVariant,
             ),
           ),
         ],
@@ -297,22 +298,22 @@ class _AppointmentCard extends StatelessWidget {
               // Datum & Zeit
               Row(
                 children: [
-                  const Icon(Icons.calendar_today, size: 16, color: AppColors.textSecondary),
+                  Icon(Icons.calendar_today, size: 16, color: theme.colorScheme.onSurfaceVariant),
                   const SizedBox(width: 8),
                   Text(
                     DateFormat('EEEE, dd. MMMM yyyy', 'de').format(appointment.date),
-                    style: const TextStyle(color: AppColors.textSecondary),
+                    style: TextStyle(color: theme.colorScheme.onSurfaceVariant),
                   ),
                 ],
               ),
               const SizedBox(height: 4),
               Row(
                 children: [
-                  const Icon(Icons.access_time, size: 16, color: AppColors.textSecondary),
+                  Icon(Icons.access_time, size: 16, color: theme.colorScheme.onSurfaceVariant),
                   const SizedBox(width: 8),
                   Text(
                     '${appointment.time} Uhr (${appointment.duration} ${l10n.minutesAbbrev})',
-                    style: const TextStyle(color: AppColors.textSecondary),
+                    style: TextStyle(color: theme.colorScheme.onSurfaceVariant),
                   ),
                 ],
               ),
@@ -322,11 +323,11 @@ class _AppointmentCard extends StatelessWidget {
                 const SizedBox(height: 4),
                 Row(
                   children: [
-                    const Icon(Icons.person, size: 16, color: AppColors.textSecondary),
+                    Icon(Icons.person, size: 16, color: theme.colorScheme.onSurfaceVariant),
                     const SizedBox(width: 8),
                     Text(
                       appointment.doctorName!,
-                      style: const TextStyle(color: AppColors.textSecondary),
+                      style: TextStyle(color: theme.colorScheme.onSurfaceVariant),
                     ),
                   ],
                 ),
@@ -335,11 +336,11 @@ class _AppointmentCard extends StatelessWidget {
                 const SizedBox(height: 4),
                 Row(
                   children: [
-                    const Icon(Icons.room, size: 16, color: AppColors.textSecondary),
+                    Icon(Icons.room, size: 16, color: theme.colorScheme.onSurfaceVariant),
                     const SizedBox(width: 8),
                     Text(
                       appointment.location!,
-                      style: const TextStyle(color: AppColors.textSecondary),
+                      style: TextStyle(color: theme.colorScheme.onSurfaceVariant),
                     ),
                   ],
                 ),
@@ -392,7 +393,7 @@ class _AppointmentCard extends StatelessWidget {
       case AppointmentStatus.completed:
         return AppColors.info;
       case AppointmentStatus.noShow:
-        return AppColors.textSecondary;
+        return AppColors.completed;
     }
   }
 

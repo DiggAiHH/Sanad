@@ -45,6 +45,7 @@ class _FillAnamnesisScreenState extends ConsumerState<FillAnamnesisScreen> {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     
     final currentSectionData = _template.sections[_currentSection];
     final progress = (_currentSection + 1) / _template.sections.length;
@@ -74,11 +75,11 @@ class _FillAnamnesisScreenState extends ConsumerState<FillAnamnesisScreen> {
               children: [
                 Text(
                   '${l10n.anamnesisSection} ${_currentSection + 1} ${l10n.of_} ${_template.sections.length}',
-                  style: const TextStyle(color: AppColors.textSecondary),
+                  style: TextStyle(color: colorScheme.onSurfaceVariant),
                 ),
                 Text(
                   '~${_template.estimatedMinutes} ${l10n.minutesAbbrev}',
-                  style: const TextStyle(color: AppColors.textSecondary),
+                  style: TextStyle(color: colorScheme.onSurfaceVariant),
                 ),
               ],
             ),
@@ -102,7 +103,7 @@ class _FillAnamnesisScreenState extends ConsumerState<FillAnamnesisScreen> {
                     const SizedBox(height: 8),
                     Text(
                       currentSectionData.description!,
-                      style: const TextStyle(color: AppColors.textSecondary),
+                      style: TextStyle(color: colorScheme.onSurfaceVariant),
                     ),
                   ],
                   const SizedBox(height: 24),
@@ -290,7 +291,7 @@ class _FillAnamnesisScreenState extends ConsumerState<FillAnamnesisScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('$min', style: const TextStyle(color: AppColors.textSecondary)),
+                Text('$min', style: TextStyle(color: colorScheme.onSurfaceVariant)),
                 Text(
                   '$value',
                   style: const TextStyle(
@@ -298,7 +299,7 @@ class _FillAnamnesisScreenState extends ConsumerState<FillAnamnesisScreen> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                Text('$max', style: const TextStyle(color: AppColors.textSecondary)),
+                Text('$max', style: TextStyle(color: colorScheme.onSurfaceVariant)),
               ],
             ),
             Slider(

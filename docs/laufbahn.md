@@ -1,8 +1,8 @@
 # 🛤️ LAUFBAHN – Sanad Agent Handoff Log
 
-> **Letzte Aktualisierung:** 2026-01-24
+> **Letzte Aktualisierung:** 2026-02-01
 > **Agent-Version:** Senior Architect Agent v2025.2
-> **Status:** 🟡 Phase 14: UI Polish Sprint (Build ausstehend)
+> **Status:** 🟡 Phase 14: UI Polish Sprint (Commit ausstehend)
 
 ---
 
@@ -201,8 +201,8 @@ packages/
 | Spacing Migration | ✅ | EdgeInsets.all → AppSpacing.cardPadding |
 | Shadows Migration | ✅ | Inline BoxShadow → AppShadows.small |
 | tokens.dart Konflikt | ✅ | DEPRECATED gesetzt, Export entfernt |
-| Build | ⏳ | Ausstehend |
-| Deploy | ⏳ | Ausstehend |
+| Build | ✅ | `bash scripts/build_web.sh` erfolgreich |
+| Deploy | ✅ | Netlify Deploy via CLI mit `--no-build` + Site-IDs (APP_NAME Build-Pipeline wird umgangen) |
 
 **Geänderte Dateien in Phase 14:**
 - `apps/patient_app/lib/features/home/screens/home_screen.dart`
@@ -245,8 +245,8 @@ packages/ui/lib/src/
 
 | Priorität | Aufgabe | Beschreibung | Status |
 |-----------|---------|--------------|--------|
-| P1 | **Build ausführen** | `bash scripts/build_web.sh` | ⏳ Ausstehend |
-| P2 | **Netlify Deploy** | `netlify deploy --prod --dir=build/web_deploy` | ⏳ Ausstehend |
+| P1 | **Build ausführen** | `bash scripts/build_web.sh` | ✅ Abgeschlossen |
+| P2 | **Netlify Deploy** | `netlify deploy --no-build --prod --dir=build/web_deploy/<app> --site=<id>` | ✅ Abgeschlossen |
 | P3 | **Git Commit** | Änderungen committen und pushen | ⏳ Ausstehend |
 
 ---
@@ -264,5 +264,9 @@ packages/ui/lib/src/
 1. Diese Datei lesen (laufbahn.md)
 2. tasks.md lesen (aktuelle Phase 14 Tasks)
 3. Build ausführen: `bash scripts/build_web.sh`
-4. Falls Build erfolgreich: `netlify deploy --prod --dir=build/web_deploy`
+4. Deploy (bypasst Netlify Build, da `netlify.toml` `APP_NAME` verlangt):
+  - Admin: `netlify deploy --no-build --prod --dir=build/web_deploy/admin --site=89479734-3c20-4300-8e26-f12dab3197f9`
+  - MFA: `netlify deploy --no-build --prod --dir=build/web_deploy/mfa --site=d1fe9a5f-240e-44ab-9208-95c6e9f14c3d`
+  - Staff: `netlify deploy --no-build --prod --dir=build/web_deploy/staff --site=bfb8b97e-be84-4f6f-adb6-296a056a8f96`
+  - Patient: `netlify deploy --no-build --prod --dir=build/web_deploy/patient --site=4783a06c-0b35-4e08-8e8d-a592295967f4`
 5. Git commit und push

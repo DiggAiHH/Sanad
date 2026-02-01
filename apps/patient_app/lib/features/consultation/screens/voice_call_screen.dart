@@ -702,13 +702,13 @@ class _RequestCallbackScreenState extends ConsumerState<RequestCallbackScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     final isVoiceCall = widget.requestType == ConsultationType.voiceCall;
     return Scaffold(
-      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: Text(isVoiceCall ? 'Telefonsprechstunde anfragen' : 'Rückruf anfordern'),
         backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
+        foregroundColor: colorScheme.onPrimary,
       ),
       body: Form(
         key: _formKey,
@@ -878,9 +878,9 @@ class _RequestCallbackScreenState extends ConsumerState<RequestCallbackScreen> {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: AppColors.surface,
+                  color: colorScheme.surface,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AppColors.border),
+                  border: Border.all(color: colorScheme.outlineVariant),
                 ),
                 child: CheckboxListTile(
                   value: _acceptedPrivacy,
@@ -983,22 +983,23 @@ class _TimeSlotChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return GestureDetector(
       onTap: onSelected,
       child: Container(
         width: (MediaQuery.of(context).size.width - 48) / 2,
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
         decoration: BoxDecoration(
-          color: selected ? AppColors.primary : AppColors.surface,
+          color: selected ? colorScheme.primary : colorScheme.surface,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: selected ? AppColors.primary : AppColors.border,
+            color: selected ? colorScheme.primary : colorScheme.outlineVariant,
           ),
         ),
         child: Text(
           label,
           style: AppTextStyles.bodySmall.copyWith(
-            color: selected ? Colors.white : AppColors.textPrimary,
+            color: selected ? colorScheme.onPrimary : colorScheme.onSurface,
             fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
           ),
           textAlign: TextAlign.center,

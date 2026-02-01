@@ -32,8 +32,8 @@ class _AURequestScreenState extends ConsumerState<AURequestScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
-      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: const Text('AU-Bescheinigung'),
         backgroundColor: AppColors.warning,
@@ -109,7 +109,7 @@ class _AURequestScreenState extends ConsumerState<AURequestScreen> {
               Text(
                 'Der genaue Grund wird nicht auf der AU angegeben.',
                 style: AppTextStyles.bodySmall.copyWith(
-                  color: AppColors.textSecondary,
+                  color: colorScheme.onSurfaceVariant,
                   fontStyle: FontStyle.italic,
                 ),
               ),
@@ -180,24 +180,25 @@ class _AURequestScreenState extends ConsumerState<AURequestScreen> {
       title,
       style: AppTextStyles.titleSmall.copyWith(
         fontWeight: FontWeight.w600,
-        color: AppColors.textPrimary,
+        color: Theme.of(context).colorScheme.onSurface,
       ),
     );
   }
 
   InputDecoration _inputDecoration(String hint, IconData icon) {
+    final colorScheme = Theme.of(context).colorScheme;
     return InputDecoration(
       hintText: hint,
       prefixIcon: Icon(icon, color: AppColors.warning),
       filled: true,
-      fillColor: AppColors.surface,
+      fillColor: colorScheme.surfaceContainerHighest,
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: AppColors.border),
+        borderSide: BorderSide(color: colorScheme.outlineVariant),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: AppColors.border),
+        borderSide: BorderSide(color: colorScheme.outlineVariant),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
@@ -320,6 +321,7 @@ class _DatePickerField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return InkWell(
       onTap: () async {
         final picked = await showDatePicker(
@@ -337,9 +339,9 @@ class _DatePickerField extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: AppColors.surface,
+          color: colorScheme.surface,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppColors.border),
+          border: Border.all(color: colorScheme.outlineVariant),
         ),
         child: Row(
           children: [
@@ -351,8 +353,8 @@ class _DatePickerField extends StatelessWidget {
                   : hint ?? 'Datum auswählen',
               style: AppTextStyles.bodyLarge.copyWith(
                 color: date != null
-                    ? AppColors.textPrimary
-                    : AppColors.textSecondary,
+                    ? colorScheme.onSurface
+                    : colorScheme.onSurfaceVariant,
               ),
             ),
           ],
@@ -379,16 +381,17 @@ class _PriorityOption extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     final optionColor = color ?? AppColors.primary;
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: isSelected ? optionColor.withOpacity(0.15) : AppColors.surface,
+          color: isSelected ? optionColor.withOpacity(0.15) : colorScheme.surface,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isSelected ? optionColor : AppColors.border,
+            color: isSelected ? optionColor : colorScheme.outlineVariant,
             width: isSelected ? 2 : 1,
           ),
         ),
@@ -397,7 +400,7 @@ class _PriorityOption extends StatelessWidget {
             Text(
               label,
               style: AppTextStyles.titleMedium.copyWith(
-                color: isSelected ? optionColor : AppColors.textPrimary,
+                color: isSelected ? optionColor : colorScheme.onSurface,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -405,7 +408,7 @@ class _PriorityOption extends StatelessWidget {
             Text(
               subtitle,
               style: AppTextStyles.bodySmall.copyWith(
-                color: isSelected ? optionColor : AppColors.textSecondary,
+                color: isSelected ? optionColor : colorScheme.onSurfaceVariant,
               ),
             ),
           ],
@@ -430,6 +433,7 @@ class _DeliveryChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -437,10 +441,10 @@ class _DeliveryChip extends StatelessWidget {
         decoration: BoxDecoration(
           color: isSelected
               ? AppColors.warning.withOpacity(0.15)
-              : AppColors.surface,
+              : colorScheme.surface,
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
-            color: isSelected ? AppColors.warning : AppColors.border,
+            color: isSelected ? AppColors.warning : colorScheme.outlineVariant,
             width: isSelected ? 2 : 1,
           ),
         ),
@@ -450,14 +454,13 @@ class _DeliveryChip extends StatelessWidget {
             Icon(
               icon,
               size: 16,
-              color: isSelected ? AppColors.warning : AppColors.textSecondary,
+              color: isSelected ? AppColors.warning : colorScheme.onSurfaceVariant,
             ),
             const SizedBox(width: 4),
             Text(
               label,
               style: AppTextStyles.labelMedium.copyWith(
-                color:
-                    isSelected ? AppColors.warning : AppColors.textSecondary,
+                color: isSelected ? AppColors.warning : colorScheme.onSurfaceVariant,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
               ),
             ),

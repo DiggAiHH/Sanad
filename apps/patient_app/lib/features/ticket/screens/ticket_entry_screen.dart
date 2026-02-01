@@ -55,19 +55,19 @@ class _TicketEntryScreenState extends ConsumerState<TicketEntryScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
-      backgroundColor: AppColors.background,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () => context.pop(),
         ),
         title: Text(
           'Ticket-Status',
           style: AppTextStyles.titleLarge.copyWith(
-            color: AppColors.textPrimary,
+            color: colorScheme.onSurface,
           ),
         ),
         centerTitle: true,
@@ -109,7 +109,7 @@ class _TicketEntryScreenState extends ConsumerState<TicketEntryScreen> {
               Text(
                 'Geben Sie Ihre Ticketnummer ein, die Sie am Empfang erhalten haben (z.B. A-042).',
                 style: AppTextStyles.bodyMedium.copyWith(
-                  color: AppColors.textSecondary,
+                  color: colorScheme.onSurfaceVariant,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -132,27 +132,27 @@ class _TicketEntryScreenState extends ConsumerState<TicketEntryScreen> {
                       decoration: InputDecoration(
                         hintText: 'A-000',
                         hintStyle: AppTextStyles.headlineMedium.copyWith(
-                          color: AppColors.textSecondary.withOpacity(0.4),
+                          color: colorScheme.onSurfaceVariant.withOpacity(0.6),
                           letterSpacing: 4,
                         ),
                         helperText: 'Beispiel: A-042',
                         filled: true,
-                        fillColor: Colors.white,
+                        fillColor: colorScheme.surfaceContainerHighest,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
-                          borderSide: const BorderSide(color: AppColors.border),
+                          borderSide: BorderSide(color: colorScheme.outlineVariant),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
-                          borderSide: const BorderSide(color: AppColors.border),
+                          borderSide: BorderSide(color: colorScheme.outlineVariant),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
-                          borderSide: const BorderSide(color: AppColors.primary, width: 2),
+                          borderSide: BorderSide(color: colorScheme.primary, width: 2),
                         ),
                         errorBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
-                          borderSide: const BorderSide(color: AppColors.error),
+                          borderSide: BorderSide(color: colorScheme.error),
                         ),
                         contentPadding: const EdgeInsets.symmetric(
                           horizontal: 24,
@@ -190,8 +190,8 @@ class _TicketEntryScreenState extends ConsumerState<TicketEntryScreen> {
                       child: ElevatedButton(
                         onPressed: _checkTicketStatus,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primary,
-                          foregroundColor: Colors.white,
+                          backgroundColor: colorScheme.primary,
+                          foregroundColor: colorScheme.onPrimary,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16),
                           ),

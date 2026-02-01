@@ -115,7 +115,7 @@ class _TicketStatusScreenState extends ConsumerState<TicketStatusScreen>
       case TicketStatus.completed:
       case TicketStatus.cancelled:
       case TicketStatus.noShow:
-        return AppColors.textSecondary;
+        return AppColors.completed;
       default:
         return AppColors.warning;
     }
@@ -208,21 +208,21 @@ class _TicketStatusScreenState extends ConsumerState<TicketStatusScreen>
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     final trimmedTicket = _normalizedTicketNumber();
     if (trimmedTicket.isEmpty) {
       return Scaffold(
-        backgroundColor: AppColors.background,
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
+            icon: const Icon(Icons.arrow_back),
             onPressed: () => context.go('/'),
           ),
           title: Text(
             'Ticket fehlt',
             style: AppTextStyles.titleLarge.copyWith(
-              color: AppColors.textPrimary,
+              color: colorScheme.onSurface,
             ),
           ),
           centerTitle: true,
@@ -246,18 +246,17 @@ class _TicketStatusScreenState extends ConsumerState<TicketStatusScreen>
     final isInitialLoading = ticketAsync.isLoading && !ticketAsync.hasValue;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () => context.go('/'),
         ),
         title: Text(
           'Ticket $trimmedTicket',
           style: AppTextStyles.titleLarge.copyWith(
-            color: AppColors.textPrimary,
+            color: colorScheme.onSurface,
           ),
         ),
         centerTitle: true,
@@ -265,7 +264,7 @@ class _TicketStatusScreenState extends ConsumerState<TicketStatusScreen>
           IconButton(
             icon: Icon(
               _isRefreshing ? Icons.sync : Icons.refresh,
-              color: AppColors.primary,
+              color: colorScheme.primary,
             ),
             onPressed: _isRefreshing ? null : _handleRefresh,
           ),
@@ -330,6 +329,7 @@ class _TicketStatusContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     final isCalled = ticket.status == TicketStatus.called;
     final statusColor = getStatusColor(ticket.status);
     final estimatedCallTime = DateTime.now().add(
@@ -361,7 +361,7 @@ class _TicketStatusContent extends StatelessWidget {
                       child: Text(
                         'Offline-Modus: Status kann veraltet sein.',
                         style: AppTextStyles.bodyMedium.copyWith(
-                          color: AppColors.textSecondary,
+                          color: colorScheme.onSurfaceVariant,
                         ),
                       ),
                     ),
@@ -391,13 +391,13 @@ class _TicketStatusContent extends StatelessWidget {
                 Icon(
                   isRefreshing ? Icons.sync : Icons.update,
                   size: 16,
-                  color: AppColors.textSecondary,
+                  color: colorScheme.onSurfaceVariant,
                 ),
                 const SizedBox(width: 6),
                 Text(
                   'Letzte Aktualisierung: ${formatTime(context, lastUpdated)}',
                   style: AppTextStyles.bodySmall.copyWith(
-                    color: AppColors.textSecondary,
+                    color: colorScheme.onSurfaceVariant,
                   ),
                 ),
               ],
@@ -406,7 +406,7 @@ class _TicketStatusContent extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: colorScheme.surface,
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
@@ -490,10 +490,11 @@ class _CalledStatusCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Container(
       padding: const EdgeInsets.all(32),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colorScheme.surface,
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
@@ -530,7 +531,7 @@ class _CalledStatusCard extends StatelessWidget {
           Text(
             'Bitte begeben Sie sich jetzt zum Behandlungszimmer.',
             style: AppTextStyles.bodyLarge.copyWith(
-              color: AppColors.textSecondary,
+              color: colorScheme.onSurfaceVariant,
             ),
             textAlign: TextAlign.center,
           ),
@@ -700,6 +701,7 @@ class _StatItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Column(
       children: [
         Text(
@@ -713,7 +715,7 @@ class _StatItem extends StatelessWidget {
         Text(
           label,
           style: AppTextStyles.bodySmall.copyWith(
-            color: AppColors.textSecondary,
+            color: colorScheme.onSurfaceVariant,
           ),
         ),
       ],
@@ -734,12 +736,13 @@ class _InfoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colorScheme.surface,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: colorScheme.outlineVariant),
       ),
       child: Row(
         children: [
@@ -766,7 +769,7 @@ class _InfoCard extends StatelessWidget {
                 Text(
                   description,
                   style: AppTextStyles.bodySmall.copyWith(
-                    color: AppColors.textSecondary,
+                    color: colorScheme.onSurfaceVariant,
                   ),
                 ),
               ],

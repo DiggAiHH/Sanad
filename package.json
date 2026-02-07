@@ -1,0 +1,31 @@
+{
+  "name": "sanad-healthcare-system",
+  "version": "1.0.0",
+  "description": "Healthcare Reception System with 4 React Applications",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "install-all": "npm install",
+    "build:reception": "cd apps/reception && npm run build",
+    "build:doctor": "cd apps/doctor && npm run build",
+    "build:patient": "cd apps/patient && npm run build",
+    "build:dashboard": "cd apps/dashboard && npm run build",
+    "build:all": "npm run build:reception && npm run build:doctor && npm run build:patient && npm run build:dashboard",
+    "dev:reception": "cd apps/reception && npm run dev",
+    "dev:doctor": "cd apps/doctor && npm run dev",
+    "dev:patient": "cd apps/patient && npm run dev",
+    "dev:dashboard": "cd apps/dashboard && npm run dev"
+  },
+  "keywords": [
+    "healthcare",
+    "reception",
+    "nfc",
+    "qr-code",
+    "react"
+  ],
+  "author": "",
+  "license": "MIT"
+}

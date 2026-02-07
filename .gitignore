@@ -40,3 +40,31 @@ coverage/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+# Flutter/Dart
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+build/
+**/build/
+**/.dart_tool/
+**/.flutter-plugins
+**/.flutter-plugins-dependencies
+**/.metadata
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.venv/
+
+# Tooling/IDE
+.vscode/
+.idea/
+*.iml
+**/.idea/
+.DS_Store
+
+# Local Netlify folder
+.netlify

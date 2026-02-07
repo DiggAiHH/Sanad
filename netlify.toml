@@ -1,0 +1,71 @@
+# ==============================================================================
+# SANAD - Netlify Configuration (Monorepo Root)
+# ==============================================================================
+# This config supports building all 4 Flutter web apps from the monorepo.
+# Deploy each app as a separate Netlify site using APP_NAME env variable.
+# ==============================================================================
+
+[build]
+  # Base directory for builds
+  base = "/"
+  
+  # Build command - uses APP_NAME env to determine which app to build
+  command = "bash scripts/netlify_build.sh"
+  
+  # Publish directory - set per-site via APP_NAME
+  publish = "build/web_deploy/admin"
+
+# SPA routing - redirect all paths to index.html
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Security headers
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    X-XSS-Protection = "1; mode=block"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(self), microphone=(), geolocation=()"
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains"
+
+# Cache static assets
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.wasm"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Flutter-specific: canvaskit files
+[[headers]]
+  for = "/canvaskit/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Environment contexts
+[context.production]
+  environment = { FLUTTER_WEB_RENDERER = "canvaskit" }
+
+[context.deploy-preview]
+  environment = { FLUTTER_WEB_RENDERER = "canvaskit" }
+
+# ==============================================================================
+# Per-App Configuration (set in Netlify Dashboard)
+# ==============================================================================
+# Each Netlify site should set:
+#   APP_NAME = "admin" | "mfa" | "staff" | "patient"
+#   API_BASE_URL = "https://<your-railway-domain>/api/v1"
+#   ENABLE_DEMO_MODE = "true" (optional)
+# ==============================================================================
